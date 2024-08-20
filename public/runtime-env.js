@@ -1,0 +1,1 @@
+window.__RUNTIME_CONFIG__ = {"GEOPLANET_TOKEN":"2b10IIRdVxkhYtdx530XXHVIUe","MY_PLANET_API":"https://maps.plantnet.org/api/guarden/cbnmed/habitats"};

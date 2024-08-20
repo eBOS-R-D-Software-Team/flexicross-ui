@@ -1,0 +1,9 @@
+.leaflet-bottom {
+  transform: translateY(100%)!important;
+  bottom: 0;
+}
+
+.gauge-wrapper {
+  position: relative;
+}
+
