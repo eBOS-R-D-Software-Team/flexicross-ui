@@ -28,14 +28,14 @@ const items: MenuItem[] = [
     //     getItem('Observations', '4', undefined, '/species/observations'),
     //     getItem('Predictions', '5', undefined, '/species/predictions'),
     // ]), 
-    getItem('Dashboards', '3', <DesktopOutlined />, '/dashboard'),
+    getItem('Dashboards', '3', <DesktopOutlined />, '/dashboards'),
 ];
 const Sidebar: React.FC<any> = (menu)  => {
     console.log(menu.menu);
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <Sider collapsible  collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
             <div>
                 <div
                     style={{

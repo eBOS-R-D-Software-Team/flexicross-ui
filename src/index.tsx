@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM, { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 import './index.css';
 import { Provider } from 'react-redux';
 import  store  from './redux/store';
@@ -18,13 +17,11 @@ const root = ReactDOM.createRoot(
 
         theme={{
           token: {
-            // // Seed Token
-            // colorPrimary: '#00b96b',
-            // borderRadius: 2,
-  
-            // // Alias Token
-            // colorBgContainer: '#f6ffed',
-          },
+            "colorPrimary": "#418cc0",
+            "fontSize": 16,
+            "borderRadius": 6,
+            
+        },
   
           // 1. Use dark algorithm
           algorithm: theme.darkAlgorithm,

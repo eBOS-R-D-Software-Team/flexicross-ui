@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Layout } from 'antd';
-
+import { Breadcrumb, Layout } from 'antd';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
 const { Content } = Layout;
 
 interface AppContentProps {
@@ -16,7 +16,27 @@ const AppContent: React.FC<AppContentProps> = ({ children }) => (
                 minHeight: 360,
                 borderRadius: 16,
             }}
-        >       
+        >
+            <Breadcrumb style={{marginBottom:16}}
+                items={[
+                    {
+                        href: 'dashboard',
+                        title:  (
+                            <><HomeOutlined /> <span>Home</span>  </>
+                        ),
+                    },
+                    {
+                        href: 'data-table',
+                        title: (
+                            <>
+                                <UserOutlined />
+                                <span>Risk Data Table</span>
+                            </>
+                        ),
+                    }
+                ]}
+            />
+
             {children}
         </div>
     </Content>
