@@ -7,8 +7,10 @@ const loadStateFromLocalStorage = (): any[] => {
   try {
     const serializedState = localStorage.getItem('anomalyData');
     if (serializedState === null) {
+      console.log(anomalyDummy);
+
       saveStateToLocalStorage(anomalyDummy);
-      return [];
+      return anomalyDummy;
     }
     const state = JSON.parse(serializedState) as DashboardData[];
     return state.map(item => ({
@@ -23,6 +25,7 @@ const loadStateFromLocalStorage = (): any[] => {
 
 // Utility function to save state to local storage
 const saveStateToLocalStorage = (state: any[]) => {
+  console.log(state);
   try {
     const serializableState = state.map(item => ({
       ...item,
@@ -54,7 +57,7 @@ const anomalySlice = createSlice({
       state.anomalyData=(action.payload);
     },
     clearAnomalyData: (state) => {
-      state.anomalyData = [];
+      state.anomalyData = loadStateFromLocalStorage();
     },
     deleteAnomalyDataById: (state, action: PayloadAction<string>) => {
       state.anomalyData = state.anomalyData.filter(data => data.id !== action.payload);
@@ -101,7 +104,7 @@ const localStorageAnomalyMiddleware: Middleware = store => next => action => {
     deleteAnomalyDataById.match(action) ||
     updateAnomalyData.match(action)
   ) {
-    saveStateToLocalStorage(store.getState().dashboardData.dashboardData);
+    saveStateToLocalStorage(store.getState().anomalyData.anomalyData);
   }
   return result;
 };

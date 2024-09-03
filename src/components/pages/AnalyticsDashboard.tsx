@@ -7,17 +7,26 @@ import { countRiskTypes, processData } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 
 const AnalyticsDashboard: React.FC = () => {
-    const [statsData, setStatsData] = useState<any>(processData(anomalyDummy));
-    const [tinyData, setTinyData] = useState<any>(processData(anomalyDummy));
+
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(null);
     const [modalTitle, setModalTitle] = useState<string>('');
     const dispatch = useDispatch();
     const anomalyData = useSelector((state: RootState) => state.anomalyData.anomalyData);
+    const detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
+
+    const [statsData, setStatsData] = useState<any>();
+    const [tinyData, setTinyData] = useState<any>();
     useEffect(() => {
         console.log(anomalyData);
+        if(anomalyData){
+            setStatsData(processData(anomalyData));
+            setTinyData(processData(anomalyData));
+
+        }
         return () => {
         };
     }, [anomalyData]);
@@ -85,9 +94,9 @@ const AnalyticsDashboard: React.FC = () => {
                 <Col span={12}>
                     <Card
                         title="Filter Detections"
-                        extra={<FullscreenOutlined onClick={() => openModal('Filter Detections', <DataTableComponent data={anomalyDummy} flag={'anomaly'} fullscreen={true} />)} />}
+                        extra={<FullscreenOutlined onClick={() => openModal('Filter Detections', <DataTableComponent data={detectionDummy} flag={'detection'} fullscreen={true} />)} />}
                     >
-                        <DataTableComponent data={anomalyDummy} flag={'anomaly'}fullscreen={false} />
+                        <DataTableComponent data={detectionDummy} flag={'detection'}fullscreen={false} />
                     </Card>
                 </Col>
             </Row>

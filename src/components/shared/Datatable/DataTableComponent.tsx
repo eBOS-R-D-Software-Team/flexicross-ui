@@ -1,6 +1,4 @@
 import React, { useRef } from 'react';
-import { useId } from 'react';
-
 import { ProTable, ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, Form, Tag } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined, DownCircleOutlined, CloseCircleOutlined, MinusCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
@@ -10,8 +8,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DashboardData } from '../../../interfaces/dashboardData';
 import { v4 as uuid } from 'uuid';
-import { dummyData } from '../../../dummyData';
-import { anomalyDummy } from '../../pages/anomalydummy';
+import { setAnomalyData } from '../../../redux/slices/anomalySlice';
+import { setDetectionData } from '../../../redux/slices/detectionSlice';
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -221,6 +219,60 @@ const columnsAnomaly: ProColumns<any>[] = [
     },
   },
 ];
+const columnsDetection: ProColumns<any>[] = [
+  // {
+  //   title: 'ID',
+  //   dataIndex: 'id',
+  //   render: (dom: React.ReactNode) => {
+  //     const text = dom as string;
+  //     return text ? text.split('|').join(', ') : '';
+  //   },
+
+  // },
+  {
+    title: 'Date & Time',
+    dataIndex: 'datetime',
+    valueType: 'dateTime',
+    sorter: true,
+    hideInSearch: false,
+  },
+
+  {
+    disable: true,
+    title: 'Detection Type',
+    dataIndex: 'detectionType',
+    filters: true,
+    onFilter: true,
+    ellipsis: true,
+    valueType: 'select',
+    valueEnum: {
+      all: { text: 'All' },
+      HumanTrafficking: {
+        text: 'Human Trafficking',
+        status: 'HumanTrafficking',
+      },
+      Contraband: {
+        text: 'Contraband',
+        status: 'Contraband',
+        // disabled: true,
+      },
+      UTurnVehicle: {
+        text: 'U Turn Vehicle',
+        status: 'UTurnVehicle',
+      },
+      SuspiciousDrivingPattern: {
+        text: 'Suspicious Driving Pattern',
+        status: 'SuspiciousDrivingPattern',
+      },
+    },
+    render: (dom: any) => {
+      const dm = dom;
+      const textTemp = dm?.props.children;
+      const text = textTemp?.props.text;
+      return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
+    },
+  },
+];
 export interface TableProps{
   data: any[],
   flag: string,
@@ -229,8 +281,6 @@ export interface TableProps{
 const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
   const [dataSource, setDataSource] = React.useState<any[]>(data);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [date, setDate] = React.useState<Date>(new Date());
   const [filters, setFilters] = React.useState({});
   const [dashboard, setDashboard] = React.useState<DashboardData>({ id: '', datetime: new Date(), data: [], filters: [] });
 
@@ -241,6 +291,7 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
         if (values.id && !item.id.includes(values.id)) return false;
         if (values.datetime && formatDateToISO(new Date(item.datetime)) != formatDateToISO(values.datetime)) return false;
         if (values.anomalyType && !item.anomalyType.includes(values.anomalyType)) return false;
+        if (values.detectionType && !item.detectionType.includes(values.detectionType)) return false;
 
         if (values.riskType && !item.riskType.includes(values.riskType)) return false;
         if (values.severity && !item.severity.includes(values.severity)) return false;
@@ -279,7 +330,7 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
   return (
 
     <ProTable
-      columns={(flag==='risk')?columns:columnsAnomaly}
+      columns={(flag==='risk')?columns:(flag==='anomaly')?columnsAnomaly: columnsDetection}
       dataSource={dataSource}
       headerTitle={true}
       // search={{}}
@@ -301,7 +352,16 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
 
         const tempdata = await onSearch(params)
         console.log(dataSource,tempdata, 'search');
-        return dataSource;
+        if(flag === 'anomaly'){
+          console.log(tempdata,'temp');
+          dispatch(setAnomalyData(tempdata));
+          return tempdata;
+        } else if(flag === 'detection'){
+          console.log(tempdata,'temp');
+          dispatch(setDetectionData(tempdata));
+          return tempdata;
+        }
+        return tempdata;
       }}
       onChange={
         (pagination, filters, sorter, extra) => {

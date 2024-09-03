@@ -1,5 +1,3 @@
-import { dataItem } from "../interfaces/riskData";
-
 export const countRiskTypes = (data: any,flag:any): any => {
   const riskTypeCounts: { [key: string]: number } = {};
 if(data){
@@ -72,6 +70,7 @@ result.statistics['total'] = dataArray.length;
 // Function to process the data
 export const processData = (data: any[])=> {
   const result: Record<string, Record<string, number>> = {};
+  console.log(data);
 
   data.forEach((anomaly) => {
        // Check if datetime and anomalyType are present
@@ -103,5 +102,6 @@ export const processData = (data: any[])=> {
       formattedResult.push({ time, type, total });
     }
   }
+  console.log(formattedResult);
   return formattedResult;
 };

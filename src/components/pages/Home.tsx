@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, Row, Col } from 'antd';
-import species from '../../assets/species.png';
-import habitat from '../../assets/habitat.png';
-import indicators from '../../assets/indicators.jpg';
+import risk from '../../assets/risk.jpg';
+import analytics from '../../assets/analytics.jpg';
+
 import { Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
@@ -14,14 +14,14 @@ const Home: React.FC = () => {
 
                         <Card style={{
                             backgroundSize: "cover",
-                            backgroundRepeat: "no-repeat", backgroundImage: `url(${species
+                            backgroundRepeat: "no-repeat", backgroundImage: `url(${risk
                                 })`, height: 350
                         }}
                             hoverable
                         // cover={<img alt="example"  src={species}/>}
                         >
                             <h1 style={{
-                                color: 'white', fontWeight: 100
+                                color: '#001529', fontWeight: 400
                             }}>Risk Assessment Dashboards</h1>
 
                         </Card>
@@ -33,15 +33,15 @@ const Home: React.FC = () => {
                         <Card style={{
                             backgroundColor: "none",
                             backgroundSize: "cover",
-                            backgroundRepeat: "no-repeat", backgroundImage: `url(${habitat
+                            backgroundRepeat: "no-repeat", backgroundImage: `url(${analytics
                                 })`, height: 350
                         }}
                             hoverable
                         // cover={<img alt="example"  src={species}/>}
                         >
                             <h1 style={{
-                                color: 'white', fontWeight: 100
-                            }}>Visual Analytics Report</h1>
+                                color: '#001529', fontWeight: 400
+                            }}>Visual Analytics<br/> Report</h1>
                         </Card></Link>
                 </Col>
             </Row>

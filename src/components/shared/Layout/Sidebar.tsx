@@ -23,6 +23,8 @@ function getItem(
 }
 
 const items: MenuItem[] = [
+    getItem('Home', '1', <DesktopOutlined />, '/'),
+
         getItem('Risk Analysis', '4', <DesktopOutlined />, '', [
 
     getItem('Create Dashboard', '2', <PieChartOutlined />, '/risk/create-dashboard'),
