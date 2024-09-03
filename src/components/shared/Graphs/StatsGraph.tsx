@@ -19,8 +19,8 @@ const StatsGraph: React.FC<AppContentProps> = ({ data,title,total })=> {
     const percent = Math.round((data/total) * 10) / 10;
     const config = {
         percent,
-      width: 240,
-      height: 240,
+      width: 140,
+      height: 140,
       theme: "classicDark",
 
       color: ['#ffffff', '#66AFF4'],
@@ -41,7 +41,7 @@ const StatsGraph: React.FC<AppContentProps> = ({ data,title,total })=> {
     };
    return (
     <Card style={{margin: '0 auto',textAlign:'center'}}>
-        <Typography.Title>{title}</Typography.Title>
+        <Typography.Title level={5}>{title}</Typography.Title>
 <Tiny.Ring {...config} /></Card>
    )
 };

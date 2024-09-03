@@ -65,7 +65,8 @@ const SingleDashboard: React.FC = () => {
                 textAlign: 'center',
                 fill: '#ffffff',
                 fontSize: 32,
-                fontStyle: 'bold',            },
+                fontStyle: 'bold',
+            },
         },
         scale: {
             y: {
@@ -84,9 +85,12 @@ const SingleDashboard: React.FC = () => {
                 title: false,
             },
         },
-        interaction: {
-            elementHighlight: false,
-        },
+        // interaction: {
+        //     elementHighlight: true,
+        //     brushFilter: true
+        // },
+        // slider: { y: true, x: true },
+
     };
 
     const customLabel = (_: any, datum: any) => (
@@ -132,40 +136,41 @@ const SingleDashboard: React.FC = () => {
     };
     const columns = [
         {
-          title: 'id',
-          dataIndex: 'id',
-          key: 'id',
+            title: 'id',
+            dataIndex: 'id',
+            key: 'id',
         },
         {
-          title: 'riskType',
-          dataIndex: 'riskType',
-          key: 'riskType',
+            title: 'riskType',
+            dataIndex: 'riskType',
+            key: 'riskType',
         },
         {
-          title: 'severity',
-          dataIndex: 'severity',
-          key: 'severity',
-        },        {
+            title: 'severity',
+            dataIndex: 'severity',
+            key: 'severity',
+        }, {
             title: 'probability',
             dataIndex: 'probability',
             key: 'probability',
-          },
-      ];
+        },
+    ];
     return (
         <Layout>
-<Row gutter={24} style={{marginBottom:32}}>
-{statsData && Object.keys(statsData.riskType).map((key) => (
-        <Col span={6} key={key}>
-          <StatsGraph data={statsData.riskType[key]} total={statsData.statistics['total']} title={key.replace(/([A-Z])/g, ' $1').trim()} />
-        </Col>
-      ))}
-</Row>
-<Row gutter={24} style={{marginBottom:32}}>
-        <Col span={24}>
-        <Card>
-        {graphData && <Table columns={columns} dataSource={graphData} /> }  </Card>     </Col>
-  
-</Row>
+            
+            <Row gutter={24} style={{ marginBottom: 32 }}>
+                {statsData && Object.keys(statsData.riskType).map((key) => (
+                    <Col span={6} key={key}>
+                        <StatsGraph data={statsData.riskType[key]} total={statsData.statistics['total']} title={key.replace(/([A-Z])/g, ' $1').trim()} />
+                    </Col>
+                ))}
+            </Row>
+            <Row gutter={24} style={{ marginBottom: 32 }}>
+                <Col span={24}>
+                    <Card>
+                        {graphData && <Table columns={columns} dataSource={graphData} />}  </Card>     </Col>
+
+            </Row>
 
             <Row gutter={24}>
                 <Col span={12} >

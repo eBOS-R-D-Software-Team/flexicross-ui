@@ -35,7 +35,7 @@
     "xml-parser": "^1.2.1"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
+    "start": "cross-env GENERATE_SOURCEMAP=false && react-scripts start",
     "dev": "set HTTPS=true&&set SSL_CRT_FILE=./nginx/cert.pem&&set SSL_KEY_FILE=./nginx/key.pem&&react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

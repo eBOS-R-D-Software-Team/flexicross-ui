@@ -63,7 +63,7 @@ const Dashboards: React.FC = () => {
                 <Row gutter={24}>
                     {dashboardData.map((item: DashboardData, index: number) => (
                         <Col span={8} key={index} style={{ marginBottom: 16 }}>
-                            <Link to={`/dashboard/${item.id}`}>
+                            <Link to={`/risk/dashboard/${item.id}`}>
 
                                 <Card spellCheck title={<div>Dashboard {item.id} - <Tag color='blue'>{formatDate(item.datetime)}</Tag></div>} bordered={true} style={{ minHeight: 300 }}>
                                     <Row>                                    <Col style={{ marginBottom: 16 }}>

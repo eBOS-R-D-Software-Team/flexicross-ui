@@ -10,7 +10,7 @@ const Home: React.FC = () => {
         <div>
             <Row gutter={16}>
                 <Col span={12}>
-                    <Link to={'/species/observations'}>
+                    <Link to={'/risk/view-dashboards'}>
 
                         <Card style={{
                             backgroundSize: "cover",
@@ -22,13 +22,13 @@ const Home: React.FC = () => {
                         >
                             <h1 style={{
                                 color: 'white', fontWeight: 100
-                            }}>Species</h1>
+                            }}>Risk Assessment Dashboards</h1>
 
                         </Card>
                     </Link>
                 </Col>
                 <Col span={12}>
-                    <Link to={'habitat'}>
+                    <Link to={'/visual-analytics/report'}>
 
                         <Card style={{
                             backgroundColor: "none",
@@ -41,25 +41,7 @@ const Home: React.FC = () => {
                         >
                             <h1 style={{
                                 color: 'white', fontWeight: 100
-                            }}>Habitats</h1>
-                        </Card></Link>
-                </Col>
-                <Col span={12}>
-                    <Link to={'/indicators/conservation'}>
-
-                        <Card style={{
-                            marginTop: "15px",
-                            backgroundColor: "none",
-                            backgroundSize: "cover",
-                            backgroundRepeat: "no-repeat", backgroundImage: `url(${indicators
-                                })`, height: 350
-                        }}
-                            hoverable
-                        // cover={<img alt="example"  src={species}/>}
-                        >
-                            <h1 style={{
-                                color: 'white', fontWeight: 100
-                            }}>Indicators</h1>
+                            }}>Visual Analytics Report</h1>
                         </Card></Link>
                 </Col>
             </Row>

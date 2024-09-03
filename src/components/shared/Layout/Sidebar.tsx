@@ -23,12 +23,18 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-    getItem('Home', '4', <PieChartOutlined />, '/'),
+        getItem('Risk Analysis', '4', <DesktopOutlined />, '', [
+
+    getItem('Create Dashboard', '2', <PieChartOutlined />, '/risk/create-dashboard'),
+    getItem('Dashboards', '4', <DesktopOutlined />, '/risk/view-dashboards'),
+
+]),
     // getItem('Risk Analysis', '4', <DesktopOutlined />, '', [
     //     getItem('Observations', '4', undefined, '/species/observations'),
     //     getItem('Predictions', '5', undefined, '/species/predictions'),
     // ]), 
-    getItem('Dashboards', '3', <DesktopOutlined />, '/dashboards'),
+    getItem('Visual Analytics', '6', <DesktopOutlined />, '/visual-analytics/report'),
+
 ];
 const Sidebar: React.FC<any> = (menu)  => {
     console.log(menu.menu);

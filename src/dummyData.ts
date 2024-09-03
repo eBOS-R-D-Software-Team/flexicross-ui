@@ -1,4 +1,4 @@
-import { dataItem } from "../../../interfaces/riskData";
+import { dataItem } from "./interfaces/riskData";
 
 export const dummyData: dataItem[] = [
     // {

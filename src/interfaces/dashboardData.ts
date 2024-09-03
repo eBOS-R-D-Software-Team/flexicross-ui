@@ -4,7 +4,7 @@ export interface DashboardData{
     datetime: any;
     filters: any;
     id:any;
-    data: dataItem[];
+    data: any[];
 }
 export interface BarGraph {
     labelName: string;
