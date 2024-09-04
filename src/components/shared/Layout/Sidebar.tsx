@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Col, Layout, Menu, MenuProps, Row,Image } from 'antd';
+import { Col, Layout, Menu, MenuProps, Row } from 'antd';
 import { Link } from 'react-router-dom';
-import { PieChartOutlined, DesktopOutlined, UserOutlined } from '@ant-design/icons';
-import logo from '../../assets/guarden.png';
+import { PieChartOutlined, DesktopOutlined } from '@ant-design/icons';
 const { Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -25,7 +24,7 @@ function getItem(
 const items: MenuItem[] = [
     getItem('Home', '1', <DesktopOutlined />, '/'),
 
-        getItem('Risk Analysis', '4', <DesktopOutlined />, '', [
+        getItem('Risk Analysis', '', <DesktopOutlined />, '', [
 
     getItem('Create Dashboard', '2', <PieChartOutlined />, '/risk/create-dashboard'),
     getItem('Dashboards', '4', <DesktopOutlined />, '/risk/view-dashboards'),
@@ -39,7 +38,6 @@ const items: MenuItem[] = [
 
 ];
 const Sidebar: React.FC<any> = (menu)  => {
-    console.log(menu.menu);
     const [collapsed, setCollapsed] = useState(false);
 
     return (

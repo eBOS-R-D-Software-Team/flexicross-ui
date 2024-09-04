@@ -1,4 +1,3 @@
-import { AnomalyItem } from "../../interfaces/anomalyData"
 
 export const anomalyDummy: any[]=
 [
@@ -494,9 +493,191 @@ export const anomalyDummy: any[]=
 		  "fileURI": "http://myhost.com/path/image.jpg"
 		}
 	  ]
-	}
-  ]
-// export const anomalyDummy: AnomalyItem[]=
+	},
+		{
+			"id": "1a2b3c4d-0001-1234-abcd-123456789001",
+			"datetime": "2024-01-25T08:12:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonMisVerified"
+		},
+		{
+			"id": "2b3c4d5e-0002-2345-bcde-234567890012",
+			"datetime": "2024-01-25T09:18:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonOutOfBounds"
+		},
+		{
+			"id": "3c4d5e6f-0003-3456-cdef-345678901023",
+			"datetime": "2024-01-25T10:22:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonRunning"
+		},
+		{
+			"id": "4d5e6f7g-0004-4567-def0-456789012034",
+			"datetime": "2024-01-25T11:29:13.225Z",
+			"type": "Anomaly",
+			"anomalyType": "HumanTrafficking"
+		},
+		{
+			"id": "5e6f7g8h-0005-5678-ef01-567890123045",
+			"datetime": "2024-01-25T12:35:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Contraband"
+		},
+		{
+			"id": "6f7g8h9i-0006-6789-f012-678901234056",
+			"datetime": "2024-01-25T13:40:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Smuggling"
+		},
+		{
+			"id": "7g8h9i0j-0007-7890-0123-789012345067",
+			"datetime": "2024-01-25T14:47:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "FalsifiedDocuments"
+		},
+		{
+			"id": "8h9i0j1k-0008-8901-1234-890123456078",
+			"datetime": "2024-01-26T08:13:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "SuspiciousDrivingPattern"
+		},
+		{
+			"id": "9i0j1k2l-0009-9012-2345-901234567089",
+			"datetime": "2024-01-26T09:17:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UnlawfulParkingVehicle"
+		},
+		{
+			"id": "0j1k2l3m-0010-0123-3456-012345678090",
+			"datetime": "2024-01-26T10:21:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UturnVehicle"
+		},
+		{
+			"id": "1k2l3m4n-0011-1234-4567-123456789101",
+			"datetime": "2024-01-26T11:29:13.225Z",
+			"type": "Anomaly",
+			"anomalyType": "BiometricDataInconsistency"
+		},
+		{
+			"id": "2l3m4n5o-0012-2345-5678-234567890112",
+			"datetime": "2024-01-26T12:33:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UnlawfulCrossingBorder"
+		},
+		{
+			"id": "3m4n5o6p-0013-3456-6789-345678901123",
+			"datetime": "2024-01-26T13:38:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "AbnormalWeight"
+		},
+		{
+			"id": "4n5o6p7q-0014-4567-7890-456789012134",
+			"datetime": "2024-01-26T14:42:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "BlockchainMisVerification"
+		},
+		{
+			"id": "5o6p7q8r-0015-5678-8901-567890123145",
+			"datetime": "2024-01-26T15:47:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "GoodsFromEphidemicRegion"
+		},
+		{
+			"id": "6p7q8r9s-0016-6789-9012-678901234156",
+			"datetime": "2024-01-27T08:12:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UnaccompaniedMinor"
+		},
+		{
+			"id": "7q8r9s0t-0017-7890-0123-789012345167",
+			"datetime": "2024-01-27T09:16:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonMisVerified"
+		},
+		{
+			"id": "8r9s0t1u-0018-8901-1234-890123456178",
+			"datetime": "2024-01-27T10:21:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonOutOfBounds"
+		},
+		{
+			"id": "9s0t1u2v-0019-9012-2345-901234567189",
+			"datetime": "2024-01-27T11:25:03.225Z",
+			"type": "Anomaly",
+			"anomalyType": "PersonRunning"
+		},
+		{
+			"id": "0t1u2v3w-0020-0123-3456-012345678190",
+			"datetime": "2024-01-27T12:29:13.225Z",
+			"type": "Anomaly",
+			"anomalyType": "HumanTrafficking"
+		},
+		{
+			"id": "1u2v3w4x-0021-1234-4567-123456789201",
+			"datetime": "2024-01-27T13:32:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Contraband"
+		},
+		{
+			"id": "2v3w4x5y-0022-2345-5678-234567890212",
+			"datetime": "2024-01-27T14:37:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Smuggling"
+		},
+		{
+			"id": "3w4x5y6z-0023-3456-6789-345678901223",
+			"datetime": "2024-01-28T08:12:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "FalsifiedDocuments"
+		},
+		{
+			"id": "4x5y6z7a-0024-4567-7890-456789012234",
+			"datetime": "2024-01-28T09:18:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "SuspiciousDrivingPattern"
+		},
+		{
+			"id": "5y6z7a8b-0025-5678-8901-567890123245",
+			"datetime": "2024-01-28T10:21:03.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UnlawfulParkingVehicle"
+		},
+		{
+			"id": "6z7a8b9c-0026-6789-9012-678901234256",
+			"datetime": "2024-01-28T11:26:13.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UturnVehicle"
+		},
+		{
+			"id": "7a8b9c0d-0027-7890-0123-789012345267",
+			"datetime": "2024-01-28T12:30:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "BiometricDataInconsistency"
+		},
+		{
+			"id": "8b9c0d1e-0028-8901-1234-890123456278",
+			"datetime": "2024-01-28T13:34:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "UnlawfulCrossingBorder"
+		},
+		{
+			"id": "9c0d1e2f-0029-9012-2345-901234567289",
+			"datetime": "2024-01-28T14:38:43.225Z",
+			"type": "Anomaly",
+			"anomalyType": "AbnormalWeight"
+		},
+		{
+			"id": "0d1e2f3g-0030-0123-3456-012345678290",
+			"datetime": "2024-01-28T15:43:53.225Z",
+			"type": "Anomaly",
+			"anomalyType": "BlockchainMisVerification"
+		}
+	]
+	
+	
+	// export const anomalyDummy: AnomalyItem[]=
 // [
 // 	{
 // 		"id": "6",

@@ -3,7 +3,7 @@ export const countRiskTypes = (data: any,flag:any): any => {
 if(data){
   data.forEach((item: any) => {
     const { riskType,severity,probability,type } = item;
-const types = (flag === 'riskType') ? riskType : (flag === 'severity') ? severity :(flag === 'probability') ? probability : type;
+    const types = (flag === 'riskType') ? riskType : (flag === 'severity') ? severity :(flag === 'probability') ? probability : type;
     if (riskTypeCounts[types]) {
       riskTypeCounts[types]++;
     } else {
@@ -70,8 +70,6 @@ result.statistics['total'] = dataArray.length;
 // Function to process the data
 export const processData = (data: any[])=> {
   const result: Record<string, Record<string, number>> = {};
-  console.log(data);
-
   data.forEach((anomaly) => {
        // Check if datetime and anomalyType are present
        if (!anomaly.datetime || !anomaly.anomalyType) return;
@@ -102,6 +100,103 @@ export const processData = (data: any[])=> {
       formattedResult.push({ time, type, total });
     }
   }
-  console.log(formattedResult);
   return formattedResult;
 };
+// Function to process the data
+export const processDataDetection = (data: any[])=> {
+  const result: Record<string, Record<string, number>> = {};
+  data.forEach((anomaly) => {
+       // Check if datetime and anomalyType are present
+       if (!anomaly.datetime || !anomaly.detectionType) return;
+
+       const date = new Date(anomaly.datetime);
+       // Format the date in European structure (dd-mm-yyyy)
+       const day = String(date.getDate()).padStart(2, '0');
+       const month = String(date.getMonth() + 1).padStart(2, '0');
+       const year = date.getFullYear();
+       const formattedDate = `${day}-${month}-${year}`;
+   
+       const type = anomaly.detectionType;
+   
+       if (!result[formattedDate]) {
+         result[formattedDate] = {};
+       }
+   
+       if (!result[formattedDate][type]) {
+         result[formattedDate][type] = 0;
+       }
+      //  result[formattedDate][type]=Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+       result[formattedDate][type] += 1;
+     });
+  const formattedResult= [];
+
+  for (const [time, types] of Object.entries(result)) {
+    for (const [type, total] of Object.entries(types)) {
+      formattedResult.push({ time, type, total });
+    }
+  }
+  return formattedResult;
+};
+export const totalDataTypesPerDay = (data: any[])=> {
+  const counts: { [key: string]: number } = {};
+
+  data.forEach(record => {
+      const date = new Date(record.datetime).toISOString().split('T')[0]; // '2024-01-25'
+      if (counts[date]) {
+          counts[date]++;
+      } else {
+          counts[date] = 1;
+      }
+  });
+  return counts
+
+}
+
+
+type CountData = {
+  [date: string]: number;
+};
+
+type CombinedData = {
+  [date: string]: {
+    anomalyCount: number;
+    detectionCount: number;
+  };
+};
+
+interface DataPoint {
+  date: string;
+  anomalyCount: number;
+  detectionCount: number;
+}
+ /**
+* Merges anomaly and detection data by date and prepares it for charting.
+* @param anomalyData - Object with anomaly counts by date.
+* @param detectionData - Object with detection counts by date.
+* @returns An array of data points ready for charting.
+*/
+export function mergeAndPrepareData(anomalyData: any, detectionData: any): any[] {
+ // Merge and combine anomaly and detection data
+ const allDates = new Set([...Object.keys(anomalyData), ...Object.keys(detectionData)]);
+ const combinedData: CombinedData = {};
+
+ allDates.forEach(date => {
+   combinedData[date] = {
+     anomalyCount: anomalyData[date] || 0,
+     detectionCount: detectionData[date] || 0
+   };
+ });
+
+ // Transform the combined data into an array of DataPoint for charting
+ const chartData: DataPoint[] = Object.entries(combinedData).map(([date, { anomalyCount, detectionCount }]) => ({
+   date,
+   anomalyCount,
+   detectionCount
+ }));
+  // Transform data to fit the seriesField requirement
+  const transformedData = chartData.flatMap(item => [
+    { date: item.date, type: 'anomalyCount', value: item.anomalyCount },
+    { date: item.date, type: 'detectionCount', value: item.detectionCount }
+  ]);
+ return transformedData;
+}

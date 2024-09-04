@@ -1,14 +1,12 @@
 import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
 import {  DashboardData } from '../../interfaces/dashboardData';
-import { anomalyDummy } from '../../components/pages/anomalydummy';
+import { anomalyDummy } from './data/anomalydummy';
 
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
     const serializedState = localStorage.getItem('anomalyData');
     if (serializedState === null) {
-      console.log(anomalyDummy);
-
       saveStateToLocalStorage(anomalyDummy);
       return anomalyDummy;
     }
@@ -25,7 +23,6 @@ const loadStateFromLocalStorage = (): any[] => {
 
 // Utility function to save state to local storage
 const saveStateToLocalStorage = (state: any[]) => {
-  console.log(state);
   try {
     const serializableState = state.map(item => ({
       ...item,
@@ -42,11 +39,13 @@ const saveStateToLocalStorage = (state: any[]) => {
 interface AnomalyDataState {
   anomalyData: any[];
   filteredData: any[] ;
+  selectedAnomaly: any;
 }
 
 const initialState: AnomalyDataState = {
   anomalyData: loadStateFromLocalStorage(),
   filteredData: [],
+  selectedAnomaly: null
 };
 
 const anomalySlice = createSlice({
@@ -74,15 +73,10 @@ const anomalySlice = createSlice({
       }
     },
     getAnomalyDataById: (state, action: PayloadAction<any>) => {
-      // This reducer will be used to fetch data by id.
-      // However, typically you do not change the state in a getter, so return type is void.
-      const tempData = state.anomalyData.find(data => data.id === action.payload)
-      const data = {
-        ...tempData,
-        datetime: '',
-      };
-       state.anomalyData=data;
-      //  return state.selectedDashboard;
+      const foundData = anomalyDummy.find(data => data.id === action.payload);
+      if (foundData) {
+        state.selectedAnomaly = foundData;
+      }
     },
   },
 });

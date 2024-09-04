@@ -7,7 +7,8 @@ import Dashboards from './components/pages/Dashboards';
 import SingleDashboard from './components/pages/SingleDashboard';
 import AnalyticsDashboard from './components/pages/AnalyticsDashboard';
 import { dummyData } from './dummyData';
-import { anomalyDummy } from './components/pages/anomalydummy';
+import DetailPage from './components/shared/Details/DetailsPage';
+import { anomalyDummy } from './redux/slices/data/anomalydummy';
 
 const AppRoutes: React.FC = () => (
     <Routes>
@@ -18,6 +19,7 @@ const AppRoutes: React.FC = () => (
         <Route path="risk/view-dashboards" element={<MainLayout menu={"4"}><Dashboards /></MainLayout>} />
         <Route path="risk/dashboard/:id" element={<MainLayout menu={"5"}><SingleDashboard /></MainLayout>} />
         <Route path="/visual-analytics/report" element={<MainLayout menu={"6"}><AnalyticsDashboard /></MainLayout>} />
+        <Route path="/involved-objects/:type/:id" element={<MainLayout menu={"6"}><DetailPage /></MainLayout>} /> {/* Route for detail pages */}
 
     </Routes>
 );

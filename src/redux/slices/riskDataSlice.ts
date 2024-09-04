@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
 import { DashboardData } from '../../interfaces/dashboardData';
+import { dummyData } from '../../dummyData';
 
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): DashboardData[] => {
@@ -37,11 +38,13 @@ const saveStateToLocalStorage = (state: DashboardData[]) => {
 interface DashboardDataState {
   dashboardData: DashboardData[];
   selectedDashboard: any;
+  selectedRisk:any;
 }
 
 const initialState: DashboardDataState = {
   dashboardData: loadStateFromLocalStorage(),
   selectedDashboard: null,
+  selectedRisk: null
 };
 
 const dashboardDataSlice = createSlice({
@@ -85,6 +88,13 @@ const dashboardDataSlice = createSlice({
        state.selectedDashboard=data;
       //  return state.selectedDashboard;
     },
+    getRiskById: (state, action: PayloadAction<any>) => {
+      console.log(dummyData,action.payload);
+      const foundData = dummyData.find(data => data.id === action.payload);
+        state.selectedRisk = foundData;
+        console.log(foundData,action.payload);
+
+    }
   },
 });
 
@@ -94,6 +104,7 @@ export const {
   deleteDashboardDataById,
   updateDashboardData,
   getDashboardDataById,
+  getRiskById
 } = dashboardDataSlice.actions;
 
 // Middleware to handle saving state to local storage

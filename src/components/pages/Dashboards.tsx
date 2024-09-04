@@ -14,7 +14,7 @@ const Dashboards: React.FC = () => {
     const dispatch = useDispatch();
     const dashboardData = useSelector((state: RootState) => state.dashboardData.dashboardData);
     useEffect(() => {
-        console.log(dashboardData);
+        // console.log(dashboardData);
         return () => {
         };
     }, []);

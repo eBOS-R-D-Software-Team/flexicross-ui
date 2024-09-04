@@ -26,13 +26,10 @@ const SingleDashboard: React.FC = () => {
 
     useEffect(() => {
         dispatch(getDashboardDataById(id));
-        // console.log(countRiskTypes(graphData));            
     }, [id]);
     useEffect(() => {
-        console.log('dsj', selectedDashboard);
         setGraphData(selectedDashboard?.data);
         if (graphData) {
-            console.log(countOccurrences(graphData));
             setStatsData(countOccurrences(graphData));
         }
 
@@ -49,7 +46,6 @@ const SingleDashboard: React.FC = () => {
         markBackground: {
             label: {
                 text: (originData: any) => {
-                    console.log(originData);
                     return `${(originData.originData.value / 10) * 100}% | ${originData.originData.value}`;
                 },
                 position: 'left',

@@ -29,12 +29,12 @@ const saveStateToLocalStorage = (state: any[]) => {
 // Define the initial state structure
 interface DetectionDataState {
   detectionData: any[];
-  filteredData: any[];
+  selectedDetection: any;
 }
 
 const initialState: DetectionDataState = {
   detectionData: loadStateFromLocalStorage(),
-  filteredData: [],
+  selectedDetection: null,
 };
 
 const detectionSlice = createSlice({
@@ -61,11 +61,10 @@ const detectionSlice = createSlice({
         };
       }
     },
-    getDetectionDataById: (state, action: PayloadAction<string>) => {
-      const foundData = state.detectionData.find(data => data.id === action.payload);
-      if (foundData) {
-        state.filteredData = [foundData];
-      }
+    getDetectionDataById: (state, action: PayloadAction<any>) => {
+      const foundData = detectionDummy.find(data => data.id === action.payload);
+        state.selectedDetection = foundData;
+      
     },
   },
 });

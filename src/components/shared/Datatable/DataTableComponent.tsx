@@ -32,6 +32,22 @@ const formatDateToISO = (dateString: Date) => {
 
   return isoString;
 };
+
+export interface TableProps{
+  data: any[],
+  flag: string,
+  fullscreen: boolean,
+  onRowClick?: (record: any) => void; // Add this prop for row click handling
+  onActionClick?: (record: any) => void; // Add this prop for action button handling
+
+}
+const DataTableComponent: React.FC<TableProps> = ({ data, flag, fullscreen, onRowClick, onActionClick }) => {
+  const [dataSource, setDataSource] = React.useState<any[]>(data);
+  const dispatch = useDispatch();
+  const [filters, setFilters] = React.useState({});
+  const [dashboard, setDashboard] = React.useState<DashboardData>({ id: '', datetime: new Date(), data: [], filters: [] });
+  const navigate = useNavigate();
+
 // Define columns for ProTable
 const columns: ProColumns<dataItem>[] = [
   // {
@@ -163,6 +179,13 @@ const columns: ProColumns<dataItem>[] = [
       const text = textTemp?.props.text;
       return (<Tag icon={text === 'AlmostImprobable' ? <CloseCircleOutlined /> : text === 'Rare' ? <DownCircleOutlined /> : text === 'Occasional' ? <MinusCircleOutlined /> : text === 'HighlyProbable' ? <UpCircleOutlined /> : <ExclamationCircleOutlined />} color={text === 'AlmostImprobable' ? 'green' : text === 'Rare' ? 'blue' : text === 'Occasional' ? 'yellow' : text === 'HighlyProbable' ? 'red' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
+  },{
+    title: 'Involved Objects',
+    key: 'action',
+    render: (text: any, record: any) => (
+              <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
+
+    ),
   },
 ];
 const columnsAnomaly: ProColumns<any>[] = [
@@ -217,6 +240,13 @@ const columnsAnomaly: ProColumns<any>[] = [
       const text = textTemp?.props.text;
       return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
+  },{
+    title: 'Involved Objects',
+    key: 'action',
+    render: (text: any, record: any) => (
+              <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
+
+    ),
   },
 ];
 const columnsDetection: ProColumns<any>[] = [
@@ -271,19 +301,15 @@ const columnsDetection: ProColumns<any>[] = [
       const text = textTemp?.props.text;
       return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
+  },    {
+    title: 'Involved Objects',
+    key: 'action',
+    render: (text: any, record: any) => (
+              <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
+
+    ),
   },
 ];
-export interface TableProps{
-  data: any[],
-  flag: string,
-  fullscreen: boolean
-}
-const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
-  const [dataSource, setDataSource] = React.useState<any[]>(data);
-  const dispatch = useDispatch();
-  const [filters, setFilters] = React.useState({});
-  const [dashboard, setDashboard] = React.useState<DashboardData>({ id: '', datetime: new Date(), data: [], filters: [] });
-
   const onSearch = async (values: any) => {
     if (Object.keys(values).length !== 2) {
       const filteredData = dataSource.filter(item => {
@@ -298,7 +324,6 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
         if (values.probability && !item.probability.includes(values.probability)) return false;
         return true;
       });
-      console.log(values,filteredData,'currentFilter');
       setFilters(values);
 
 
@@ -314,10 +339,7 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
   const handleGenerateGraphs = () => {
     // Dispatch the query data to the store
     var time = new Date().toString();
-    console.log('Query data dispatched:', filters);
-
     setDashboard({ id: uuid().slice(0,8), datetime: time, data: dataSource, filters: filters });
-    console.log('Query data dispatched:', dataSource, 'dash', dashboard);
     // navigate('/dashboard');  // Navigate to the dashboard
     dispatch(setDashboardData({ id: uuid().slice(0,8), datetime: time.toString(), data: dataSource, filters: filters }));
 
@@ -347,17 +369,13 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
         // if(params['datetime']){
         //   params['datetime'] = formatDateToISO(params['datetime']).toString()
         // }
-        console.log(sort, filter, params, 'takis2');
         setFilters(params);
 
         const tempdata = await onSearch(params)
-        console.log(dataSource,tempdata, 'search');
         if(flag === 'anomaly'){
-          console.log(tempdata,'temp');
           dispatch(setAnomalyData(tempdata));
           return tempdata;
         } else if(flag === 'detection'){
-          console.log(tempdata,'temp');
           dispatch(setDetectionData(tempdata));
           return tempdata;
         }
@@ -387,6 +405,15 @@ const DataTableComponent: React.FC<TableProps> = ({ data,flag,fullscreen }) => {
           listsHeight: 400,
         },
       }}
+      onRow={(record) => ({
+        onClick: () => {
+          if (onRowClick) {
+            onRowClick(record);
+          } else {
+            navigate(`/involved-objects/${flag}/${record.id}`);
+          }
+        },
+      })}
       pagination={{
         pageSize: (flag!='risk' && fullscreen) ?15:(flag ==='risk' )? 15:5 ,
       }}
