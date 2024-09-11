@@ -5,20 +5,28 @@ import { ConfigProvider, theme } from 'antd';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import enUSIntl from 'antd/lib/locale/en_US';
+import keycloak from "./keycloak";
+import { ReactKeycloakProvider } from '@react-keycloak/web/lib/provider';
 
 const { darkAlgorithm } = theme;
 
 const App: React.FC = () => (
+    <ReactKeycloakProvider
+    authClient={keycloak}
+    initOptions={{
+      onLoad: 'login-required',  // Automatically redirect to the login page if not authenticated
+    }}
+  >
     <ConfigProvider
-    locale={enUSIntl}
-        theme={{
-            algorithm: darkAlgorithm,
-            // token: {
-            //     // "colorPrimary": "#0e0e0e",
-            //     "fontSize": 16,
-            //     "borderRadius": 14
-            // }
-        }}
+      locale={enUSIntl}
+      theme={{
+        algorithm: darkAlgorithm,
+        // token: {
+        //     // "colorPrimary": "#0e0e0e",
+        //     "fontSize": 16,
+        //     "borderRadius": 14
+        // }
+      }}
     >
         <Router>
         <Provider store={store}>
@@ -26,6 +34,7 @@ const App: React.FC = () => (
             <Routes />
             </Provider>
         </Router></ConfigProvider>
+        </ReactKeycloakProvider>
 
 );
 
