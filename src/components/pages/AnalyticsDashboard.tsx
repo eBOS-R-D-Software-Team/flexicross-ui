@@ -147,7 +147,11 @@ const AnalyticsDashboard: React.FC = () => {
         onCancel={() => setModalVisible(false)}
         width="100%"
         style={{ top: 0 }}
-        bodyStyle={{ height: '100vh', padding: 0 }}
+        modalRender={(modalContent) => (
+          <div style={{ height: '100vh', padding: 0 }}>
+            {modalContent}
+          </div>
+        )}
       >
         {modalContent}
       </Modal>
