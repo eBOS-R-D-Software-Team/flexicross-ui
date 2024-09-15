@@ -22,6 +22,7 @@ const AnalyticsDashboard: React.FC = () => {
   const [tinyData, setTinyData] = useState<any>();
   const [tinyDataDetection, setTinyDataDetection] = useState<any>();
   const [combinedData, setCombinedData] = useState<any>();
+  let detectionMapData :any;
 
   useEffect(() => {
     if (anomalyData) {
@@ -29,6 +30,11 @@ const AnalyticsDashboard: React.FC = () => {
       setTinyData(processData(anomalyData));
     }
     if (detectionData) {
+      console.log("detection data: ", detectionData);
+      detectionMapData = detectionData.filter(item => {
+        return item.location;
+      })
+      console.log("detection map data: ", detectionMapData);
       setTinyDataDetection(processDataDetection(detectionData));
       setCombinedData(mergeAndPrepareData(totalDataTypesPerDay(anomalyData), totalDataTypesPerDay(detectionData)));
     }
@@ -120,10 +126,15 @@ const AnalyticsDashboard: React.FC = () => {
         <Col span={24}>
           <Card
             title="Detections Location"
-            extra={<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionData.map(item => item.location)} center={undefined} />)} />}
+            extra={<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData.map((item: { location: any; }) => { 
+              return item.location
+      }
+            )} center={undefined}  />)} />}
           >
             {detectionData === undefined && <Spin />}
-            {detectionData && <MapComponent locations={detectionData.map(item => item.location)} center={[ 21.8243,39.0742
+            {detectionMapData && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionData.map(item => 
+            {if(item.location){
+            return item.location}})} center={[ 21.8243,39.0742
 ]} />}
           </Card>
         </Col>
