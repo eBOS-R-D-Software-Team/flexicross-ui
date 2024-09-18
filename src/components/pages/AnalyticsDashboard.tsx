@@ -16,25 +16,22 @@ const AnalyticsDashboard: React.FC = () => {
   const [modalTitle, setModalTitle] = useState<string>('');
   const dispatch = useDispatch();
   const anomalyData = useSelector((state: RootState) => state.anomalyData.anomalyData);
-  const detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
+  let detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
 
   const [statsData, setStatsData] = useState<any>();
   const [tinyData, setTinyData] = useState<any>();
   const [tinyDataDetection, setTinyDataDetection] = useState<any>();
   const [combinedData, setCombinedData] = useState<any>();
-  let detectionMapData :any;
-
+let detectionMapData :any[] = [];
   useEffect(() => {
     if (anomalyData) {
       setStatsData(processData(anomalyData));
       setTinyData(processData(anomalyData));
     }
     if (detectionData) {
-      console.log("detection data: ", detectionData);
       detectionMapData = detectionData.filter(item => {
         return item.location;
       })
-      console.log("detection map data: ", detectionMapData);
       setTinyDataDetection(processDataDetection(detectionData));
       setCombinedData(mergeAndPrepareData(totalDataTypesPerDay(anomalyData), totalDataTypesPerDay(detectionData)));
     }
@@ -126,15 +123,10 @@ const AnalyticsDashboard: React.FC = () => {
         <Col span={24}>
           <Card
             title="Detections Location"
-            extra={<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData.map((item: { location: any; }) => { 
-              return item.location
-      }
-            )} center={undefined}  />)} />}
+            extra={<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData.map(item => item.location)} center={undefined}  />)} />}
           >
             {detectionData === undefined && <Spin />}
-            {detectionMapData && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionData.map(item => 
-            {if(item.location){
-            return item.location}})} center={[ 21.8243,39.0742
+            {detectionMapData && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionMapData.map(item => item.lcoation)} center={[ 21.8243,39.0742
 ]} />}
           </Card>
         </Col>
