@@ -68,7 +68,7 @@ result.statistics['total'] = dataArray.length;
 };
 
 // Function to process the data
-export const processData = (data: any[])=> {
+export const processAnomalyData = (data: any[])=> {
   const result: Record<string, Record<string, number>> = {};
   data.forEach((anomaly) => {
        // Check if datetime and anomalyType are present
