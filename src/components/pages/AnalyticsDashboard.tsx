@@ -9,6 +9,7 @@ import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
 import { anomalyDummy } from '../../redux/slices/data/anomalydummy';
+import * as regression from 'regression'; // Add a regression library for linear regression calculations
 
 const AnalyticsDashboard: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,18 +24,19 @@ const AnalyticsDashboard: React.FC = () => {
   const [tinyAnomalyData, setTinyAnomalyData] = useState<any>();
   const [tinyDataDetection, setTinyDataDetection] = useState<any>();
   const [combinedData, setCombinedData] = useState<any>();
+  const[filteredAnomalyData,setFilteredAnomalyData] = useState<any[]>();
+  const [trendlineData, setTrendlineData] = useState<any[]>();
   let detectionMapData :any[] = [];
-
+  const [combinedAnomalyData, setCombinedAnomalyData] = useState<any[]>();
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
-  };
+}
 
   useEffect(() => {
     if (anomalyData) {
       const processedAnomalyData = processAnomalyData(anomalyData);
       setStatsData(processedAnomalyData);
       setTinyAnomalyData(processedAnomalyData);
-      console.log("precessed anomaly data: ", processedAnomalyData );
     }
 
     if (detectionData) {
@@ -43,16 +45,28 @@ const AnalyticsDashboard: React.FC = () => {
       })
       const processedDetectionData = processDataDetection(detectionData);
       setTinyDataDetection(processedDetectionData);
-
       const anomalyTotals = totalDataTypesPerDay(anomalyData);
       const detectionTotals = totalDataTypesPerDay(detectionData);
       setCombinedData(mergeAndPrepareData(anomalyTotals, detectionTotals));
-      console.log("anomaly data: ", anomalyData);
-      console.log("combined data: ", combinedData);
     }
   }, [anomalyData, detectionData]);
 
+  useEffect(() => {
 
+    setFilteredAnomalyData(Array.isArray(tinyAnomalyData)
+    ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
+    : []);
+    if(filteredAnomalyData?.length){
+    setTrendlineData(calculateTrendline(Array.isArray(tinyAnomalyData)
+    ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
+    : []))
+  };
+    
+  }, [tinyAnomalyData, selectedAnomalyTypes]);
+  useEffect(() => {
+  setCombinedAnomalyData([...(filteredAnomalyData || []), ...(trendlineData || [])]);
+    
+  }, [filteredAnomalyData, trendlineData]); 
   
   const openModal = (title: string, content: React.ReactNode) => {
     setModalTitle(title);
@@ -63,6 +77,8 @@ const AnalyticsDashboard: React.FC = () => {
   const handleRowClick = (record: any) => {
     openModal('Details', <div>{JSON.stringify(record.involvedObjects, null, 2)}</div>);
   };
+
+
 
   const configPie = useMemo(() => ({
     theme: 'classicDark',
@@ -92,15 +108,61 @@ const AnalyticsDashboard: React.FC = () => {
   }), []);
 
   // Filter the data to only show the selected types
-  const filteredAnomalyData = useMemo(() => {
-    return tinyAnomalyData?.filter((item: { type: string; }) => selectedAnomalyTypes.includes(item.type));
-  }, [tinyAnomalyData, selectedAnomalyTypes]);
+  // const filteredAnomalyData = useMemo(() => {
+  //   return Array.isArray(tinyAnomalyData)
+  //     ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
+  //     : [];
+  // }, [tinyAnomalyData, selectedAnomalyTypes]);
+
 
   // Generate options for the Select component
   const options = Array.from(new Set(tinyAnomalyData?.map((item: { type: any; }) => item.type))).map(type => ({
     label: type,
     value: type,
   }));
+
+   // Function to calculate trendlines
+   const calculateTrendline = (data: any[]) => {
+    console.log("data inside function: ", data);
+    const groupedData = data.reduce((acc: any, curr: any) => {
+      const type = curr.type || 'Contraband';
+// Manually parse the date in DD-MM-YYYY format
+const [day, month, year] = curr.time.split('-'); // Split the date by "-"
+const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); // Convert to timestamp
+  const total = curr.total !== undefined ? Number(curr.total) : NaN; // Ensure total is a number
+        console.log('Processing:', { type, time, total });
+
+      if (!isNaN(time) && !isNaN(total)) {  // Ensure both time and total are valid numbers
+        if (!acc[type]) {
+          acc[type] = [];
+        }
+        acc[type].push([time, total]);
+      }
+      return acc;
+    }, {});
+
+    let trendlineData:any[] = [];
+    console.log('grouped data: ', groupedData);
+    Object.keys(groupedData).forEach((type) => {
+      const result = regression.linear(groupedData[type]); // Calculate linear regression
+      result.points.forEach((point) => {
+        const date = new Date(point[0]);
+        // Format the date in European structure (dd-mm-yyyy)
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const formattedDate = `${day}-${month}-${year}`;
+ 
+        trendlineData.push({
+          time: formattedDate,
+          total: point[1],
+          type: `${type} (Trend)`,
+        });
+      });
+    });
+    console.log("trendline data inside function: ", trendlineData);
+    return trendlineData;
+  };
 
   return (
     <Layout>
@@ -188,7 +250,7 @@ const AnalyticsDashboard: React.FC = () => {
             onChange={handleAnomalyTypeChange}
             options={options} // Use the options array here
           />
-                <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={filteredAnomalyData} {...anomaliesTrendConfig} />
+                <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedAnomalyData} {...anomaliesTrendConfig} />
                 </div>
               ))
             }
@@ -196,7 +258,7 @@ const AnalyticsDashboard: React.FC = () => {
         </>
       }
     >
-      {!tinyAnomalyData ? <Spin /> : <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={filteredAnomalyData} {...anomaliesTrendConfig} />}
+      {!tinyAnomalyData ? <Spin /> : <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedAnomalyData} {...anomaliesTrendConfig} />}
     </Card>
           <Card
             title="Anomaly Trend"
