@@ -21,7 +21,6 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
-  console.log(center);
   return (
     <MapContainer center={[center[1], center[0]]} zoom={11} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
