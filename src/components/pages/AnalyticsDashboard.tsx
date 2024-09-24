@@ -20,16 +20,27 @@ const AnalyticsDashboard: React.FC = () => {
   const anomalyData = useSelector((state: RootState) => state.anomalyData.anomalyData);
   const detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
   const [selectedAnomalyTypes, setSelectedAnomalyTypes] = useState<string[]>(['Contraband', 'Smuggling']); // Show 2 types by default
+  const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>(['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
+
   const [statsData, setStatsData] = useState<any>();
   const [tinyAnomalyData, setTinyAnomalyData] = useState<any>();
   const [tinyDataDetection, setTinyDataDetection] = useState<any>();
   const [combinedData, setCombinedData] = useState<any>();
   const[filteredAnomalyData,setFilteredAnomalyData] = useState<any[]>();
+  const[filteredDetectionData,setFilteredDetectionData] = useState<any[]>();
+
   const [trendlineData, setTrendlineData] = useState<any[]>();
+  const [trendlineDetectionData, setTrendlineDetectionData] = useState<any[]>();
+
   let detectionMapData :any[] = [];
   const [combinedAnomalyData, setCombinedAnomalyData] = useState<any[]>();
+  const [combinedDetectionData, setCombinedDetectionData] = useState<any[]>();
+
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
+}
+const handleDetectionTypeChange = (value: string[]) => {
+  setSelectedDetectionsTypes(value);
 }
 
   useEffect(() => {
@@ -45,6 +56,7 @@ const AnalyticsDashboard: React.FC = () => {
       })
       const processedDetectionData = processDataDetection(detectionData);
       setTinyDataDetection(processedDetectionData);
+      console.log("tiny data detection", tinyDataDetection);
       const anomalyTotals = totalDataTypesPerDay(anomalyData);
       const detectionTotals = totalDataTypesPerDay(detectionData);
       setCombinedData(mergeAndPrepareData(anomalyTotals, detectionTotals));
@@ -67,6 +79,23 @@ const AnalyticsDashboard: React.FC = () => {
   setCombinedAnomalyData([...(filteredAnomalyData || []), ...(trendlineData || [])]);
     
   }, [filteredAnomalyData, trendlineData]); 
+
+  useEffect(() => {
+
+    setFilteredDetectionData(Array.isArray(tinyDataDetection)
+    ? tinyDataDetection.filter(item => selectedDetectionsTypes.includes(item.type))
+    : []);
+    if(filteredDetectionData?.length){
+    setTrendlineDetectionData(calculateTrendline(Array.isArray(tinyDataDetection)
+    ? tinyDataDetection.filter(item => selectedDetectionsTypes.includes(item.type))
+    : []))
+  };
+    
+  }, [tinyDataDetection, selectedDetectionsTypes]);
+  useEffect(() => {
+  setCombinedDetectionData([...(filteredDetectionData || []), ...(trendlineDetectionData || [])]);
+    
+  }, [filteredDetectionData, trendlineDetectionData]); 
   
   const openModal = (title: string, content: React.ReactNode) => {
     setModalTitle(title);
@@ -115,8 +144,14 @@ const AnalyticsDashboard: React.FC = () => {
   // }, [tinyAnomalyData, selectedAnomalyTypes]);
 
 
-  // Generate options for the Select component
+  // Generate options for the Select anomaly component
   const options = Array.from(new Set(tinyAnomalyData?.map((item: { type: any; }) => item.type))).map(type => ({
+    label: type,
+    value: type,
+  }));
+
+   // Generate options for the Select detection component
+   const detectionOptions = Array.from(new Set(tinyDataDetection?.map((item: { type: any; }) => item.type))).map(type => ({
     label: type,
     value: type,
   }));
@@ -260,12 +295,49 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
     >
       {!tinyAnomalyData ? <Spin /> : <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedAnomalyData} {...anomaliesTrendConfig} />}
     </Card>
+    <Card
+      title="Detections Trend"
+      extra={
+        <>
+          <Select
+            mode="multiple"
+            allowClear
+            style={{ width: '600px', marginRight: '16px' }}
+            placeholder="Select detection types"
+            value={selectedDetectionsTypes}
+            onChange={handleDetectionTypeChange}
+            options={detectionOptions} // Use the options array here
+          />
+
+          <FullscreenOutlined
+            onClick={() =>
+              openModal('Detections Trend', (
+                <div>
+                   <Select
+            mode="multiple"
+            allowClear
+            style={{ width: '600px', marginRight: '16px' }}
+            placeholder="Select anomaly types"
+            value={selectedAnomalyTypes}
+            onChange={handleAnomalyTypeChange}
+            options={detectionOptions} // Use the options array here
+          />
+                <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedDetectionData} {...anomaliesTrendConfig} />
+                </div>
+              ))
+            }
+          />
+        </>
+      }
+    >
+      {!tinyDataDetection ? <Spin /> : <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedDetectionData} {...anomaliesTrendConfig} />}
+    </Card>
           <Card
-            title="Anomaly Trend"
+            title="Anomalies and detections graph"
             extra={
               <FullscreenOutlined
                 onClick={() =>
-                  openModal('Anomaly Trend', (
+                  openModal('Anomalies and detections graph', (
                     <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedData} {...config} />
                   ))
                 }
