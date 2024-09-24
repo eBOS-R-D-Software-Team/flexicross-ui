@@ -5,6 +5,7 @@
   "dependencies": {
     "@ant-design/charts": "^2.1.2",
     "@ant-design/pro-components": "^2.7.14",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@react-keycloak/web": "^3.4.0",
     "@reduxjs/toolkit": "^2.2.6",
     "@testing-library/jest-dom": "^5.17.0",
