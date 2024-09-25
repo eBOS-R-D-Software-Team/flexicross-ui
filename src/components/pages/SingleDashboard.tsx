@@ -6,8 +6,6 @@ import { RootState } from '../../redux/store';
 import { getDashboardDataById } from '../../redux/slices/riskDataSlice';
 import { Card, Col, Layout, Row, Spin, Table, Tag } from 'antd';
 import { Bar, Heatmap } from '@ant-design/charts';
-import { text } from 'stream/consumers';
-import { AnyARecord } from 'dns';
 import { Pie } from '@ant-design/plots';
 import { countOccurrences, countRiskTypes } from '../../hooks/useRiskTypeCount';
 import StatsGraph from '../shared/Graphs/StatsGraph';

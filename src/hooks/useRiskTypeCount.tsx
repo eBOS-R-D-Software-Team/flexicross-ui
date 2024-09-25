@@ -106,6 +106,7 @@ export const processAnomalyData = (data: any[])=> {
 export const processDataDetection = (data: any[])=> {
   const result: Record<string, Record<string, number>> = {};
   data.forEach((anomaly) => {
+      if(!anomaly) return;
        // Check if datetime and anomalyType are present
        if (!anomaly.datetime || !anomaly.detectionType) return;
 
@@ -141,21 +142,24 @@ export const totalDataTypesPerDay = (data: any[])=> {
   const counts: { [key: string]: number } = {};
 
   data.forEach(record => {
+    if(record) {
       const date = new Date(record.datetime).toISOString().split('T')[0]; // '2024-01-25'
       if (counts[date]) {
           counts[date]++;
       } else {
           counts[date] = 1;
       }
+    }
   });
+
   return counts
 
 }
 
 
-type CountData = {
-  [date: string]: number;
-};
+// type CountData = {
+//   [date: string]: number;
+// };
 
 type CombinedData = {
   [date: string]: {

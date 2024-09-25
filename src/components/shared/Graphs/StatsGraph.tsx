@@ -1,10 +1,7 @@
-import React, { ReactNode, useEffect } from 'react';
-import { Card, Layout, Typography } from 'antd';
-import { dataItem } from '../../../interfaces/riskData';
+import React, { useEffect } from 'react';
+import { Card, Typography } from 'antd';
 import { Tiny } from '@ant-design/charts';
-import { Color } from 'antd/es/color-picker';
 
-const { Header } = Layout;
 interface AppContentProps {
     data: any;
     title:any;
