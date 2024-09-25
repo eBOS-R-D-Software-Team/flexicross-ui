@@ -62,7 +62,7 @@ export const detectionDummy: any[]=[
       "_id": {
         "$oid": "65c5e60a9c57101e28eba6ec"
       },
-      "id": "5",
+      "id": "15",
       "datetime": "2024-01-26T17:10:06.187Z",
       "type": "Detection",
       "detectionType": "FaceVerificationIdentification",
@@ -150,7 +150,7 @@ export const detectionDummy: any[]=[
       "_id": {
         "$oid": "65c5e60a9c57101e28eba6ea"
       },
-      "id": "1e0ee7f0-1b35-49e6-a79f-b06024e47b29",
+      "id": "1wwe0ee7f0-1b35-49e6-a79f-b06024e47b29",
       "datetime": "2024-01-25T16:10:33.964Z",
       "type": "Detection",
       "detectionType": "UnusualPatternDetection",
@@ -205,12 +205,11 @@ export const detectionDummy: any[]=[
         "geometries": []
       }
     },
-    ,
     {
       "_id": {
         "$oid": "65c5e60a9c57101e28eba6ea"
       },
-      "id": "1e0ee7f0-1b35-49e6-a79f-b06024e47b29",
+      "id": "1e0ee7fd0-1b35-49e6-a79f-b06024e47b29",
       "datetime": "2024-01-26T16:10:33.964Z",
       "type": "Detection",
       "detectionType": "UnusualPatternDetection",
@@ -357,7 +356,7 @@ export const detectionDummy: any[]=[
       "_id": {
         "$oid": "65c5e60a9c57101e28eba6ea"
       },
-      "id": "1e0ee7f0-1b35-49e6-a79f-b06024e47b29",
+      "id": "1e0ee7f0-1b35-49e6-a79f-b06024e47b2p9",
       "datetime": "2024-01-25T16:10:33.964Z",
       "type": "Detection",
       "detectionType": "UnusualPatternDetection",

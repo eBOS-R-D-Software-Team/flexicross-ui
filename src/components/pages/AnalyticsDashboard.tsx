@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Card, Row, Col, Layout, Modal, Spin, Select } from 'antd';
 import { FullscreenOutlined } from '@ant-design/icons';
 import { Line, Pie } from '@ant-design/charts';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
@@ -16,9 +16,8 @@ const AnalyticsDashboard: React.FC = () => {
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [modalTitle, setModalTitle] = useState<string>('');
 
-  const dispatch = useDispatch();
   const anomalyData = useSelector((state: RootState) => state.anomalyData.anomalyData);
-  const detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
+  let detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
   const [selectedAnomalyTypes, setSelectedAnomalyTypes] = useState<string[]>(['Contraband', 'Smuggling']); // Show 2 types by default
   const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>(['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
 
@@ -51,9 +50,13 @@ const handleDetectionTypeChange = (value: string[]) => {
     }
 
     if (detectionData) {
+      detectionData= detectionData.filter(detection => detection != null);
+      console.log('detection data', detectionData);
       detectionMapData = detectionData.filter(item => {
+        if(item)
         return item.location;
       })
+      console.log("detection map data", detectionMapData);
       const processedDetectionData = processDataDetection(detectionData);
       setTinyDataDetection(processedDetectionData);
       console.log("tiny data detection", tinyDataDetection);
