@@ -106,7 +106,7 @@ export const processAnomalyData = (data: any[])=> {
 export const processDataDetection = (data: any[])=> {
   const result: Record<string, Record<string, number>> = {};
   data.forEach((anomaly) => {
-      if(!anomaly) return;
+    
        // Check if datetime and anomalyType are present
        if (!anomaly.datetime || !anomaly.detectionType) return;
 
