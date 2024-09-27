@@ -141,8 +141,9 @@ export const processDataDetection = (data: any[])=> {
 export const totalDataTypesPerDay = (data: any[])=> {
   const counts: { [key: string]: number } = {};
 
-  data.forEach(record => {
+  data.forEach((record, index) => {
     if(record) {
+      try {
       const date = new Date(record.datetime).toISOString().split('T')[0]; // '2024-01-25'
       if (counts[date]) {
           counts[date]++;
@@ -150,7 +151,13 @@ export const totalDataTypesPerDay = (data: any[])=> {
           counts[date] = 1;
       }
     }
-  });
+  
+  catch (error:any) {
+    // Catch any error and log the problematic record
+    console.error(`Error processing record at index ${index}:`, record);
+    console.error('Error message:', error.message);
+  }
+ } });
 
   return counts
 
