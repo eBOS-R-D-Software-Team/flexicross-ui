@@ -525,7 +525,7 @@ export const anomalyDummy: any[]=
 			"anomalyType": "Contraband"
 		},
 		{
-			"id": "6f7g8h9i-0006-6789-f012-678901234056",
+			"id": "6f7g8h9i-0006-6789-f012-6789012340f56",
 			"datetime": "2024-01-25T13:40:33.225Z",
 			"type": "Anomaly",
 			"anomalyType": "Smuggling"
@@ -673,7 +673,43 @@ export const anomalyDummy: any[]=
 			"datetime": "2024-01-28T15:43:53.225Z",
 			"type": "Anomaly",
 			"anomalyType": "BlockchainMisVerification"
-		}
+		},
+		{
+			"id": "5e6f7g8h-0005-5678-ef01-56789012304w5",
+			"datetime": "2024-01-29T12:35:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Contraband"
+		},
+		{
+			"id": "5e6f7g8h-0005-5678-ef01-56789012304a5",
+			"datetime": "2024-01-29T12:35:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Contraband"
+		},
+		{
+			"id": "5e6f7g8h-0005-5678-ef01-56789012304d5",
+			"datetime": "2024-01-29T12:35:23.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Contraband"
+		},
+		{
+			"id": "2v3w4x5y-0022-2345-5678-23456789q0212",
+			"datetime": "2024-01-29T14:37:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Smuggling"
+		},
+		{
+			"id": "2v3w4x5y-0022-2345-5678-2345678s90212",
+			"datetime": "2024-01-29T14:37:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Smuggling"
+		},
+		{
+			"id": "2v3w4x5y-0022-2345-5678-23456789f0212",
+			"datetime": "2024-01-29T14:37:33.225Z",
+			"type": "Anomaly",
+			"anomalyType": "Smuggling"
+		},
 	]
 	
 	

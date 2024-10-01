@@ -99,7 +99,7 @@ const handleDetectionTypeChange = (value: string[]) => {
   }, [tinyDataDetection, selectedDetectionsTypes]);
   useEffect(() => {
   setCombinedDetectionData([...(filteredDetectionData || []), ...(trendlineDetectionData || [])]);
-    
+  console.log("detection data: ",[...(filteredDetectionData || []), ...(trendlineDetectionData || [])]); 
   }, [filteredDetectionData, trendlineDetectionData]); 
   
   const openModal = (title: string, content: React.ReactNode) => {
@@ -198,10 +198,97 @@ const handleDetectionTypeChange = (value: string[]) => {
       return lineColor;
     },
   },
+  interaction: {
+    tooltip: {
+      render: (e:any, { title, items }: { title:any, items:any }) => {
+        const list = items.filter((item: { value: any; }) => item.value);
+        return (
+          <div key={title}>
+            <h4 style={{color: "#808080"}}>{title}</h4>
+            {list.map((item: { name: any; value: any; color: any; }) => {
+              const { name, value, color } = item;
+              let lineColor = "#cf1578";
+      if(name.includes('UnusualBehaviourOutOfBounds')){
+        lineColor="#2389ff";
+      }
+      else if(name.includes('UnusualBehaviourRunning')){
+        lineColor="#0dcccc";
+
+      }
+      else if(name.includes('SuspiciousDrivingPattern')){
+        lineColor="#7f6bff";
+
+      }
+      else if(name.includes('PersonMisVerified')){
+        lineColor="#c1952f";
+
+      }
+      else if(name.includes('PersonOutOfBounds')){
+        lineColor="#2f97b7";
+
+      }
+      else if(name.includes('PersonRunning')){
+        lineColor="#2389ff";
+
+      }
+      else if(name.includes('HumanTrafficking')){
+        lineColor="#68c738";
+
+      }
+      else if(name.includes('Contraband')){
+        lineColor="#f3ca20";
+
+      }
+      else if(name.includes('Smuggling')){
+        lineColor="#d72631";
+
+      }
+      else if(name.includes('FalsifiedDocuments')){
+        lineColor="#a2d5c6";
+
+      }
+      else if(name.includes('SuspiciousDrivingPattern')){
+        lineColor="#077b8a";
+
+      }
+      else if(name.includes('UnlawfulParkingVehicle')){
+        lineColor="#5c3c92";
+      }
+      else{
+        lineColor="#ff87cd";
+
+      }
+              return (
+                <div>
+                  <div style={{ margin: 0, display: 'flex', justifyContent: 'space-between', color: "#808080" }}>
+                    <div>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: lineColor,
+                          marginRight: 6,
+                        }}
+                      ></span>
+                      <span>{name}</span>
+                    </div>
+                    <b>{value}</b>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+  },
     sizeField: 'total',
    // shapeField: 'trail',
-    legend: { size: true,
- },
+//     legend: { size: true,
+//  },
+legend:false,
     colorField: 'type',
    
   }), []);
@@ -272,10 +359,97 @@ const handleDetectionTypeChange = (value: string[]) => {
       return lineColor;
     },
   },
+  interaction: {
+    tooltip: {
+      render: (e:any, { title, items }: { title:any, items:any }) => {
+        const list = items.filter((item: { value: any; }) => item.value);
+        return (
+          <div key={title}>
+            <h4 style={{color: "#808080"}}>{title}</h4>
+            {list.map((item: { name: any; value: any; color: any; }) => {
+              const { name, value, color } = item;
+              let lineColor = "#cf1578";
+              if(name.includes('UnusualPatternDetection')){
+                lineColor="#2389ff";
+              }
+              else if(name.includes('FaceVerificationIdentification')){
+                lineColor="#0dcccc";
+        
+              }
+              else if(name.includes('PersonPattern')){
+                lineColor="#7f6bff";
+        
+              }
+              else if(name.includes('PersonIdentification')){
+                lineColor="#c1952f";
+        
+              }
+              else if(name.includes('PersonVerification')){
+                lineColor="#2f97b7";
+        
+              }
+              else if(name.includes('BlockchainVerification')){
+                lineColor="#2389ff";
+        
+              }
+              else if(name.includes('Vesselrecognition')){
+                lineColor="#68c738";
+        
+              }
+              else if(name.includes('Contraband')){
+                lineColor="#f3ca20";
+        
+              }
+              else if(name.includes('Smuggling')){
+                lineColor="#d72631";
+        
+              }
+              else if(name.includes('Dangeroussubstance')){
+                lineColor="#a2d5c6";
+        
+              }
+              else if(name.includes('HumanTrafficking')){
+                lineColor="#077b8a";
+        
+              }
+              else if(name.includes('ConfirmedDocuments')){
+                lineColor="#5c3c92";
+              }
+              else{
+                lineColor="#ff87cd";
+        
+              }
+              return (
+                <div>
+                  <div style={{ margin: 0, display: 'flex', justifyContent: 'space-between', color: "#808080" }}>
+                    <div>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: lineColor,
+                          marginRight: 6,
+                        }}
+                      ></span>
+                      <span>{name}</span>
+                    </div>
+                    <b>{value}</b>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+  },
     sizeField: 'total',
    // shapeField: 'trail',
-    legend: { size: true,
- },
+//     legend: { size: true,
+//  },
+legend: false,
     colorField: 'type',
    
   }), []);
