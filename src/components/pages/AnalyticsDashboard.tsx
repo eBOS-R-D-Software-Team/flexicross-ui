@@ -6,7 +6,7 @@ import { Line } from '@ant-design/plots';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay } from '../../hooks/useRiskTypeCount';
+import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
@@ -144,58 +144,7 @@ const handleDetectionTypeChange = (value: string[]) => {
     },
     stroke:(items: { type: string; }[]) => {
       const { type } = items[0];
-      let lineColor = "#cf1578";
-      if(type.includes('UnusualBehaviourOutOfBounds')){
-        lineColor="#2389ff";
-      }
-      else if(type.includes('UnusualBehaviourRunning')){
-        lineColor="#0dcccc";
-
-      }
-      else if(type.includes('SuspiciousDrivingPattern')){
-        lineColor="#7f6bff";
-
-      }
-      else if(type.includes('PersonMisVerified')){
-        lineColor="#c1952f";
-
-      }
-      else if(type.includes('PersonOutOfBounds')){
-        lineColor="#2f97b7";
-
-      }
-      else if(type.includes('PersonRunning')){
-        lineColor="#2389ff";
-
-      }
-      else if(type.includes('HumanTrafficking')){
-        lineColor="#68c738";
-
-      }
-      else if(type.includes('Contraband')){
-        lineColor="#f3ca20";
-
-      }
-      else if(type.includes('Smuggling')){
-        lineColor="#d72631";
-
-      }
-      else if(type.includes('FalsifiedDocuments')){
-        lineColor="#a2d5c6";
-
-      }
-      else if(type.includes('SuspiciousDrivingPattern')){
-        lineColor="#077b8a";
-
-      }
-      else if(type.includes('UnlawfulParkingVehicle')){
-        lineColor="#5c3c92";
-      }
-      else{
-        lineColor="#ff87cd";
-
-      }
-      return lineColor;
+     return getAnomalyLineColor(type);
     },
   },
   interaction: {
@@ -207,57 +156,6 @@ const handleDetectionTypeChange = (value: string[]) => {
             <h4 style={{color: "#808080"}}>{title}</h4>
             {list.map((item: { name: any; value: any; color: any; }) => {
               const { name, value, color } = item;
-              let lineColor = "#cf1578";
-      if(name.includes('UnusualBehaviourOutOfBounds')){
-        lineColor="#2389ff";
-      }
-      else if(name.includes('UnusualBehaviourRunning')){
-        lineColor="#0dcccc";
-
-      }
-      else if(name.includes('SuspiciousDrivingPattern')){
-        lineColor="#7f6bff";
-
-      }
-      else if(name.includes('PersonMisVerified')){
-        lineColor="#c1952f";
-
-      }
-      else if(name.includes('PersonOutOfBounds')){
-        lineColor="#2f97b7";
-
-      }
-      else if(name.includes('PersonRunning')){
-        lineColor="#2389ff";
-
-      }
-      else if(name.includes('HumanTrafficking')){
-        lineColor="#68c738";
-
-      }
-      else if(name.includes('Contraband')){
-        lineColor="#f3ca20";
-
-      }
-      else if(name.includes('Smuggling')){
-        lineColor="#d72631";
-
-      }
-      else if(name.includes('FalsifiedDocuments')){
-        lineColor="#a2d5c6";
-
-      }
-      else if(name.includes('SuspiciousDrivingPattern')){
-        lineColor="#077b8a";
-
-      }
-      else if(name.includes('UnlawfulParkingVehicle')){
-        lineColor="#5c3c92";
-      }
-      else{
-        lineColor="#ff87cd";
-
-      }
               return (
                 <div>
                   <div style={{ margin: 0, display: 'flex', justifyContent: 'space-between', color: "#808080" }}>
@@ -268,7 +166,7 @@ const handleDetectionTypeChange = (value: string[]) => {
                           width: 6,
                           height: 6,
                           borderRadius: '50%',
-                          backgroundColor: lineColor,
+                          backgroundColor: getAnomalyLineColor(name),
                           marginRight: 6,
                         }}
                       ></span>
@@ -305,58 +203,7 @@ legend:false,
     },
     stroke:(items: { type: string; }[]) => {
       const { type } = items[0];
-      let lineColor = "#cf1578";
-      if(type.includes('UnusualPatternDetection')){
-        lineColor="#2389ff";
-      }
-      else if(type.includes('FaceVerificationIdentification')){
-        lineColor="#0dcccc";
-
-      }
-      else if(type.includes('PersonPattern')){
-        lineColor="#7f6bff";
-
-      }
-      else if(type.includes('PersonIdentification')){
-        lineColor="#c1952f";
-
-      }
-      else if(type.includes('PersonVerification')){
-        lineColor="#2f97b7";
-
-      }
-      else if(type.includes('BlockchainVerification')){
-        lineColor="#2389ff";
-
-      }
-      else if(type.includes('Vesselrecognition')){
-        lineColor="#68c738";
-
-      }
-      else if(type.includes('Contraband')){
-        lineColor="#f3ca20";
-
-      }
-      else if(type.includes('Smuggling')){
-        lineColor="#d72631";
-
-      }
-      else if(type.includes('Dangeroussubstance')){
-        lineColor="#a2d5c6";
-
-      }
-      else if(type.includes('HumanTrafficking')){
-        lineColor="#077b8a";
-
-      }
-      else if(type.includes('ConfirmedDocuments')){
-        lineColor="#5c3c92";
-      }
-      else{
-        lineColor="#ff87cd";
-
-      }
-      return lineColor;
+      return getDetectionLineColor(type);
     },
   },
   interaction: {
@@ -368,57 +215,6 @@ legend:false,
             <h4 style={{color: "#808080"}}>{title}</h4>
             {list.map((item: { name: any; value: any; color: any; }) => {
               const { name, value, color } = item;
-              let lineColor = "#cf1578";
-              if(name.includes('UnusualPatternDetection')){
-                lineColor="#2389ff";
-              }
-              else if(name.includes('FaceVerificationIdentification')){
-                lineColor="#0dcccc";
-        
-              }
-              else if(name.includes('PersonPattern')){
-                lineColor="#7f6bff";
-        
-              }
-              else if(name.includes('PersonIdentification')){
-                lineColor="#c1952f";
-        
-              }
-              else if(name.includes('PersonVerification')){
-                lineColor="#2f97b7";
-        
-              }
-              else if(name.includes('BlockchainVerification')){
-                lineColor="#2389ff";
-        
-              }
-              else if(name.includes('Vesselrecognition')){
-                lineColor="#68c738";
-        
-              }
-              else if(name.includes('Contraband')){
-                lineColor="#f3ca20";
-        
-              }
-              else if(name.includes('Smuggling')){
-                lineColor="#d72631";
-        
-              }
-              else if(name.includes('Dangeroussubstance')){
-                lineColor="#a2d5c6";
-        
-              }
-              else if(name.includes('HumanTrafficking')){
-                lineColor="#077b8a";
-        
-              }
-              else if(name.includes('ConfirmedDocuments')){
-                lineColor="#5c3c92";
-              }
-              else{
-                lineColor="#ff87cd";
-        
-              }
               return (
                 <div>
                   <div style={{ margin: 0, display: 'flex', justifyContent: 'space-between', color: "#808080" }}>
@@ -429,7 +225,7 @@ legend:false,
                           width: 6,
                           height: 6,
                           borderRadius: '50%',
-                          backgroundColor: lineColor,
+                          backgroundColor: getDetectionLineColor(name),
                           marginRight: 6,
                         }}
                       ></span>
