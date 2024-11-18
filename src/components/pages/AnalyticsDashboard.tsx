@@ -4,14 +4,16 @@ import { FullscreenOutlined } from '@ant-design/icons';
 import { Pie } from '@ant-design/charts';
 import { Line } from '@ant-design/plots';
 
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
 import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
 import { anomalyDummy } from '../../redux/slices/data/anomalydummy';
 import * as regression from 'regression'; // Add a regression library for linear regression calculations
+import { fetchAnomaliesFromAPI } from '../../redux/slices/anomalySlice';
+import { fetchDetectionsFromAPI } from '../../redux/slices/detectionSlice';
 
 const AnalyticsDashboard: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,6 +45,14 @@ const AnalyticsDashboard: React.FC = () => {
 const handleDetectionTypeChange = (value: string[]) => {
   setSelectedDetectionsTypes(value);
 }
+const dispatch: AppDispatch = useDispatch();
+
+useEffect(() => {
+  // Fetch anomalies when the component mounts
+  dispatch(fetchAnomaliesFromAPI());
+  dispatch(fetchDetectionsFromAPI());
+
+}, [dispatch]);
 
   useEffect(() => {
     if (anomalyData) {
@@ -316,7 +326,7 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
                 onClick={() =>
                   openModal('Filter Anomalies', (
                     <DataTableComponent
-                      data={anomalyDummy}
+                      data={anomalyData}
                       flag="anomaly"
                       fullscreen
                       onRowClick={handleRowClick}
@@ -327,7 +337,7 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
             }
           >
             <DataTableComponent
-              data={anomalyDummy}
+              data={anomalyData}
               flag="anomaly"
               fullscreen={false}
               onRowClick={handleRowClick}
@@ -342,7 +352,7 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
                 onClick={() =>
                   openModal('Filter Detections', (
                     <DataTableComponent
-                      data={detectionDummy}
+                      data={detectionData}
                       flag="detection"
                       fullscreen
                       onRowClick={handleRowClick}
@@ -353,7 +363,7 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
             }
           >
             <DataTableComponent
-              data={detectionDummy}
+              data={detectionData}
               flag="detection"
               fullscreen={false}
               onRowClick={handleRowClick}
