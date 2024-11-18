@@ -100,7 +100,13 @@ export const {
 // Thunk to fetch data from API
 export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
   try {
-    const response = await fetch('http://localhost:8080/anomaly');
+    const response = await fetch('http://localhost:8080/api/UseCaseData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type: 'anomaly' }),
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch anomalies');
     }
