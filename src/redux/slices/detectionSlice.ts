@@ -82,12 +82,15 @@ export const {
 // Thunk to fetch data from API
 export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
   try {
+    const postData = new URLSearchParams();
+    postData.append('type', 'detection');  // Ensure 'type' has a value
+    postData.append('usecase', '');  // Assuming 'usecase' can be empty
     const response = await fetch('http://localhost:8080/api/UseCaseData', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ type: 'detection' }),
+      body: postData.toString(),
     });
     if (!response.ok) {
       throw new Error('Failed to fetch detections');
