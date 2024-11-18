@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
-import { detectionDummy } from './data/dummyDetections';
 
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
     const serializedState = localStorage.getItem('detectionData');
     if (serializedState === null) {
-      saveStateToLocalStorage(detectionDummy);
-      return detectionDummy;
+      return [];
     }
     return JSON.parse(serializedState);
   } catch (err) {
@@ -62,9 +60,12 @@ const detectionSlice = createSlice({
       }
     },
     getDetectionDataById: (state, action: PayloadAction<any>) => {
-      const foundData = detectionDummy.find(data => data.id === action.payload);
-        state.selectedDetection = foundData;
-      
+      const foundData = state.detectionData.find(data => data.id === action.payload);
+      state.selectedDetection = foundData;
+    },
+    fetchDetections: (state, action: PayloadAction<any[]>) => {
+      // Exclude the first element from the fetched detections
+      state.detectionData = action.payload.slice(1);
     },
   },
 });
@@ -75,7 +76,23 @@ export const {
   deleteDetectionDataById,
   updateDetectionData,
   getDetectionDataById,
+  fetchDetections,
 } = detectionSlice.actions;
+
+// Thunk to fetch data from API
+export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
+  try {
+    const response = await fetch('http://localhost:8080/detection');
+    if (!response.ok) {
+      throw new Error('Failed to fetch detections');
+    }
+    const data = await response.json();
+    dispatch(fetchDetections(data));
+    saveStateToLocalStorage(data); // Save fetched data to local storage
+  } catch (err) {
+    console.error('Failed to fetch detections:', err);
+  }
+};
 
 // Middleware to handle saving state to local storage
 const localStorageDetectionMiddleware: Middleware = store => next => action => {
@@ -86,7 +103,7 @@ const localStorageDetectionMiddleware: Middleware = store => next => action => {
     deleteDetectionDataById.match(action) ||
     updateDetectionData.match(action)
   ) {
-    saveStateToLocalStorage(store.getState().detectionData.detectionData);
+  //  saveStateToLocalStorage(store.getState().detectionData.detectionData);
   }
   return result;
 };
