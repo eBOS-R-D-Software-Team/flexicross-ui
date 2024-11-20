@@ -80,7 +80,7 @@ const anomalySlice = createSlice({
     },
     fetchAnomalies: (state, action: PayloadAction<any[]>) => {
       // Exclude the first element from the fetched anomalies
-      state.anomalyData = action.payload.slice(1);
+      state.anomalyData = action.payload;
       saveStateToLocalStorage(state.anomalyData); // Save fetched data to local storage
 
       console.log("anomaly data first returned :", state.anomalyData[0]);
@@ -102,7 +102,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
   try {
     const postData = new URLSearchParams();
     postData.append('type', 'anomaly');  // Ensure 'type' has a value
-    postData.append('usecase', '');  // Assuming 'usecase' can be empty
+    
     const response = await fetch('http://localhost:8080/api/UseCaseData', {
       method: 'POST',
       headers: {

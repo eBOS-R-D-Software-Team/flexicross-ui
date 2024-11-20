@@ -65,7 +65,7 @@ const detectionSlice = createSlice({
     },
     fetchDetections: (state, action: PayloadAction<any[]>) => {
       // Exclude the first element from the fetched detections
-      state.detectionData = action.payload.slice(1);
+      state.detectionData = action.payload;
     },
   },
 });
@@ -84,7 +84,6 @@ export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
   try {
     const postData = new URLSearchParams();
     postData.append('type', 'detection');  // Ensure 'type' has a value
-    postData.append('usecase', '');  // Assuming 'usecase' can be empty
     const response = await fetch('http://localhost:8080/api/UseCaseData', {
       method: 'POST',
       headers: {
