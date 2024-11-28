@@ -6,7 +6,7 @@ import { Line } from '@ant-design/plots';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor } from '../../hooks/useRiskTypeCount';
+import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor, countRiskTypesForPieChart } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
@@ -14,6 +14,7 @@ import { anomalyDummy } from '../../redux/slices/data/anomalydummy';
 import * as regression from 'regression'; // Add a regression library for linear regression calculations
 import { fetchAnomaliesFromAPI } from '../../redux/slices/anomalySlice';
 import { fetchDetectionsFromAPI } from '../../redux/slices/detectionSlice';
+import PieChartWithPopup from '../charts/PieChart';
 
 const AnalyticsDashboard: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -466,13 +467,50 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
       </Row>
 
       <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={12}>
+
+      <Col span={12}>
           <Card
-            title="Anomaly Status"
+            title="Anomalies Distribution"
             extra={
               <FullscreenOutlined
                 onClick={() =>
-                  openModal('Anomaly Status', (
+                  openModal('Anomalies Distribution', (
+                    <PieChartWithPopup data={tinyAnomalyData} type={"anomalyType"}/>
+                  ))
+                }
+              />
+            }
+          >
+                 <PieChartWithPopup  data={tinyAnomalyData} type={"anomalyType"}/>
+
+          </Card>
+        </Col>
+
+        <Col span={12}>
+          <Card
+            title="Detections Distribution"
+            extra={
+              <FullscreenOutlined
+                onClick={() =>
+                  openModal('Anomalies Distribution', (
+                    <PieChartWithPopup data={tinyDataDetection} type={"detectionType"}/>
+                  ))
+                }
+              />
+            }
+          >
+                 <PieChartWithPopup  data={tinyDataDetection} type={"detectionType"}/>
+
+          </Card>
+        </Col>
+
+        {/* <Col span={12}>
+          <Card
+            title="Anomalies Distribution"
+            extra={
+              <FullscreenOutlined
+                onClick={() =>
+                  openModal('Anomalies Distribution', (
                     <Pie width={650} height={500} data={countRiskTypes(tinyAnomalyData, 'anomalyType')} {...configPie} />
                   ))
                 }
@@ -485,11 +523,11 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
 
         <Col span={12}>
           <Card
-            title="Detection Status"
+            title="Detections Distribution"
             extra={
               <FullscreenOutlined
                 onClick={() =>
-                  openModal('Detection Status', (
+                  openModal('Detections Distribution', (
                     <Pie width={650} height={500} data={countRiskTypes(tinyDataDetection, 'detectionType')} {...configPie} />
                   ))
                 }
@@ -498,7 +536,7 @@ const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); /
           >
             {!tinyDataDetection ? <Spin /> : <Pie style={{ textAlign: 'center', display: 'flex' }} width={650} height={500} data={countRiskTypes(tinyDataDetection, 'detectionType')} {...configPie} />}
           </Card>
-        </Col>
+        </Col> */}
       </Row>
 
       <Row gutter={24} style={{ marginBottom: 32 }}>
