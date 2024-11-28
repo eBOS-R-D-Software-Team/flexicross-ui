@@ -17,6 +17,26 @@ if(data){
   }));}
 };
 
+export const countRiskTypesForPieChart = (data: any,flag:any): any => {
+  const riskTypeCounts: { [key: string]: number } = {};
+if(data){
+  data.forEach((item: any) => {
+    const { riskType,severity,probability,type } = item;
+    const types = (flag === 'riskType') ? riskType : (flag === 'severity') ? severity :(flag === 'probability') ? probability : type;
+    if (riskTypeCounts[types]) {
+      riskTypeCounts[types]++;
+    } else {
+      riskTypeCounts[types] = 1;
+    }
+  });
+
+  return Object.entries(riskTypeCounts).map(([name, value]) => ({
+    name,
+    value,
+  }));}
+};
+
+
 export const countOccurrences = (dataArray: any[]) => {
   const result: { [key: string]: { [value: string]: number } } = {
     riskType: {},
