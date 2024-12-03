@@ -60,6 +60,7 @@ useEffect(() => {
       const processedAnomalyData = processAnomalyData(anomalyData);
       setStatsData(processedAnomalyData);
       setTinyAnomalyData(processedAnomalyData);
+      console.log("tiny anomaly data1: ", tinyAnomalyData);
     }
 
     if (detectionData) {
@@ -262,9 +263,9 @@ legend: false,
   }), []);
 
   // Generate options for the Select anomaly component
-  const options = Array.from(new Set(tinyAnomalyData?.map((item: { type: any; }) => item.type))).map(type => ({
+  const options = Array.from(new Set(tinyAnomalyData?.map((item: { type: any; ids:string[] }) => item.type))).map(type => ({
     label: type,
-    value: type,
+    value: type
   }));
 
    // Generate options for the Select detection component

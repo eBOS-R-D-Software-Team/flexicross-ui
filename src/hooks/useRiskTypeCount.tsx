@@ -17,25 +17,49 @@ if(data){
   }));}
 };
 
-export const countRiskTypesForPieChart = (data: any,flag:any): any => {
-  const riskTypeCounts: { [key: string]: number } = {};
-if(data){
-  data.forEach((item: any) => {
-    const { riskType,severity,probability,type } = item;
-    const types = (flag === 'riskType') ? riskType : (flag === 'severity') ? severity :(flag === 'probability') ? probability : type;
-    if (riskTypeCounts[types]) {
-      riskTypeCounts[types]++;
-    } else {
-      riskTypeCounts[types] = 1;
-    }
-  });
+export const countRiskTypesForPieChart = (data: any[], flag: any): any => {
+  const riskTypeCounts: { [key: string]: { count: number; ids: string[] } } = {};
 
-  return Object.entries(riskTypeCounts).map(([name, value]) => ({
-    name,
-    value,
-  }));}
+  if (data) {
+    data.forEach((item: any) => {
+      console.log("data item inside countrisktypes", item);
+      const { riskType, severity, probability, type, ids } = item;
+
+      // Determine the type based on the flag
+      const types =
+        flag === 'riskType'
+          ? riskType
+          : flag === 'severity'
+          ? severity
+          : flag === 'probability'
+          ? probability
+          : type;
+
+      if (!types || !ids) return; // Skip if the type or ids are undefined or null
+
+      if (riskTypeCounts[types]) {
+        riskTypeCounts[types].count += item.total; // Increment by the total value
+
+        // Merge and deduplicate ids
+        riskTypeCounts[types].ids = [
+          ...riskTypeCounts[types].ids,
+          ...ids.filter((id: string) => !riskTypeCounts[types].ids.includes(id)),
+        ];
+      } else {
+        riskTypeCounts[types] = { count: item.total, ids: [...ids] }; // Initialize count and ids
+      }
+    });
+
+    // Transform the data into the desired format
+    return Object.entries(riskTypeCounts).map(([name, { count, ids }]) => ({
+      name,
+      value: count,
+      ids,
+    }));
+  }
+
+  return [];
 };
-
 
 export const countOccurrences = (dataArray: any[]) => {
   const result: { [key: string]: { [value: string]: number } } = {
@@ -88,47 +112,53 @@ result.statistics['total'] = dataArray.length;
 };
 
 // Function to process the data
-export const processAnomalyData = (data: any[])=> {
-  const result: Record<string, Record<string, number>> = {};
+export const processAnomalyData = (data: any[]) => {
+  // Update the type declaration for result
+  const result: Record<string, Record<string, { count: number; ids: string[] }>> = {};
+  
   data.forEach((anomaly) => {
-       // Check if datetime and anomalyType are present
-       if (!anomaly.datetime || !anomaly.anomalyType) return;
+    // Check if datetime, anomalyType, and _id are present
+    if (!anomaly.datetime || !anomaly.anomalyType || !anomaly._id) return;
 
-       const date = new Date(anomaly.datetime);
-       // Format the date in European structure (dd-mm-yyyy)
-       const day = String(date.getDate()).padStart(2, '0');
-       const month = String(date.getMonth() + 1).padStart(2, '0');
-       const year = date.getFullYear();
-       const formattedDate = `${day}-${month}-${year}`;
-   
-       const type = anomaly.anomalyType;
-   
-       if (!result[formattedDate]) {
-         result[formattedDate] = {};
-       }
-   
-       if (!result[formattedDate][type]) {
-         result[formattedDate][type] = 0;
-       }
-       result[formattedDate][type]=Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
-       result[formattedDate][type] += 1;
-     });
-  const formattedResult= [];
+    const date = new Date(anomaly.datetime);
+    // Format the date in European structure (dd-mm-yyyy)
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
+
+    const type = anomaly.anomalyType;
+    const id = anomaly.id;
+
+    if (!result[formattedDate]) {
+      result[formattedDate] = {};
+    }
+
+    if (!result[formattedDate][type]) {
+      result[formattedDate][type] = { count: 0, ids: [] }; // Initialize with count and ids
+    }
+
+    result[formattedDate][type].count += 1;
+    result[formattedDate][type].ids.push(id);
+  });
+
+  const formattedResult = [];
 
   for (const [time, types] of Object.entries(result)) {
-    for (const [type, total] of Object.entries(types)) {
-      formattedResult.push({ time, type, total });
+    for (const [type, { count, ids }] of Object.entries(types)) {
+      formattedResult.push({ time, type, total: count, ids });
     }
   }
   return formattedResult;
 };
+
 // Function to process the data
 export const processDataDetection = (data: any[])=> {
-  const result: Record<string, Record<string, number>> = {};
+  const result: Record<string, Record<string,  { count: number; ids: string[] }>> = {};
   data.forEach((anomaly) => {
     
        // Check if datetime and anomalyType are present
-       if (!anomaly.datetime || !anomaly.detectionType) return;
+       if (!anomaly.datetime || !anomaly.detectionType || !anomaly._id) return;
 
        const date = new Date(anomaly.datetime);
        // Format the date in European structure (dd-mm-yyyy)
@@ -138,22 +168,24 @@ export const processDataDetection = (data: any[])=> {
        const formattedDate = `${day}-${month}-${year}`;
    
        const type = anomaly.detectionType;
-   
+       const id = anomaly.id;
+
        if (!result[formattedDate]) {
          result[formattedDate] = {};
        }
    
        if (!result[formattedDate][type]) {
-         result[formattedDate][type] = 0;
-       }
+        result[formattedDate][type] = { count: 0, ids: [] }; // Initialize with count and ids       
+      }
       //  result[formattedDate][type]=Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
-       result[formattedDate][type] += 1;
-     });
+      result[formattedDate][type].count += 1;
+      result[formattedDate][type].ids.push(id);
+       });
   const formattedResult= [];
 
   for (const [time, types] of Object.entries(result)) {
-    for (const [type, total] of Object.entries(types)) {
-      formattedResult.push({ time, type, total });
+    for (const [type, { count, ids }] of Object.entries(types)) {
+      formattedResult.push({ time, type, total: count, ids });
     }
   }
   return formattedResult;

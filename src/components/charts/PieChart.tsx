@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import { Modal,DatePicker, ConfigProvider } from 'antd';
+import { Modal,DatePicker, ConfigProvider, Layout, Row, Col, Card, Tag } from 'antd';
 import { ActiveShape } from 'recharts/types/util/types';
 import { countRiskTypesForPieChart } from '../../hooks/useRiskTypeCount';
 import dayjs from 'dayjs'; // To work with date formatting and comparison
+import Item from 'antd/lib/list/Item';
 
 interface ChartData {
   name: string;
   value: number;
+  ids: string[];
 }
 
 const COLORS = ['#2389ff', '#7f6bff', '#c1952f', '#a2d5c6','#2f97b7','#f3ca20','#d72631'];
@@ -23,7 +25,9 @@ const PieChartWithPopup = (props: { data: any; type:string}) => {
   let data = props.data? props.data : [];
   useEffect(() => {
     if(filteredData.length == 0) setFilteredData(data);
-  
+    console.log("type is : ", props.type);
+    console.log("passed data to pie chart: ", data);
+    console.log("processed data: ", countRiskTypesForPieChart(data, props.type));
   }, [data]);
   
 
@@ -113,15 +117,63 @@ const PieChartWithPopup = (props: { data: any; type:string}) => {
         
       </PieChart>
       <Modal
-        title="Details"
+        title={`${(props.type) == 'anomalyType' ? 'Selected anomalies' : 'Selected detections'} details`} style={{ marginTop: '16px' }}
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
       >
         {selectedData ? (
-          <div>
-            <p><strong>Type:</strong> {selectedData.name}</p>
+                        <div style={{ padding: '15px'}}>
+
+                     
+                      <p>Type: </p>  
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Tag color='cyan'>{selectedData.name}</Tag>
+                      </div>
+                      <br></br>
+                      <p>Total number of cases: </p>  
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Tag  color='cyan'>{selectedData.value}</Tag>
+                      </div>
+                        <br></br>
+                        <p>Dates of occurences: </p>  
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+  {Array.from(
+    new Set(
+      data
+        .filter((item: { ids: string[] }) => item.ids = selectedData.ids)
+        .map((filteredItem: { time: string }) => filteredItem.time)
+    )
+  ).map((uniqueTime, index) => (
+    <Tag key={index} color="cyan" style={{ margin: '5px' }}>
+      {uniqueTime as string}
+    </Tag>
+  ))}
+</div>
+<br></br>
+<p>Ids of related cases: </p>  
+<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+  {
+     
+  selectedData.ids.map((uniqueTime, index) => (
+    <Tag key={index} color="yellow" style={{ margin: '5px' }}>
+      {uniqueTime as string}
+    </Tag>
+  ))}
+          </div>
+
+
+
+                        {/* <Tag color='orange'>{selectedRisk.riskSeverity}</Tag>
+                        <Tag color='sucess'>{selectedRisk.riskStatus}</Tag> */}
+                    
+          
+                     
+            {/* <p><strong>Type:</strong> {selectedData.name}</p>
+            <p><strong>date:</strong> {data.filter((item: { ids: string[]; }) => item.ids = selectedData.ids)[0].time}</p>
+
             <p><strong>Value:</strong> {selectedData.value}</p>
+            <p><strong>ids:</strong> {selectedData.ids}</p> */}
           </div>
         ) : (
           <p>No data available</p>
