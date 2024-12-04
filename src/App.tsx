@@ -9,13 +9,16 @@ import keycloak from "./keycloak";
 import { ReactKeycloakProvider } from '@react-keycloak/web/lib/provider';
 
 const { darkAlgorithm } = theme;
+const initOptions = {
+  onLoad: 'login-required',
+  checkLoginIframe: false, // Disables iframe-based session check
+  enable3PC: false // Disables third-party cookies verification
+};
 
 const App: React.FC = () => (
     <ReactKeycloakProvider
     authClient={keycloak}
-    initOptions={{
-      onLoad: 'login-required',  // Automatically redirect to the login page if not authenticated
-    }}
+    initOptions={initOptions}
   >
     <ConfigProvider
       locale={enUSIntl}
