@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './components/pages/Home';
 import MainLayout from './components/layouts/MainLayout';
@@ -9,6 +9,8 @@ import AnalyticsDashboard from './components/pages/AnalyticsDashboard';
 import { dummyData } from './dummyData';
 import DetailPage from './components/shared/Details/DetailsPage';
 import { anomalyDummy } from './redux/slices/data/anomalydummy';
+
+
 
 const AppRoutes: React.FC = () => (
     <Routes>

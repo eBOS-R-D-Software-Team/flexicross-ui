@@ -16,19 +16,19 @@ const initOptions = {
 };
 
 const App: React.FC = () => (
-    <ReactKeycloakProvider
-    authClient={keycloak}
-    initOptions={initOptions}
-  >
+  //   <ReactKeycloakProvider
+  //   authClient={keycloak}
+  //   initOptions={initOptions}
+  // >
     <ConfigProvider
       locale={enUSIntl}
       theme={{
         algorithm: darkAlgorithm,
-        // token: {
-        //     // "colorPrimary": "#0e0e0e",
-        //     "fontSize": 16,
-        //     "borderRadius": 14
-        // }
+        token: {
+            // "colorPrimary": "#0e0e0e",
+            "fontSize": 16,
+            "borderRadius": 14
+        }
       }}
     >
         <Router>
@@ -37,7 +37,7 @@ const App: React.FC = () => (
             <Routes />
             </Provider>
         </Router></ConfigProvider>
-        </ReactKeycloakProvider>
+        //  </ReactKeycloakProvider>
 
 );
 

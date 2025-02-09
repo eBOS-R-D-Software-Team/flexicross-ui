@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDashboardData, clearDashboardData } from '../../redux/slices/riskDataSlice';
+import { setDashboardData,fetchRisksFromAPI, clearDashboardData } from '../../redux/slices/riskDataSlice';
 import { Link } from 'react-router-dom';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { Button, Card, Col, Layout, Row, Tag, Typography } from 'antd';
 import moment from 'moment';
 import { DashboardData } from '../../interfaces/dashboardData';
@@ -12,12 +12,19 @@ import { PlusOutlined, ExclamationCircleOutlined, DownCircleOutlined, CloseCircl
 
 const Dashboards: React.FC = () => {
     const dispatch = useDispatch();
-    const dashboardData = useSelector((state: RootState) => state.dashboardData.dashboardData);
+
+    // const dispatch:AppDispatch = useDispatch();
+    // useEffect(() => {
+    //     dispatch(fetchRisksFromAPI());
+    //     console.log("waaa data: ", dashboardData);
+
+    //   }, [dispatch]);
+   // const dashboardData = useSelector((state: RootState) => state.dashboardData.dashboardData);
+   const dashboardData = useSelector((state: RootState) => state.dashboardData.dashboardData);
     useEffect(() => {
-        // console.log(dashboardData);
-        return () => {
-        };
-    }, []);
+         console.log("dashboard data: ", dashboardData);
+       
+    }, [dashboardData]);
     // const addData = () => {
     //   const newData: Dashboard = { datetime: new Date(), filters: ['filter1', 'filter2'] };
     //   dispatch(setDashboardData(newData));
@@ -66,7 +73,7 @@ const Dashboards: React.FC = () => {
                             <Link to={`/risk/dashboard/${item.id}`}>
 
                                 <Card spellCheck title={<div>Dashboard {item.id} - <Tag color='blue'>{formatDate(item.datetime)}</Tag></div>} bordered={true} style={{ minHeight: 300 }}>
-                                    <Row>                                    <Col style={{ marginBottom: 16 }}>
+                                   {item.filters && <Row>                                    <Col style={{ marginBottom: 16 }}>
                                          <Typography.Paragraph strong>Type: <Tag style={{ marginLeft: 8 }}>Risk</Tag></Typography.Paragraph>
                                         {item.filters.severity || item.filters.riskType &&<><Typography.Paragraph strong>Filters:
 
@@ -77,7 +84,7 @@ const Dashboards: React.FC = () => {
 
                                                 <Tag style={{ marginLeft: 8, marginBottom: 16 }} color={item.filters.riskType === 'HumanTrafficking' ? '#000000' : item.filters.riskType === 'Contraband' ? '#8c8c8c' : item.filters.riskType === 'UTurnVehicle' ? '#262626' : item.filters.riskType === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {item.filters.riskType ? item.filters.riskType.toString().split('|').join(', ') : ''}</Tag>
                                             }                                    </Typography.Paragraph></>}
-                                    </Col></Row>
+                                    </Col></Row>}
                                 </Card>
                             </Link>
                         </Col>

@@ -12,7 +12,9 @@ interface ChartData {
   ids: string[];
 }
 
-const COLORS = ['#2389ff', '#7f6bff', '#c1952f', '#a2d5c6','#2f97b7','#f3ca20','#d72631'];
+//const COLORS = ['#2389ff', '#7f6bff', '#c1952f', '#a2d5c6','#2f97b7','#f3ca20','#d72631'];
+const COLORS = ['#0dcccc','#2389ff', '#48dbfb', '#1dd1a1','#ff6b6b', '#ff9f43', '#feca57', '#1dd1a1', '#48dbfb', '#5f27cd', '#ff4757'];
+
 
 const PieChartWithPopup = (props: { data: any; type:string}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);

@@ -22,7 +22,6 @@ export const countRiskTypesForPieChart = (data: any[], flag: any): any => {
 
   if (data) {
     data.forEach((item: any) => {
-      console.log("data item inside countrisktypes", item);
       const { riskType, severity, probability, type, ids } = item;
 
       // Determine the type based on the flag
@@ -125,7 +124,55 @@ export const processAnomalyData = (data: any[]) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
+
+    // // Format the time in hh:mm
+    // const hours = String(date.getHours()).padStart(2, '0');
+    // const minutes = String(date.getMinutes()).padStart(2, '0');
+    //const formattedTime = `${hours}:${minutes}`;
     const formattedDate = `${day}-${month}-${year}`;
+
+
+    const type = anomaly.anomalyType;
+    const id = anomaly.id;
+
+    if (!result[formattedDate]) {
+      result[formattedDate] = {};
+    }
+
+    if (!result[formattedDate][type]) {
+      result[formattedDate][type] = { count: 0, ids: [] }; // Initialize with count and ids
+    }
+
+    result[formattedDate][type].count += 1;
+    result[formattedDate][type].ids.push(id);
+  });
+
+  const formattedResult = [];
+
+  for (const [time, types] of Object.entries(result)) {
+    for (const [type, { count, ids }] of Object.entries(types)) {
+      formattedResult.push({ time, type, total: count, ids });
+    }
+  }
+  return formattedResult;
+};
+
+// Process by time instead of date
+export const processAnomalyDataToTime = (data: any[]) => {
+  // Update the type declaration for result
+  const result: Record<string, Record<string, { count: number; ids: string[] }>> = {};
+  
+  data.forEach((anomaly) => {
+    // Check if datetime, anomalyType, and _id are present
+    if (!anomaly.datetime || !anomaly.anomalyType || !anomaly._id) return;
+
+    const date = new Date(anomaly.datetime);
+
+    // Format the time in hh:mm
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const formattedDate = `${hours}:${minutes}`;
+
 
     const type = anomaly.anomalyType;
     const id = anomaly.id;
@@ -190,6 +237,44 @@ export const processDataDetection = (data: any[])=> {
   }
   return formattedResult;
 };
+// Function to process the data
+export const processDataDetectionToTime = (data: any[])=> {
+  const result: Record<string, Record<string,  { count: number; ids: string[] }>> = {};
+  data.forEach((anomaly) => {
+    
+       // Check if datetime and anomalyType are present
+       if (!anomaly.datetime || !anomaly.detectionType || !anomaly._id) return;
+
+       const date = new Date(anomaly.datetime);
+        // Format the time in hh:mm
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const formattedDate = `${hours}:${minutes}`;
+   
+       const type = anomaly.detectionType;
+       const id = anomaly.id;
+
+       if (!result[formattedDate]) {
+         result[formattedDate] = {};
+       }
+   
+       if (!result[formattedDate][type]) {
+        result[formattedDate][type] = { count: 0, ids: [] }; // Initialize with count and ids       
+      }
+      //  result[formattedDate][type]=Math.floor(Math.random() * (1000 - 1 + 1)) + 1;
+      result[formattedDate][type].count += 1;
+      result[formattedDate][type].ids.push(id);
+       });
+  const formattedResult= [];
+
+  for (const [time, types] of Object.entries(result)) {
+    for (const [type, { count, ids }] of Object.entries(types)) {
+      formattedResult.push({ time, type, total: count, ids });
+    }
+  }
+  return formattedResult;
+};
+
 export const totalDataTypesPerDay = (data: any[])=> {
   const counts: { [key: string]: number } = {};
 
@@ -219,10 +304,11 @@ export const getAnomalyLineColor=(type:string)=>{
   let lineColor = "#cf1578";
   if(type.includes('UnusualBehaviourOutOfBounds')){
     lineColor="#2389ff";
+   //lineColor="#2389ff";
   }
   else if(type.includes('UnusualBehaviourRunning')){
     lineColor="#0dcccc";
-
+   //lineColor="#002353";
   }
   else if(type.includes('SuspiciousDrivingPattern')){
     lineColor="#7f6bff";
@@ -315,7 +401,7 @@ export const getDetectionLineColor=(type:string)=>{
     lineColor="#077b8a";
 
   }
-  else if(type.includes('ConfirmedDocuments')){
+  else if(type.includes('PersonPattern')){
     lineColor="#5c3c92";
   }
   else{

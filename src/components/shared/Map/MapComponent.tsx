@@ -7,9 +7,9 @@ interface Location {
   type: string;
   geometry: {
     type: string;
-    coordinates: [number, number];
+    coordinates: [[number, number]];
   };
-  properties: {
+  properties?: {
     detectionConfidence: number;
     trackingConfidence: number;
   };
@@ -21,8 +21,22 @@ interface MapComponentProps {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
+//   locations=[{
+//     geometry: {
+//         coordinates: [
+//              23.784161159985374,
+//                 37.97927915998538
+//             ,
+
+//         ],
+//         type: "LineString"
+//     },
+//     type: "Feature"
+// }];
+  console.log("received locations in map component: ", locations);
+
   return (
-    <MapContainer center={[center[1], center[0]]} zoom={11} style={{ height: '100vh', width: '100%' }}>
+    <MapContainer center={[center[1], center[0]]} zoom={12} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
         noWrap={true}
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
@@ -38,8 +52,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
       {locations.map((location, index) => (
         <>{location &&
           <Marker
-            key={index +Math.floor(100000000)}
-            position={[location.geometry.coordinates[1], location.geometry.coordinates[0]]}
+            position={[location.geometry.coordinates[0][1], location.geometry.coordinates[0][0]]}
             icon={L.icon({
               iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
               iconSize: [25, 41],

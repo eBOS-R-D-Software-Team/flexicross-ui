@@ -1,15 +1,19 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ProTable, ProColumns, ActionType } from '@ant-design/pro-table';
 import { Button, Form, Tag } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined, DownCircleOutlined, CloseCircleOutlined, MinusCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
-import { setDashboardData } from '../../../redux/slices/riskDataSlice';
+import { fetchRisksFromAPI, setDashboardData } from '../../../redux/slices/riskDataSlice';
 import { dataItem } from '../../../interfaces/riskData';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DashboardData } from '../../../interfaces/dashboardData';
 import { v4 as uuid } from 'uuid';
 import { setAnomalyData } from '../../../redux/slices/anomalySlice';
 import { setDetectionData } from '../../../redux/slices/detectionSlice';
+import { AppDispatch, RootState } from '../../../redux/store';
+
+
+  
 export const waitTimePromise = async (time: number = 100) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -47,6 +51,18 @@ const DataTableComponent: React.FC<TableProps> = ({ data, flag, fullscreen, onRo
   const [filters, setFilters] = React.useState({});
   const [dashboard, setDashboard] = React.useState<DashboardData>({ id: '', datetime: new Date(), data: [], filters: [] });
   const navigate = useNavigate();
+
+
+// const dispatch:AppDispatch = useDispatch();
+// useEffect(() => {
+//     dispatch(fetchRisksFromAPI());
+
+//   }, [dispatch]);
+//   const dashboardData = useSelector((state: RootState) => state.dashboardData.dashboardData);
+
+// if (flag==='risk') {
+//   data = dashboardData;
+// }
 
 // Define columns for ProTable
 const columns: ProColumns<dataItem>[] = [
