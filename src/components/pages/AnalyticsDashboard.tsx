@@ -98,7 +98,6 @@ useEffect(() => {
       // })
       setdetectionMapData(detectionData.map(item => {
         if(item.trackingDetection){
-          console.log("item tracking detection: ", item.trackingDetection);
         return item.trackingDetection.geometries[0];}}));
 
       console.log("detection map data", detectionMapData);
