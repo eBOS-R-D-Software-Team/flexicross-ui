@@ -103,7 +103,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const postData = new URLSearchParams();
     postData.append('type', 'anomaly');  // Ensure 'type' has a value
     //postData.append('usecase','uc1_iccs');
-    const response = await fetch('http://slimrelief.pythonanywhere.com/api/UseCaseData', {
+    const response = await fetch('https://slimrelief.pythonanywhere.com/api/UseCaseData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

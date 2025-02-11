@@ -86,7 +86,7 @@ export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
     postData.append('type', 'detection');  // Ensure 'type' has a value
    // postData.append('usecase','uc1_iccs');
 
-    const response = await fetch('slimrelief.pythonanywhere.com/api/UseCaseData', {
+    const response = await fetch('https://slimrelief.pythonanywhere.com/api/UseCaseData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
