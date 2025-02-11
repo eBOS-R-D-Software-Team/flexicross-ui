@@ -19,7 +19,7 @@ const processAnomaliesData = (anomaliesData: Anomaly[]): ChartData[] => {
   const typeCounts: Record<string, { count: number; visualIds: string[] }> = {};
 
   anomaliesData.forEach((anomaly) => {
-    if(anomaly){
+    if(anomaly.involvedObjects){
     const involvedObject = anomaly.involvedObjects[0]; // Get the first element of involvedObjects
     if (involvedObject) {
       const { type, visualId } = involvedObject;
