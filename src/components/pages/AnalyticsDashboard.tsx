@@ -66,8 +66,9 @@ useEffect(() => {
 }, [dispatch]);
 
   useEffect(() => {
-    if (anomalyData) {
+    if (anomalyData && anomalyData[0]) {
       const firstDate = anomalyData[0].datetime.substring(0,10);
+      console.log("first date: ",firstDate);
       setFirstAnomalyDate(anomalyData[0].datetime.substring(0,10))
       let isOneDate = true;
       anomalyData.forEach(anomaly =>{
@@ -724,7 +725,7 @@ const formatDate = (date: Date): string => {
         </Row>
 
 
-        <Row gutter={24} style={{ marginBottom: 32 }}>
+        {/* <Row gutter={24} style={{ marginBottom: 32 }}>
         <Col span={24}>
         <Card
             title="Line chart"
@@ -732,7 +733,7 @@ const formatDate = (date: Date): string => {
           <LineChart/>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
       <Row gutter={24} style={{ marginBottom: 32 }}>
         <Col span={24}>
         <Card
