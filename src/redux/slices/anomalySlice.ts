@@ -85,6 +85,10 @@ const anomalySlice = createSlice({
 
       console.log("anomaly data first returned :", state.anomalyData[0]);
     },
+    setFilteredAnomalyData: (state, action: PayloadAction<any[]>) => {
+      state.filteredData = action.payload;
+    //  saveStateToLocalStorage(state.filteredData); 
+    },
   },
 });
 
@@ -95,6 +99,7 @@ export const {
   updateAnomalyData,
   getAnomalyDataById,
   fetchAnomalies,
+  setFilteredAnomalyData
 } = anomalySlice.actions;
 
 // Thunk to fetch data from API
@@ -130,7 +135,8 @@ const localStorageAnomalyMiddleware: Middleware = store => next => action => {
     clearAnomalyData.match(action) ||
     deleteAnomalyDataById.match(action) ||
     updateAnomalyData.match(action) ||
-    fetchAnomalies.match(action)
+    fetchAnomalies.match(action)  ||
+    setFilteredAnomalyData.match(action)
 
   ) {
     // console.log("store.getState().anomalyData.anomalyData.length: ", store.getState().anomalyData.anomalyData.length);

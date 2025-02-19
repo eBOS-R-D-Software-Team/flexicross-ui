@@ -27,11 +27,13 @@ const saveStateToLocalStorage = (state: any[]) => {
 // Define the initial state structure
 interface DetectionDataState {
   detectionData: any[];
+  filteredData: any[];
   selectedDetection: any;
 }
 
 const initialState: DetectionDataState = {
   detectionData: loadStateFromLocalStorage(),
+  filteredData: [],
   selectedDetection: null,
 };
 
@@ -67,6 +69,10 @@ const detectionSlice = createSlice({
       // Exclude the first element from the fetched detections
       state.detectionData = action.payload;
     },
+    setFilteredDetectionData: (state, action: PayloadAction<any[]>) => {
+      state.filteredData = action.payload;
+    //  saveStateToLocalStorage(state.filteredData); 
+    },
   },
 });
 
@@ -77,6 +83,7 @@ export const {
   updateDetectionData,
   getDetectionDataById,
   fetchDetections,
+  setFilteredDetectionData
 } = detectionSlice.actions;
 
 // Thunk to fetch data from API
@@ -111,7 +118,9 @@ const localStorageDetectionMiddleware: Middleware = store => next => action => {
     setDetectionData.match(action) ||
     clearDetectionData.match(action) ||
     deleteDetectionDataById.match(action) ||
-    updateDetectionData.match(action)
+    updateDetectionData.match(action) || 
+    setFilteredDetectionData.match(action)
+
   ) {
   //  saveStateToLocalStorage(store.getState().detectionData.detectionData);
   }

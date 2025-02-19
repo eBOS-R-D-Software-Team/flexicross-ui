@@ -27,6 +27,8 @@
                 dispatch(getAnomalyDataById(id));
               }
               if(selectedAnomaly&&selectedAnomaly?.involvedObjects){
+                console.log("fama object data w anomaly.involvedObjects: ", selectedAnomaly?.involvedObjects);
+
                 setObjectData(selectedAnomaly?.involvedObjects);
           
           }

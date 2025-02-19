@@ -33,8 +33,8 @@ const AnalyticsDashboard: React.FC = () => {
   const [tinyAnomalyData, setTinyAnomalyData] = useState<any>();
   const [tinyDataDetection, setTinyDataDetection] = useState<any>();
   const [combinedData, setCombinedData] = useState<any>();
-  const[filteredAnomalyData,setFilteredAnomalyData] = useState<any[]>();
-  const[filteredDetectionData,setFilteredDetectionData] = useState<any[]>();
+  const [filteredAnomalyData,setFilteredAnomalyData] = useState<any[]>();
+  const [filteredDetectionData,setFilteredDetectionData] = useState<any[]>();
 
   const [trendlineData, setTrendlineData] = useState<any[]>();
   const [trendlineDetectionData, setTrendlineDetectionData] = useState<any[]>();
@@ -51,6 +51,9 @@ const AnalyticsDashboard: React.FC = () => {
   const [firstAnomalyDate, setFirstAnomalyDate] = useState<string>("");
   const [firstDetectionDate, setFirstDetectionDate] = useState<string>("");
 
+  const filteredAnomalyDataState = useSelector((state: RootState) => state.anomalyData.filteredData);
+  let filteredDetectionDataState = useSelector((state: RootState) => state.detectionData.filteredData);
+
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
 }
@@ -63,6 +66,7 @@ useEffect(() => {
   // Fetch anomalies when the component mounts
   dispatch(fetchAnomaliesFromAPI());
   dispatch(fetchDetectionsFromAPI());
+
 }, [dispatch]);
 
   useEffect(() => {
@@ -121,18 +125,58 @@ useEffect(() => {
       const detectionTotals = totalDataTypesPerDay(detectionData);
       setCombinedData(mergeAndPrepareData(anomalyTotals, detectionTotals));
     }
-  }, [anomalyData, detectionData]);
+  }, [anomalyData, detectionData]); 
+
+
+  useEffect(() => {
+    if (filteredAnomalyDataState && filteredAnomalyDataState[0]) {
+      const firstDate = filteredAnomalyDataState[0].datetime.substring(0,10);
+      console.log("first date: ",firstDate);
+      setFirstAnomalyDate(filteredAnomalyDataState[0].datetime.substring(0,10))
+      let isOneDate = true;
+      filteredAnomalyDataState.forEach(anomaly =>{
+        if (anomaly.datetime.substring(0,10) != firstDate){
+          setIsOneDateOnly(false);
+          isOneDate = false;
+          return;
+        }
+      })
+      const processedAnomalyData = isOneDate? processAnomalyDataToTime(filteredAnomalyDataState) : processAnomalyData(filteredAnomalyDataState);
+      setStatsData(processedAnomalyData);
+      setTinyAnomalyData(processedAnomalyData);
+      console.log("tiny anomaly data1: ", tinyAnomalyData);
+      setanomaliesMapData(filteredAnomalyDataState.map(item => 
+         item.trackingDetection.geometries[0]));
+    }
+  }, [filteredAnomalyDataState]);
+
+  useEffect(() => {
+    if (filteredDetectionDataState) {
+      filteredDetectionDataState= filteredDetectionDataState.filter(detection => detection != null);
+      console.log('filtered detection data', filteredDetectionDataState);
+      setdetectionMapData(filteredDetectionDataState.map(item => {
+        if(item.trackingDetection){
+        return item.trackingDetection.geometries[0];}}));
+
+      console.log("detection map data", detectionMapData);
+
+      const processedDetectionData = processDataDetection(filteredDetectionDataState);
+      setTinyDataDetection(processedDetectionData);
+      console.log("tiny data detection", tinyDataDetection);
+      const anomalyTotals = totalDataTypesPerDay(filteredAnomalyDataState);
+      const detectionTotals = totalDataTypesPerDay(filteredDetectionDataState);
+      setCombinedData(mergeAndPrepareData(anomalyTotals, detectionTotals));
+    }
+  }, [filteredDetectionDataState]);
 
   useEffect(() => {
 
     setFilteredAnomalyData(Array.isArray(tinyAnomalyData)
     ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
     : []);
-   // if(filteredAnomalyData?.length){
     setTrendlineData(calculateTrendline(Array.isArray(tinyAnomalyData)
     ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
     : []))
-  //};
     
   }, [tinyAnomalyData, selectedAnomalyTypes]);
   useEffect(() => {

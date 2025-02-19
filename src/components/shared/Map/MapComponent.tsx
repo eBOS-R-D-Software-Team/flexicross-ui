@@ -7,7 +7,7 @@ interface Location {
   type: string;
   geometry: {
     type: string;
-    coordinates: [[number, number]];
+    coordinates: any[];
   };
   properties?: {
     detectionConfidence: number;
@@ -34,7 +34,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
 //     type: "Feature"
 // }];
   console.log("received locations in map component: ", locations);
-
+  let isFromDashboard = locations[0].geometry.coordinates[0][0] ? true : false;
   return (
     <MapContainer center={[center[1], center[0]]} zoom={12} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
@@ -52,7 +52,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
       {locations.map((location, index) => (
         <>{location &&
           <Marker
-            position={[location.geometry.coordinates[0][1], location.geometry.coordinates[0][0]]}
+            position={isFromDashboard? [location.geometry.coordinates[0][1], location.geometry.coordinates[0][0]] : [location.geometry.coordinates[1], location.geometry.coordinates[0]]}
             icon={L.icon({
               iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
               iconSize: [25, 41],

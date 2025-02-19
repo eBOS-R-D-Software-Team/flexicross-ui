@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DashboardData } from '../../../interfaces/dashboardData';
 import { v4 as uuid } from 'uuid';
-import { setAnomalyData } from '../../../redux/slices/anomalySlice';
-import { setDetectionData } from '../../../redux/slices/detectionSlice';
+import { setAnomalyData, setFilteredAnomalyData } from '../../../redux/slices/anomalySlice';
+import { setDetectionData, setFilteredDetectionData } from '../../../redux/slices/detectionSlice';
 import { AppDispatch, RootState } from '../../../redux/store';
 
 
@@ -51,8 +51,11 @@ const DataTableComponent: React.FC<TableProps> = ({ data, flag, fullscreen, onRo
   const [filters, setFilters] = React.useState({});
   const [dashboard, setDashboard] = React.useState<DashboardData>({ id: '', datetime: new Date(), data: [], filters: [] });
   const navigate = useNavigate();
+  const [selectedAnomalyData, setSelectedAnomalyData] = React.useState<any[]>();
+  const [selectedDetectionData, setSelectedDetectionData] = React.useState<any[]>();
 
-
+  const initialData = data;
+  console.log("reset data mel loul ", data ," w initial data ", initialData);
 // const dispatch:AppDispatch = useDispatch();
 // useEffect(() => {
 //     dispatch(fetchRisksFromAPI());
@@ -231,7 +234,6 @@ const columnsAnomaly: ProColumns<any>[] = [
     ellipsis: true,
     valueType: 'select',
     valueEnum: {
-      all: { text: 'All' },
       HumanTrafficking: {
         text: 'Human Trafficking',
         status: 'HumanTrafficking',
@@ -249,6 +251,38 @@ const columnsAnomaly: ProColumns<any>[] = [
         text: 'Suspicious Driving Pattern',
         status: 'SuspiciousDrivingPattern',
       },
+      UnusualBehaviourOutOfBounds: {
+        text: 'Unusual Behaviour Out Of Bounds',
+        status: 'UnusualBehaviourOutOfBounds',
+      },
+      UnusualBehaviourRunning: {
+        text: 'Unusual Behaviour Running',
+        status: 'UnusualBehaviourRunning',
+      },
+      PersonMisVerified: {
+        text: 'Person Mis Verified',
+        status: 'PersonMisVerified',
+      },
+      PersonOutOfBounds: {
+        text: 'Person Out Of Bounds',
+        status: 'PersonOutOfBounds',
+      },
+      PersonRunning: {
+        text: 'PersonRunning',
+        status: 'PersonRunning',
+      },
+      Smuggling: {
+        text: 'Smuggling',
+        status: 'Smuggling',
+      },
+      FalsifiedDocuments: {
+        text: 'Falsified Documents',
+        status: 'FalsifiedDocuments',
+      },
+      UnlawfulParkingVehicle: {
+        text: 'Unlawful Parking Vehicle',
+        status: 'UnlawfulParkingVehicle',
+      },
     },
     render: (dom: any) => {
       const dm = dom;
@@ -256,9 +290,31 @@ const columnsAnomaly: ProColumns<any>[] = [
       const text = textTemp?.props.text;
       return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
-  },{
+  },   
+  {
+    disable: true,
     title: 'Involved Objects',
     key: 'action',
+    dataIndex: 'involvedObjects[0].type',
+    filters: true,
+    onFilter: true,
+    ellipsis: true,
+    valueType: 'select',
+    valueEnum: {
+      Vessel: {
+        text: 'Vessel',
+        status: 'Vessel',
+      },
+      Vehicle: {
+        text: 'Vehicle',
+        status: 'Vehicle',
+        // disabled: true,
+      },
+      PersonPattern: {
+        text: 'Person',
+        status: 'Person',
+      },
+    },
     render: (text: any, record: any) => (
               <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
 
@@ -292,23 +348,58 @@ const columnsDetection: ProColumns<any>[] = [
     ellipsis: true,
     valueType: 'select',
     valueEnum: {
-      all: { text: 'All' },
-      HumanTrafficking: {
-        text: 'Human Trafficking',
-        status: 'HumanTrafficking',
+      UnusualPatternDetection: {
+        text: 'Unusual Pattern Detection',
+        status: 'UnusualPatternDetection',
+      },
+      FaceVerificationIdentification: {
+        text: 'Face Verification Identification',
+        status: 'FaceVerificationIdentification',
+        // disabled: true,
+      },
+      PersonPattern: {
+        text: 'Person Pattern',
+        status: 'PersonPattern',
+      },
+      PersonIdentification: {
+        text: 'Person Identification',
+        status: 'PersonIdentification',
+      },
+      BlockchainVerification: {
+        text: 'Blockchain Verification',
+        status: 'BlockchainVerification',
+      },
+      Vesselrecognition: {
+        text: 'Vessel recognition',
+        status: 'Vesselrecognition',
+      },
+      Smuggling: {
+        text: 'Smuggling',
+        status: 'Smuggling',
       },
       Contraband: {
         text: 'Contraband',
         status: 'Contraband',
-        // disabled: true,
       },
-      UTurnVehicle: {
-        text: 'U Turn Vehicle',
-        status: 'UTurnVehicle',
+      Dangeroussubstance: {
+        text: 'Dangerous substance',
+        status: 'Dangeroussubstance',
       },
-      SuspiciousDrivingPattern: {
-        text: 'Suspicious Driving Pattern',
-        status: 'SuspiciousDrivingPattern',
+      HumanTrafficking: {
+        text: 'Human Trafficking',
+        status: 'HumanTrafficking',
+      },
+      ConfirmedDocuments: {
+        text: 'Confirmed Documents',
+        status: 'ConfirmedDocuments',
+      },
+      Trainrecognition: {
+        text: 'Train recognition',
+        status: 'Trainrecognition',
+      },
+      NormalDrivingPattern: {
+        text: 'Normal Driving Pattern',
+        status: 'NormalDrivingPattern',
       },
     },
     render: (dom: any) => {
@@ -317,23 +408,54 @@ const columnsDetection: ProColumns<any>[] = [
       const text = textTemp?.props.text;
       return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
-  },    {
+  },   
+  {
+    disable: true,
     title: 'Involved Objects',
-    key: 'action',
+    dataIndex: ['involvedObjects', 0, 'type'], // Correctly access nested data
+    filters: true,
+    onFilter: (value: any, record: any) => {
+      console.log("inside involved objects on filter, value : ", value, " record: ", record);
+      const involvedObject = record.involvedObjects?.[0];
+      return involvedObject?.type === value || involvedObject?.visualId === value;
+    },
+    ellipsis: true,
+    valueType: 'select',
+    valueEnum: {
+      Vessel: {
+        text: 'Vessel',
+        status: 'Vessel',
+      },
+      Vehicle: {
+        text: 'Vehicle',
+        status: 'Vehicle',
+      },
+      Person: {
+        text: 'Person',
+        status: 'Person',
+      },
+    },
     render: (text: any, record: any) => (
-              <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
-
+      <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>
+        View Details
+      </Button>
     ),
   },
 ];
   const onSearch = async (values: any) => {
-    if (Object.keys(values).length !== 2) {
-      const filteredData = dataSource.filter(item => {
+    console.log("values on search: ", values);
+    console.log("Object.keys(values) on search: ", Object.keys(values));
+    
+    if (Object.keys(values).length !== 2 && (values.anomalyType || values.detectionType || values.involvedObjects[0].type)) {
+      // kenet datasource.filter
+      const filteredData = initialData.filter(item => {
+       // console.log("values.involvedObjects[0].type: ", values.involvedObjects[0].type, "item.involvedObjects[0].type: ", item.involvedObjects[0].type );
         if (values.type && item.type !== values.type) return false;
         if (values.id && !item.id.includes(values.id)) return false;
         if (values.datetime && formatDateToISO(new Date(item.datetime)) != formatDateToISO(values.datetime)) return false;
         if (values.anomalyType && !item.anomalyType.includes(values.anomalyType)) return false;
         if (values.detectionType && !item.detectionType.includes(values.detectionType)) return false;
+        if (values && values.involvedObjects[0].type && item.involvedObjects[0].type !== values.involvedObjects[0].type ) return false;
 
         if (values.riskType && !item.riskType.includes(values.riskType)) return false;
         if (values.severity && !item.severity.includes(values.severity)) return false;
@@ -346,11 +468,34 @@ const columnsDetection: ProColumns<any>[] = [
       setDataSource(filteredData);
       return filteredData;
     } else {
-      setDataSource(data);
-      return data;
+      console.log("condition reset wel data ", initialData);
+      setFilters([]);
+      setDataSource(initialData);
+      if (flag==='anomaly'){
+        dispatch(setAnomalyData(initialData));}
+        
+        else if (flag==='detection'){
+          dispatch(setDetectionData(initialData));}
+      return initialData;
 
     }
   };
+    // Function to handle reset
+    const handleReset = () => {
+      setFilters([]);
+      setDataSource(initialData);
+      
+      if (flag==='anomaly'){
+      dispatch(setAnomalyData(initialData));
+      dispatch(setFilteredAnomalyData(initialData));
+    }
+      else if (flag==='detection'){
+        dispatch(setDetectionData(initialData));
+        dispatch(setFilteredDetectionData(initialData));
+      }
+        
+
+    };
 
   const handleGenerateGraphs = () => {
     // Dispatch the query data to the store
@@ -379,8 +524,8 @@ const columnsDetection: ProColumns<any>[] = [
       //   type: 'multiple',
       // }}
       request={async (params, sort, filter) => {
+        console.log("params: ", params);
         setFilters(params);
-
         await waitTime(2000);
         // if(params['datetime']){
         //   params['datetime'] = formatDateToISO(params['datetime']).toString()
@@ -388,18 +533,21 @@ const columnsDetection: ProColumns<any>[] = [
         setFilters(params);
 
         const tempdata = await onSearch(params)
+       // setFilters([]);
         if(flag === 'anomaly'){
-          dispatch(setAnomalyData(tempdata));
+        //  dispatch(setAnomalyData(tempdata));
+        dispatch(setFilteredAnomalyData(tempdata));
+
           return tempdata;
         } else if(flag === 'detection'){
-          dispatch(setDetectionData(tempdata));
+          dispatch(setFilteredDetectionData(tempdata));
           return tempdata;
         }
         return tempdata;
       }}
       onChange={
         (pagination, filters, sorter, extra) => {
-             console.log(extra.currentDataSource,pagination, filters, sorter, extra)
+             console.log(extra.currentDataSource,pagination, filters, sorter, extra);
         } 
    } 
       columnsState={{
@@ -430,6 +578,10 @@ const columnsDetection: ProColumns<any>[] = [
           }
         },
       })}
+    onReset ={() =>{
+      console.log("reset tnezlet");
+      handleReset();
+    }}
       pagination={{
         pageSize: (flag!='risk' && fullscreen) ?15:(flag ==='risk' )? 15:5 ,
       }}
@@ -442,10 +594,14 @@ const columnsDetection: ProColumns<any>[] = [
         >
           Generate Dashboard
         </Button>,
-      ] : undefined}
+      ] : 
+      () => [   <Button type="default" onClick={handleReset}>
+      Reset Filters</Button>] 
+} 
     />
 
   );
 };
 
 export default DataTableComponent;
+
