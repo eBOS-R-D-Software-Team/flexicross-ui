@@ -294,10 +294,13 @@ const columnsAnomaly: ProColumns<any>[] = [
   {
     disable: true,
     title: 'Involved Objects',
-    key: 'action',
-    dataIndex: 'involvedObjects[0].type',
+    dataIndex: ['involvedObjects', 0, 'type'], // Correctly access nested data
     filters: true,
-    onFilter: true,
+    onFilter: (value: any, record: any) => {
+      console.log("inside involved objects on filter, value : ", value, " record: ", record);
+      const involvedObject = record.involvedObjects?.[0];
+      return involvedObject?.type === value || involvedObject?.visualId === value;
+    },
     ellipsis: true,
     valueType: 'select',
     valueEnum: {
@@ -308,16 +311,16 @@ const columnsAnomaly: ProColumns<any>[] = [
       Vehicle: {
         text: 'Vehicle',
         status: 'Vehicle',
-        // disabled: true,
       },
-      PersonPattern: {
+      Person: {
         text: 'Person',
         status: 'Person',
       },
     },
     render: (text: any, record: any) => (
-              <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>View Details</Button>
-
+      <Button onClick={() => navigate(`/involved-objects/${flag}/${record.id}`)}>
+        View Details
+      </Button>
     ),
   },
 ];
@@ -446,7 +449,7 @@ const columnsDetection: ProColumns<any>[] = [
     console.log("values on search: ", values);
     console.log("Object.keys(values) on search: ", Object.keys(values));
     
-    if (Object.keys(values).length !== 2 && (values.anomalyType || values.detectionType || values.involvedObjects[0].type)) {
+    if (Object.keys(values).length !== 2 && (values.anomalyType || values.detectionType || (values.involvedObjects && values.involvedObjects[0].type))) {
       // kenet datasource.filter
       const filteredData = initialData.filter(item => {
        // console.log("values.involvedObjects[0].type: ", values.involvedObjects[0].type, "item.involvedObjects[0].type: ", item.involvedObjects[0].type );

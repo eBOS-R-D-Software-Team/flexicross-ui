@@ -51,6 +51,9 @@ const AnalyticsDashboard: React.FC = () => {
   const [firstAnomalyDate, setFirstAnomalyDate] = useState<string>("");
   const [firstDetectionDate, setFirstDetectionDate] = useState<string>("");
 
+  const [anomalyDistribution, setAnomalyDistribution] = useState<any[]>();
+  const [detectionDistribution, setdetectionDistribution] = useState<any[]>();
+
   const filteredAnomalyDataState = useSelector((state: RootState) => state.anomalyData.filteredData);
   let filteredDetectionDataState = useSelector((state: RootState) => state.detectionData.filteredData);
 
@@ -177,7 +180,8 @@ useEffect(() => {
     setTrendlineData(calculateTrendline(Array.isArray(tinyAnomalyData)
     ? tinyAnomalyData.filter(item => selectedAnomalyTypes.includes(item.type))
     : []))
-    
+
+    setAnomalyDistribution(tinyAnomalyData);    
   }, [tinyAnomalyData, selectedAnomalyTypes]);
   useEffect(() => {
      setCombinedAnomalyData([...(filteredAnomalyData || []), ...(trendlineData || [])]);
@@ -193,9 +197,20 @@ useEffect(() => {
     setTrendlineDetectionData(calculateTrendline(Array.isArray(tinyDataDetection)
     ? tinyDataDetection.filter(item => selectedDetectionsTypes.includes(item.type))
     : []))
+
+    setdetectionDistribution(tinyDataDetection);    
+
   };
     
   }, [tinyDataDetection, selectedDetectionsTypes]);
+
+  useEffect(() => {
+
+    console.log("anomaly distribution walet: ", anomalyDistribution);
+    
+  }, [detectionDistribution, anomalyDistribution]);
+
+
   useEffect(() => {
   setCombinedDetectionData([...(filteredDetectionData || []), ...(trendlineDetectionData || [])]);
   console.log("detection data: ",[...(filteredDetectionData || []), ...(trendlineDetectionData || [])]); 
@@ -664,13 +679,13 @@ const formatDate = (date: Date): string => {
         <FullscreenOutlined
           onClick={() =>
             openModal('Anomalies Distribution', (
-              <PieChartWithPopup data={tinyAnomalyData} type={"anomalyType"}/>
+              <PieChartWithPopup data={anomalyDistribution} type={"anomalyType"}/>
             ))
           }
         />
       }
     >
-           <PieChartWithPopup  data={tinyAnomalyData} type={"anomalyType"}/>
+           <PieChartWithPopup  data={anomalyDistribution} type={"anomalyType"}/>
 
     </Card>
   </Col>
@@ -681,14 +696,14 @@ const formatDate = (date: Date): string => {
       extra={
         <FullscreenOutlined
           onClick={() =>
-            openModal('Anomalies Distribution', (
-              <PieChartWithPopup data={tinyDataDetection} type={"detectionType"}/>
+            openModal('Detections Distribution', (
+              <PieChartWithPopup data={detectionDistribution} type={"detectionType"}/>
             ))
           }
         />
       }
     >
-           <PieChartWithPopup  data={tinyDataDetection} type={"detectionType"}/>
+           <PieChartWithPopup  data={detectionDistribution} type={"detectionType"}/>
 
     </Card>
   </Col>
@@ -738,13 +753,13 @@ const formatDate = (date: Date): string => {
               <FullscreenOutlined
                 onClick={() =>
                   openModal('Anomalies Involved Objects', (
-                    <BarChartWithPopup anomaliesData={anomalyData}/>
+                    <BarChartWithPopup anomaliesData={filteredAnomalyDataState? filteredAnomalyDataState : anomalyData}/>
                   ))
                 }
               />
             }
           >
-                 <BarChartWithPopup anomaliesData={anomalyData}/>
+                 <BarChartWithPopup anomaliesData={filteredAnomalyDataState? filteredAnomalyDataState : anomalyData}/>
 
           </Card>
         </Col>
@@ -756,13 +771,13 @@ const formatDate = (date: Date): string => {
               <FullscreenOutlined
                 onClick={() =>
                   openModal('Detections Involved Objects', (
-                    <BarChartWithPopup anomaliesData={detectionData}/>
+                    <BarChartWithPopup anomaliesData={filteredDetectionDataState? filteredDetectionDataState : detectionData}/>
                   ))
                 }
               />
             }
           >
-                 <BarChartWithPopup anomaliesData={anomalyData}/>
+                 <BarChartWithPopup anomaliesData={filteredDetectionDataState? filteredDetectionDataState : detectionData}/>
 
           </Card>
         </Col>
