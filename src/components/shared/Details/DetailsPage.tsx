@@ -27,7 +27,7 @@
                 dispatch(getAnomalyDataById(id));
               }
               if(selectedAnomaly&&selectedAnomaly?.involvedObjects){
-                console.log("fama object data w anomaly.involvedObjects: ", selectedAnomaly?.involvedObjects);
+                console.log("selected anomaly: ", selectedAnomaly);
 
                 setObjectData(selectedAnomaly?.involvedObjects);
           
@@ -74,21 +74,98 @@
                   <Col span={24}>
                     <Card title={`${(type) ? type.charAt(0).toUpperCase() + type.slice(1) : ''} Details`} style={{ marginTop: '16px' }}>
                       {selectedRisk && type === 'risk' && <>
-                        <Tag color='red'>{selectedRisk.riskType}</Tag>
-                        <Tag color='orange'>{selectedRisk.riskSeverity}</Tag>
-                        <Tag color='sucess'>{selectedRisk.riskStatus}</Tag>
+                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Id: </p>
+                      <Tag style={{marginLeft: "20px"}} color='red' >{selectedRisk.id}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Risk Type: </p>
+                      <Tag style={{marginLeft: "20px"}} color='orange' >{selectedRisk.riskType}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Risk Severity: </p>
+                      <Tag style={{marginLeft: "20px"}} color='orange' >{selectedRisk.severity}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Risk Probability: </p>
+                      <Tag style={{marginLeft: "20px"}} color='orange' >{selectedRisk.Probability}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Date & Time: </p>
+                      <Tag style={{ marginLeft: "20px" }} color="green">
+  {selectedRisk.datetime.substring(0, 10)}
+  &nbsp;&nbsp;
+  {selectedRisk.datetime.substring(11, 19)}
+</Tag>
+
+                                              </div>
+                        {selectedRisk?.trackingDetection?.geometries && ( 
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Tracking Location: </p>
+                     
+                       <MapComponent locations={[selectedRisk?.location]}  center={selectedRisk?.location.geometry.coordinates}/>
+          
+                        </div>
+          )}
+
+                      
                       </>
           
                       }
                       {selectedAnomaly && type === 'anomaly' && <>
-                        <Tag color='red' >{selectedAnomaly.id}</Tag>
-                        <Tag color='orange' >{selectedAnomaly.anomalyType}</Tag>
+                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Id: </p>
+                      <Tag style={{marginLeft: "20px"}} color='red' >{selectedAnomaly.id}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Anomaly Type: </p>
+                      <Tag style={{marginLeft: "20px"}} color='orange' >{selectedAnomaly.anomalyType}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                        <p>Date & Time: </p>
+                      <Tag style={{ marginLeft: "20px" }} color="green">
+  {selectedAnomaly.datetime.substring(0, 10)}
+  &nbsp;&nbsp;
+  {selectedAnomaly.datetime.substring(11, 19)}
+</Tag>                        </div>
+                        {selectedAnomaly?.trackingDetection?.geometries && ( 
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Tracking Location: </p>
+                     
+            <MapComponent locations={[selectedAnomaly?.trackingDetection.geometries[0]]}  center={selectedAnomaly?.trackingDetection.geometries[0].geometry.coordinates[0]}/>
+                        </div>
+          )}
+
+
                       </>
                       }
                       {(selectedDetection && type === 'detection') &&
                         <>
-                          <Tag color='red'>{selectedDetection.id}</Tag>
-                          <Tag color='orange'>{selectedDetection.detectionType}</Tag></>
+                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Id: </p>
+                      <Tag style={{marginLeft: "20px"}} color='red' >{selectedDetection.id}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Anomaly Type: </p>
+                      <Tag style={{marginLeft: "20px"}} color='orange' >{selectedDetection.detectionType}</Tag>
+                        </div>
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                        <p>Date & Time: </p>
+                      <Tag style={{ marginLeft: "20px" }} color="green">
+  {selectedDetection.datetime.substring(0, 10)}
+  &nbsp;&nbsp;
+  {selectedDetection.datetime.substring(11, 19)}
+</Tag>                        </div>
+                        {selectedDetection?.trackingDetection?.geometries && ( 
+                        <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
+                      <p>Tracking Location: </p>
+                     
+            <MapComponent locations={[selectedDetection?.trackingDetection.geometries[0]]}  center={selectedDetection?.trackingDetection.geometries[0].geometry.coordinates[0]}/>
+                        </div>
+          )}
+
+
+                      </>
                       }
                     </Card>
                   </Col>
