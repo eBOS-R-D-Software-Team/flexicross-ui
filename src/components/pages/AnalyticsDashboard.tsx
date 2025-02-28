@@ -6,7 +6,7 @@ import { Line } from '@ant-design/plots';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor, countRiskTypesForPieChart, processAnomalyDataToTime } from '../../hooks/useRiskTypeCount';
+import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor, countRiskTypesForPieChart, processAnomalyDataToTime, formatDateTime } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
@@ -17,6 +17,7 @@ import { fetchDetectionsFromAPI } from '../../redux/slices/detectionSlice';
 import PieChartWithPopup from '../charts/PieChart';
 import BarChartWithPopup from '../charts/BarChart';
 import LineChart from '../charts/LineChart';
+
 
 const AnalyticsDashboard: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -56,6 +57,13 @@ const AnalyticsDashboard: React.FC = () => {
 
   const filteredAnomalyDataState = useSelector((state: RootState) => state.anomalyData.filteredData);
   let filteredDetectionDataState = useSelector((state: RootState) => state.detectionData.filteredData);
+
+  const [isAnomalyModalVisible, setIsAnomalyModalVisible] = useState(false);
+const [selectedAnpmalyDayData, setSelectedAnpmalyDayData] = useState<any[]>([]);
+const [isDetectionModalVisible, setIsDetectionModalVisible] = useState(false);
+const [selectedDetectionDayData, setSelectedDetectionDayData] = useState<any[]>([]);
+
+
 
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
@@ -226,7 +234,7 @@ useEffect(() => {
     openModal('Details', <div>{JSON.stringify(record.involvedObjects, null, 2)}</div>);
   };
 
-
+   
 
   const configPie = useMemo(() => ({
     theme: 'classicDark',
@@ -249,6 +257,10 @@ useEffect(() => {
     theme: 'classicDark',
     xField: 'time',
     yField: 'total',
+    axis:{
+      x:{title:'date'},
+      y:{title: 'anomaly value'}
+    },
   style: {
     lineWidth: 2,
     textAlign: 'center', display: 'flex',
@@ -261,6 +273,7 @@ useEffect(() => {
      return getAnomalyLineColor(type);
     },
   },
+
   interaction: {
     tooltip: {
       render: (e:any, { title, items }: { title:any, items:any }) => {
@@ -296,6 +309,75 @@ useEffect(() => {
       },
     },
   },
+  // Use onReady to attach a click listener at the plot level.
+  onReady: ({ chart }: { chart: any }) => {
+    console.log("Chart is ready", chart);
+    chart.on('plot:click', (event: any) => {
+      console.log("Plot click event:", event);
+      
+      // Get the canvas click coordinates.
+      const { x, y } = event.canvas;
+      console.log("Canvas coordinates:", x, y);
+
+      
+      // Attempt coordinate inversion.
+      let coordinate;
+      if (chart.chart && chart.chart.getCoordinate) {
+        coordinate = chart.chart.getCoordinate();
+      } else if (chart.getChart && chart.getChart().getCoordinate) {
+        coordinate = chart.getChart().getCoordinate();
+      }
+      
+      let clickedTime: any = null;
+      if (coordinate && coordinate.invert) {
+        const inverted = coordinate.invert({ x, y });
+        console.log("Inverted coordinate:", inverted);
+        if (inverted && inverted.x) {
+          clickedTime = inverted.x;
+        }
+      }
+      
+      // Fallback: if inversion didn’t work, compute based on canvas x.
+      if (!clickedTime) {
+        console.warn("Coordinate inversion failed. Using fallback.");
+        // Try getting chart width (using chart.getWidth if available)
+        let chartWidth = chart.getWidth ? chart.getWidth() : 1300;
+        // Compute the time domain from your data (parsing date strings properly)
+        const timeValues = chart.children[0].value.data.map((record: any) => parseDate(record.time).getTime());
+        const minTime = Math.min(...timeValues);
+        const maxTime = Math.max(...timeValues);
+        // Determine the proportion along the chart width.
+        const proportion = x / chartWidth;
+        const computedTime = new Date(minTime + proportion * (maxTime - minTime));
+        clickedTime = computedTime.toISOString();
+        console.log("Computed clicked time (fallback):", computedTime);
+      } else {
+        console.log("Clicked time from inversion:", clickedTime);
+      }
+      
+      // Convert clickedTime to a timestamp.
+      const clickedTimestamp = new Date(clickedTime).getTime();
+      console.log("Clicked timestamp:", clickedTimestamp);
+      
+      // Find the record in combinedAnomalyData whose time is closest.
+      const closestRecord = chart.children[0].value.data.reduce((prev: any, curr: any) => {
+        const prevTime = parseDate(prev.time).getTime();
+        const currTime = parseDate(curr.time).getTime();
+        return Math.abs(currTime - clickedTimestamp) < Math.abs(prevTime - clickedTimestamp)
+          ? curr
+          : prev;
+      }, chart.children[0].value.data[0]);
+      
+      console.log("Closest record:", closestRecord);
+      
+      // Update state with the closest record.
+      setSelectedAnpmalyDayData([closestRecord]);
+      setIsAnomalyModalVisible(true);
+    });
+  },
+
+  
+  
     sizeField: 'total',
    // shapeField: 'trail',
 //     legend: { size: true,
@@ -304,6 +386,20 @@ legend:false,
     colorField: 'type',
    
   }), []);
+  const handlePointClick = (event: any) => {
+    console.log("Clicked Point Event:", event); // Debug log
+    const data = event?.data?.data;
+    if (data) {
+      setSelectedAnpmalyDayData([data]); // Update state with selected point data
+      setIsAnomalyModalVisible(true); // Show modal
+    }
+  };
+  // Helper: parse a date string in DD-MM-YYYY format.
+function parseDate(dateStr: string) {
+  const [day, month, year] = dateStr.split('-');
+  return new Date(`${year}-${month}-${day}`);
+}
+    
   const detectionsTrendConfig = useMemo(() => ({
     theme: 'classicDark',
     xField: 'time',
@@ -355,6 +451,73 @@ legend:false,
       },
     },
   },
+    // Use onReady to attach a click listener at the plot level.
+    onReady: ({ chart }: { chart: any }) => {
+      console.log("Chart is ready", chart);
+      chart.on('plot:click', (event: any) => {
+        console.log("Plot click event:", event);
+        
+        // Get the canvas click coordinates.
+        const { x, y } = event.canvas;
+        console.log("Canvas coordinates:", x, y);
+  
+        
+        // Attempt coordinate inversion.
+        let coordinate;
+        if (chart.chart && chart.chart.getCoordinate) {
+          coordinate = chart.chart.getCoordinate();
+        } else if (chart.getChart && chart.getChart().getCoordinate) {
+          coordinate = chart.getChart().getCoordinate();
+        }
+        
+        let clickedTime: any = null;
+        if (coordinate && coordinate.invert) {
+          const inverted = coordinate.invert({ x, y });
+          console.log("Inverted coordinate:", inverted);
+          if (inverted && inverted.x) {
+            clickedTime = inverted.x;
+          }
+        }
+        
+        // Fallback: if inversion didn’t work, compute based on canvas x.
+        if (!clickedTime) {
+          console.warn("Coordinate inversion failed. Using fallback.");
+          // Try getting chart width (using chart.getWidth if available)
+          let chartWidth = chart.getWidth ? chart.getWidth() : 1300;
+          // Compute the time domain from your data (parsing date strings properly)
+          const timeValues = chart.children[0].value.data.map((record: any) => parseDate(record.time).getTime());
+          const minTime = Math.min(...timeValues);
+          const maxTime = Math.max(...timeValues);
+          // Determine the proportion along the chart width.
+          const proportion = x / chartWidth;
+          const computedTime = new Date(minTime + proportion * (maxTime - minTime));
+          clickedTime = computedTime.toISOString();
+          console.log("Computed clicked time (fallback):", computedTime);
+        } else {
+          console.log("Clicked time from inversion:", clickedTime);
+        }
+        
+        // Convert clickedTime to a timestamp.
+        const clickedTimestamp = new Date(clickedTime).getTime();
+        console.log("Clicked timestamp:", clickedTimestamp);
+        
+        // Find the record in combinedAnomalyData whose time is closest.
+        const closestRecord = chart.children[0].value.data.reduce((prev: any, curr: any) => {
+          const prevTime = parseDate(prev.time).getTime();
+          const currTime = parseDate(curr.time).getTime();
+          return Math.abs(currTime - clickedTimestamp) < Math.abs(prevTime - clickedTimestamp)
+            ? curr
+            : prev;
+        }, chart.children[0].value.data[0]);
+        
+        console.log("Closest record:", closestRecord);
+        
+        // Update state with the closest record.
+        setSelectedDetectionDayData([closestRecord]);
+        setIsDetectionModalVisible(true);
+      });
+    },
+  
     sizeField: 'total',
    // shapeField: 'trail',
 //     legend: { size: true,
@@ -375,49 +538,6 @@ legend: false,
     label: type,
     value: type,
   }));
-
-//    // Function to calculate trendlines
-//    const calculateTrendline = (data: any[]) => {
-//     console.log("data inside function: ", data);
-//     const groupedData = data.reduce((acc: any, curr: any) => {
-//       const type = curr.type || 'Contraband';
-// // Manually parse the date in DD-MM-YYYY format
-// const [day, month, year] = curr.time.split('-'); // Split the date by "-"
-// const time = new Date(Number(year), Number(month) - 1, Number(day)).getTime(); // Convert to timestamp
-//   const total = curr.total !== undefined ? Number(curr.total) : NaN; // Ensure total is a number
-//         console.log('Processing:', { type, time, total });
-
-//       if (!isNaN(time) && !isNaN(total)) {  // Ensure both time and total are valid numbers
-//         if (!acc[type]) {
-//           acc[type] = [];
-//         }
-//         acc[type].push([time, total]);
-//       }
-//       return acc;
-//     }, {});
-
-//     let trendlineData:any[] = [];
-//     console.log('grouped data: ', groupedData);
-//     Object.keys(groupedData).forEach((type) => {
-//       const result = regression.linear(groupedData[type]); // Calculate linear regression
-//       result.points.forEach((point) => {
-//         const date = new Date(point[0]);
-//         // Format the date in European structure (dd-mm-yyyy)
-//         const day = String(date.getDate()).padStart(2, '0');
-//         const month = String(date.getMonth() + 1).padStart(2, '0');
-//         const year = date.getFullYear();
-//         const formattedDate = `${day}-${month}-${year}`;
- 
-//         trendlineData.push({
-//           time: formattedDate,
-//           total: point[1],
-//           type: `${type} (Trend)`,
-//         });
-//       });
-//     });
-//     console.log("trendline data inside function: ", trendlineData);
-//     return trendlineData;
-//   };
 
 // Function to calculate trendlines manually
 const calculateTrendline = (data: any[]) => {
@@ -445,6 +565,9 @@ const calculateTrendline = (data: any[]) => {
 
     return acc;
   }, {});
+
+ 
+  
 
   let trendlineData: any[] = [];
   console.log('grouped data: ', groupedData);
@@ -519,7 +642,18 @@ const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
+const handleChartReady = (plot: any) => {
+  console.log("chart ready");
 
+  plot.on('element:click', (event: any) => {
+    console.log("tnezlet l point");
+    const { data } = event;
+    if (data) {
+      setSelectedAnpmalyDayData([data]); // Set the clicked data in state
+      setIsAnomalyModalVisible(true); // Open the modal
+    }
+  });
+};
   return (
     <Layout>
       <Row gutter={24} style={{ marginBottom: 32 }}>
@@ -606,7 +740,9 @@ const formatDate = (date: Date): string => {
             onChange={handleAnomalyTypeChange}
             options={options} // Use the options array here
           />
-                <Line width={1300} data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData} {...anomaliesTrendConfig} />
+                <Line width={1300} data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData}
+                 {...anomaliesTrendConfig}
+                                  />
                 </div>
               ))
             }
@@ -614,8 +750,39 @@ const formatDate = (date: Date): string => {
         </>
       }
     >
-      {!tinyAnomalyData ? <Spin /> : <Line width={1300}  data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData} {...anomaliesTrendConfig} />}
+      {!tinyAnomalyData ? <Spin /> : <Line width={1300}  data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData} 
+      {...anomaliesTrendConfig} 
+      // onEvent={(chart, event) => {
+      //   if (event.type === 'element:click') {
+      //     handlePointClick(event);
+      //   }
+      // }}
+      // onReady={handleChartReady}
+    
+      />}
     </Card>
+          {/* Modal to display anomalies for the selected day */}
+          {/* <Modal
+        title="Anomalies for Selected Day"
+        visible={isAnomalyModalVisible}
+        onCancel={() => setIsAnomalyModalVisible(false)}
+        footer={null} // Remove default footer buttons
+      >
+        {selectedAnpmalyDayData.length > 0 ? (
+          <ul>
+            {selectedAnpmalyDayData.map((anomaly, index) => (
+              <li key={index}>
+                <strong>Type:</strong> {anomaly.type},{' '}
+                <strong>Total:</strong> {anomaly.total}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No anomalies found for this day.</p>
+        )}
+      </Modal> */}
+    
+
     <Card
       title={isOneDetectionDateOnly? "Detections Trend for " + firstDetectionDate : "Detections Trend"}
       extra={
@@ -832,6 +999,202 @@ const formatDate = (date: Date): string => {
       >
         {modalContent}
       </Modal>
+
+      <Modal
+  title="Anomalies for Selected Day"
+  visible={isAnomalyModalVisible}
+  onCancel={() => setIsAnomalyModalVisible(false)}
+  footer={null} // Remove default footer buttons
+>
+  {selectedAnpmalyDayData.length > 0 ? (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      {(() => {
+        const selected = selectedAnpmalyDayData[0];
+        // Format the selected date/time.
+        const formattedDate = formatDateTime(selected.time);
+        // Get the list of related anomaly items by filtering anomalyData using the IDs.
+        const relatedAnomalies = anomalyData.filter(item =>
+          selected.ids && selected.ids.includes(item.id)
+        );
+        return (
+          <div>
+            <div style={{ marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+              <h3 style={{ margin: 0 }}>Selected Date &amp; Time: {formattedDate}</h3>
+              <p style={{ margin: '5px 0' }}>
+                <strong>Anomaly Type:</strong> {selected.type}
+              </p>
+              <p style={{ margin: '5px 0' }}>
+                <strong>Total Anomalies:</strong> {selected.total}
+              </p>
+            </div>
+            <div>
+              <h4 style={{ marginBottom: '10px', color: '#fff' }}>Anomalies Information:</h4>
+              {relatedAnomalies.length > 0 ? (
+                relatedAnomalies.map((anomaly, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: '20px',
+                      padding: '15px',
+                      border: '1px solid #fff',
+                      borderRadius: '5px',
+                      // backgroundColor: '#fafafa',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 5px' }}>
+                      <strong>ID:</strong> {anomaly.id}
+                    </p>
+                    <p style={{ margin: '0 0 10px' }}>
+                      <strong>Anomaly Type:</strong> {anomaly.anomalyType}
+                    </p>
+                    <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
+                      <p style={{ margin: '0 0 5px' }}><strong>Involved Objects:</strong></p>
+                      <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
+                          <li key={idx} style={{ marginBottom: '5px' }}>
+                            <p style={{ margin: 0 }}>
+                              <strong>Detection Confidence:</strong>{' '}
+                              {obj.location.properties.detectionConfidence}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Tracking Confidence:</strong>{' '}
+                              {obj.location.properties.trackingConfidence}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Type:</strong> {obj.type}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Visual ID:</strong> {obj.visualId}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p style={{ margin: '0 0 5px' }}>
+                        <strong>Tracking Detection:</strong>
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Detection Confidence:</strong>{' '}
+                        {anomaly.trackingDetection.detectionConfidence.join(', ')}
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Tracking Confidence:</strong>{' '}
+                        {anomaly.trackingDetection.trackingConfidence[0]}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No detailed anomaly information available.</p>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  ) : (
+    <p style={{ padding: '20px' }}>No anomalies found for this day.</p>
+  )}
+</Modal>
+<Modal
+  title="Detections for Selected Day"
+  visible={isDetectionModalVisible}
+  onCancel={() => setIsDetectionModalVisible(false)}
+  footer={null} // Remove default footer buttons
+>
+  {selectedDetectionDayData.length > 0 ? (
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      {(() => {
+        const selected = selectedDetectionDayData[0];
+        // Format the selected date/time.
+        const formattedDate = formatDateTime(selected.time);
+        // Get the list of related anomaly items by filtering anomalyData using the IDs.
+        const relatedAnomalies = detectionData.filter(item =>
+          selected.ids && selected.ids.includes(item.id)
+        );
+        return (
+          <div>
+            <div style={{ marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+              <h3 style={{ margin: 0 }}>Selected Date &amp; Time: {formattedDate}</h3>
+              <p style={{ margin: '5px 0' }}>
+                <strong>Detection Type:</strong> {selected.type}
+              </p>
+              <p style={{ margin: '5px 0' }}>
+                <strong>Total Detections:</strong> {selected.total}
+              </p>
+            </div>
+            <div>
+              <h4 style={{ marginBottom: '10px', color: '#fff' }}>Detections Information:</h4>
+              {relatedAnomalies.length > 0 ? (
+                relatedAnomalies.map((anomaly, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: '20px',
+                      padding: '15px',
+                      border: '1px solid #fff',
+                      borderRadius: '5px',
+                      // backgroundColor: '#fafafa',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 5px' }}>
+                      <strong>ID:</strong> {anomaly.id}
+                    </p>
+                    <p style={{ margin: '0 0 10px' }}>
+                      <strong>Anomaly Type:</strong> {anomaly.detectionType}
+                    </p>
+                    <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
+                      <p style={{ margin: '0 0 5px' }}><strong>Involved Objects:</strong></p>
+                      <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                        {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
+                          <li key={idx} style={{ marginBottom: '5px' }}>
+                            <p style={{ margin: 0 }}>
+                              <strong>Detection Confidence:</strong>{' '}
+                              {obj.location.properties.detectionConfidence}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Tracking Confidence:</strong>{' '}
+                              {obj.location.properties.trackingConfidence}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Type:</strong> {obj.type}
+                            </p>
+                            <p style={{ margin: 0 }}>
+                              <strong>Visual ID:</strong> {obj.visualId}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p style={{ margin: '0 0 5px' }}>
+                        <strong>Tracking Detection:</strong>
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Detection Confidence:</strong>{' '}
+                        {anomaly.trackingDetection.detectionConfidence.join(', ')}
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Tracking Confidence:</strong>{' '}
+                        {anomaly.trackingDetection.trackingConfidence[0]}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No detailed detections information available.</p>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  ) : (
+    <p style={{ padding: '20px' }}>No detections found for this day.</p>
+  )}
+</Modal>
+
     </Layout>
   );
 };

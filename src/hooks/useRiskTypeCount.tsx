@@ -458,3 +458,22 @@ export function mergeAndPrepareData(anomalyData: any, detectionData: any): any[]
   ]);
  return transformedData;
 }
+
+// Helper function to format a date string.
+// If the string is already in DD-MM-YYYY format, you can adjust as needed.
+export function formatDateTime(dateStr: string) {
+  // If the string is in DD-MM-YYYY (without time), you can simply return it.
+  // Otherwise, if it's an ISO string, format it.
+  if (dateStr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+    return dateStr;
+  }
+  const date = new Date(dateStr);
+  const options: Intl.DateTimeFormatOptions = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+  return date.toLocaleString(undefined, options);
+}
