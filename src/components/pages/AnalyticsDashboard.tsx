@@ -191,10 +191,59 @@ useEffect(() => {
 
     setAnomalyDistribution(tinyAnomalyData);    
   }, [tinyAnomalyData, selectedAnomalyTypes]);
-  useEffect(() => {
-     setCombinedAnomalyData([...(filteredAnomalyData || []), ...(trendlineData || [])]);
-    console.log("combined anomaly data first element: ", [...(filteredAnomalyData || []), ...(trendlineData || [])][0]);
-  }, [filteredAnomalyData, trendlineData]); 
+
+// Helper function to parse a date string in 'dd-mm-yyyy' format.
+function parseDateString(dateStr: string): Date {
+  const [day, month, year] = dateStr.split('-').map(Number);
+  // Note: month is 0-indexed in JavaScript Date.
+  return new Date(year, month - 1, day);
+}
+useEffect(() => {
+  // Create a copy of filteredAnomalyData to process.
+  const processedFilteredData = [...(filteredAnomalyData || [])];
+
+  // Extract all unique date strings from filteredAnomalyData.
+  const uniqueDatesSet = new Set(processedFilteredData.map(item => item.time));
+  const uniqueDates = Array.from(uniqueDatesSet);
+
+  // Convert these date strings to Date objects.
+  const dateObjects = uniqueDates.map(dateStr => parseDateString(dateStr));
+  const minDate = new Date(Math.min(...dateObjects.map(d => d.getTime())));
+  const maxDate = new Date(Math.max(...dateObjects.map(d => d.getTime())));
+
+  // Generate a full range of dates (in 'dd-mm-yyyy') from minDate to maxDate.
+  const fullDateRange = getDatesBetween(minDate, maxDate);
+
+  // Extract all unique anomaly types from filteredAnomalyData.
+  const uniqueTypes = Array.from(new Set(processedFilteredData.map(item => item.type)));
+
+  // For each day in the full date range and for each anomaly type,
+  // if a record does not exist for that day/type, add one with total: 0.
+  fullDateRange.forEach(dateStr => {
+    uniqueTypes.forEach(type => {
+      const exists = processedFilteredData.some(item => item.time === dateStr && item.type === type);
+      if (!exists) {
+        processedFilteredData.push({ time: dateStr, type, total: 0 });
+      }
+    });
+  });
+
+  // Combine the processed filtered data with trendlineData.
+  let combined = [
+    ...processedFilteredData,
+    ...(trendlineData || [])
+  ];
+
+  // Sort the combined array by date.
+  combined = combined.sort(
+    (a, b) => parseDateString(a.time).getTime() - parseDateString(b.time).getTime()
+  );
+
+  // Update state with the sorted, combined anomaly data.
+  setCombinedAnomalyData(combined);
+  console.log("Combined anomaly data:", combined);
+}, [filteredAnomalyData, trendlineData]);
+
 
   useEffect(() => {
 
@@ -218,12 +267,75 @@ useEffect(() => {
     
   }, [detectionDistribution, anomalyDistribution]);
 
-
-  useEffect(() => {
-  setCombinedDetectionData([...(filteredDetectionData || []), ...(trendlineDetectionData || [])]);
-  console.log("detection data: ",[...(filteredDetectionData || []), ...(trendlineDetectionData || [])]); 
-  }, [filteredDetectionData, trendlineDetectionData]); 
   
+// Helper: format a Date object into 'dd-mm-yyyy'.
+function formatDateForTotalZero(date: Date): string {
+  const dd = date.getDate();
+  const mm = date.getMonth() + 1; // JavaScript months are 0-indexed.
+  const yyyy = date.getFullYear();
+  const ddStr = dd < 10 ? `0${dd}` : `${dd}`;
+  const mmStr = mm < 10 ? `0${mm}` : `${mm}`;
+  return `${ddStr}-${mmStr}-${yyyy}`;
+}
+
+// Helper: generate all dates (as 'dd-mm-yyyy' strings) between two Date objects (inclusive).
+function getDatesBetween(startDate: Date, endDate: Date): string[] {
+  const dates = [];
+  const current = new Date(startDate);
+  while (current <= endDate) {
+    dates.push(formatDateForTotalZero(current));
+    current.setDate(current.getDate() + 1);
+  }
+  return dates;
+}
+
+
+useEffect(() => {
+  // Copy filteredDetectionData to avoid mutating the original.
+  const processedFilteredData = [...(filteredDetectionData || [])];
+
+  // Get the unique dates present in filteredDetectionData.
+  const uniqueDatesSet = new Set(processedFilteredData.map(item => item.time));
+  const uniqueDates = Array.from(uniqueDatesSet);
+  
+  // Convert date strings to Date objects.
+  const dateObjects = uniqueDates.map(dateStr => parseDateString(dateStr));
+  const minDate = new Date(Math.min(...dateObjects.map(d => d.getTime())));
+  const maxDate = new Date(Math.max(...dateObjects.map(d => d.getTime())));
+  
+  // Generate the full range of dates (as 'dd-mm-yyyy') from minDate to maxDate.
+  const fullDateRange = getDatesBetween(minDate, maxDate);
+  
+  // Get the unique detection types from filteredDetectionData.
+  const uniqueTypes = Array.from(new Set(processedFilteredData.map(item => item.type)));
+  
+  // For each date in the full range and for each detection type,
+  // if there is no record in processedFilteredData, add one with total: 0.
+  fullDateRange.forEach(dateStr => {
+    uniqueTypes.forEach(type => {
+      const exists = processedFilteredData.some(item => item.time === dateStr && item.type === type);
+      if (!exists) {
+        processedFilteredData.push({ time: dateStr, type, total: 0 });
+      }
+    });
+  });
+  
+  // Combine processed filtered data with trendlineDetectionData.
+  let combined = [
+    ...processedFilteredData,
+    ...(trendlineDetectionData || [])
+  ];
+  
+  // Sort combined array by date using the parseDateString helper.
+  combined = combined.sort(
+    (a, b) => parseDateString(a.time).getTime() - parseDateString(b.time).getTime()
+  );
+  
+  setCombinedDetectionData(combined);
+  console.log("detection data: ", combined);
+}, [filteredDetectionData, trendlineDetectionData]);
+
+    
   const openModal = (title: string, content: React.ReactNode) => {
     setModalTitle(title);
     setModalContent(content);
@@ -259,8 +371,9 @@ useEffect(() => {
     yField: 'total',
     axis:{
       x:{title:'date'},
-      y:{title: 'anomaly value'}
+      y:{title: 'anomaly value', min: 0}
     },
+    
   style: {
     lineWidth: 2,
     textAlign: 'center', display: 'flex',
@@ -312,6 +425,7 @@ useEffect(() => {
   // Use onReady to attach a click listener at the plot level.
   onReady: ({ chart }: { chart: any }) => {
     console.log("Chart is ready", chart);
+    
     chart.on('plot:click', (event: any) => {
       console.log("Plot click event:", event);
       
@@ -404,6 +518,11 @@ function parseDate(dateStr: string) {
     theme: 'classicDark',
     xField: 'time',
     yField: 'total',
+    axis:{
+      x:{title:'date'},
+      y:{title: 'detection value'}
+    },
+      
   style: {
     lineWidth: 2,
     textAlign: 'center', display: 'flex',
@@ -606,26 +725,45 @@ const calculateTrendline = (data: any[]) => {
       const minTime = Math.min(...xValues);
       const maxTime = Math.max(...xValues);
 
-      const startPoint = [minTime, m * minTime + b];
-      const endPoint = [maxTime, m * maxTime + b];
+      // const startPoint = [minTime, m * minTime + b];
+      // const endPoint = [maxTime, m * maxTime + b];
 
-      // Format these points into the desired structure
-      const startFormattedDate = formatDate(new Date(startPoint[0]));
-      const endFormattedDate = formatDate(new Date(endPoint[0]));
+      // // Format these points into the desired structure
+      // const startFormattedDate = formatDate(new Date(startPoint[0]));
+      // const endFormattedDate = formatDate(new Date(endPoint[0]));
 
-      trendlineData.push({
-        time: startFormattedDate,
-      //  total: startPoint[1] + 0.5,
-      total: startPoint[1],
-        type: `${type} (Trend)`,
-      });
+      // trendlineData.push({
+      //   time: startFormattedDate,
+      // //  total: startPoint[1] + 0.5,
+      // total: startPoint[1],
+      //   type: `${type} (Trend)`,
+      // });
 
-      trendlineData.push({
-        time: endFormattedDate,
-       // total: endPoint[1] + 0.5,
-       total: endPoint[1],
-        type: `${type} (Trend)`,
-      });
+      // trendlineData.push({
+      //   time: endFormattedDate,
+      //  // total: endPoint[1] + 0.5,
+      //  total: endPoint[1],
+      //   type: `${type} (Trend)`,
+      // });
+      const startTotal = m * minTime + b;
+const endTotal = m * maxTime + b;
+
+// Format these points into the desired structure
+const startFormattedDate = formatDate(new Date(minTime));
+const endFormattedDate = formatDate(new Date(maxTime));
+
+trendlineData.push({
+  time: startFormattedDate,
+  total: startTotal < 0 ? 0 : startTotal, // force negative values to 0
+  type: `${type} (Trend)`,
+});
+
+trendlineData.push({
+  time: endFormattedDate,
+  total: endTotal < 0 ? 0 : endTotal, // force negative values to 0
+  type: `${type} (Trend)`,
+});
+
     } catch (error) {
       console.error(`Error calculating trendline for type "${type}":`, error);
     }
