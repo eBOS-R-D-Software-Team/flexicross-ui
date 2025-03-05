@@ -11,6 +11,7 @@ import { v4 as uuid } from 'uuid';
 import { setAnomalyData, setFilteredAnomalyData } from '../../../redux/slices/anomalySlice';
 import { setDetectionData, setFilteredDetectionData } from '../../../redux/slices/detectionSlice';
 import { AppDispatch, RootState } from '../../../redux/store';
+import { getAnomalyLineColor, getDetectionLineColor } from '../../../hooks/useRiskTypeCount';
 
 
   
@@ -288,7 +289,7 @@ const columnsAnomaly: ProColumns<any>[] = [
       const dm = dom;
       const textTemp = dm?.props.children;
       const text = textTemp?.props.text;
-      return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
+      return (<Tag color={getAnomalyLineColor(text)}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
   },   
   {
@@ -409,7 +410,7 @@ const columnsDetection: ProColumns<any>[] = [
       const dm = dom;
       const textTemp = dm?.props.children;
       const text = textTemp?.props.text;
-      return (<Tag color={text === 'HumanTrafficking' ? '#000000' : text === 'Contraband' ? '#8c8c8c' : text === 'UTurnVehicle' ? '#262626' : text === 'SuspiciousDrivingPattern' ? '#a8071a' : 'warning'}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
+      return (<Tag color={getDetectionLineColor(text)}> {text ? text.toString().split('|').join(', ') : ''}</Tag>);
     },
   },   
   {

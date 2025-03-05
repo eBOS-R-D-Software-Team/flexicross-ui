@@ -348,25 +348,37 @@ useEffect(() => {
 
    
 
-  const configPie = useMemo(() => ({
-    theme: 'classicDark',
-    angleField: 'value',
-    colorField: 'labelName',
-    legend: true,
-  }), []);
 
   const config = useMemo(() => ({
-    theme: 'classicDark',
+  //  theme: 'classicDark',
     xField: 'date',
     yField: 'value',
     sizeField: 'value',
     shapeField: 'trail',
     legend: { size: true },
     colorField: 'type',
+    // style: {
+    //    textAlign: 'center', 
+    //    display: 'flex',
+    //   stroke: (items: { type: string }[]) => {
+    //     const { type } = items[0];
+    //     return type == 'anomaly' ? '#002353' : '#32c7c1';
+    //   },
+    //   lineWidth: 1,
+    // }  
+    style: {
+      lineWidth: 1,
+      textAlign: 'center', display: 'flex',
+      stroke:(items: { type: string; }[]) => {
+        const { type } = items[0];
+        return type == 'anomalyCount' ? '#002353' : '#32c7c1';      },
+    },
+
+
   }), []);
 
   const anomaliesTrendConfig = useMemo(() => ({
-    theme: 'classicDark',
+    //theme: 'classicDark',
     xField: 'time',
     yField: 'total',
     axis:{
@@ -515,7 +527,7 @@ function parseDate(dateStr: string) {
 }
     
   const detectionsTrendConfig = useMemo(() => ({
-    theme: 'classicDark',
+   // theme: 'classicDark',
     xField: 'time',
     yField: 'total',
     axis:{
@@ -959,18 +971,18 @@ const handleChartReady = (plot: any) => {
       {!tinyDataDetection ? <Spin /> : <Line width={1300}  data={combinedDetectionData} {...detectionsTrendConfig} />}
     </Card>
           <Card
-            title="Anomalies and detections graph"
+            title="Anomalies and detections count graph"
             extra={
               <FullscreenOutlined
                 onClick={() =>
                   openModal('Anomalies and detections graph', (
-                    <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedData} {...config} />
+                    <Line width={1300}  data={combinedData} {...config} />
                   ))
                 }
               />
             }
           >
-            {!combinedData ? <Spin /> : <Line width={1300} style={{ textAlign: 'center', display: 'flex' }} data={combinedData} {...config} />}
+            {!combinedData ? <Spin /> : <Line width={1300} data={combinedData} {...config} />}
           </Card>
         </Col>
       </Row>
