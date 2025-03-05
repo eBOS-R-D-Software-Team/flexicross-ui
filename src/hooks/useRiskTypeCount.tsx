@@ -299,117 +299,66 @@ export const totalDataTypesPerDay = (data: any[])=> {
   return counts
 
 }
-
-export const getAnomalyLineColor=(type:string)=>{
-  let lineColor = "#cf1578";
-  if(type.includes('UnusualBehaviourOutOfBounds')){
-    lineColor="#2389ff";
-   //lineColor="#2389ff";
-  }
-  else if(type.includes('UnusualBehaviourRunning')){
-    lineColor="#0dcccc";
-   //lineColor="#002353";
-  }
-  else if(type.includes('SuspiciousDrivingPattern')){
-    lineColor="#7f6bff";
-
-  }
-  else if(type.includes('PersonMisVerified')){
-    lineColor="#c1952f";
-
-  }
-  else if(type.includes('PersonOutOfBounds')){
-    lineColor="#2f97b7";
-
-  }
-  else if(type.includes('PersonRunning')){
-    lineColor="#2389ff";
-
-  }
-  else if(type.includes('HumanTrafficking')){
-    lineColor="#68c738";
-
-  }
-  else if(type.includes('Contraband')){
-    lineColor="#f3ca20";
-
-  }
-  else if(type.includes('Smuggling')){
-    lineColor="#d72631";
-
-  }
-  else if(type.includes('FalsifiedDocuments')){
-    lineColor="#a2d5c6";
-
-  }
-  else if(type.includes('SuspiciousDrivingPattern')){
-    lineColor="#077b8a";
-
-  }
-  else if(type.includes('UnlawfulParkingVehicle')){
-    lineColor="#5c3c92";
-  }
-  else{
-    lineColor="#ff87cd";
-
+export const getAnomalyLineColor = (type: string) => {
+  let lineColor = "#32c7c1"; // default to secondary (light blue)
+  if (type.includes('UnusualBehaviourOutOfBounds')) {
+    lineColor = "#002353"; // primary dark blue
+  } else if (type.includes('UnusualBehaviourRunning')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('SuspiciousDrivingPattern')) {
+    lineColor = "#003f72"; // complementary dark blue variant
+  } else if (type.includes('PersonMisVerified')) {
+    lineColor = "#2cc1ba"; // complementary variant
+  } else if (type.includes('PersonOutOfBounds')) {
+    lineColor = "#002353"; // primary dark blue
+  } else if (type.includes('PersonRunning')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('HumanTrafficking')) {
+    lineColor = "#001f40"; // even darker variant of primary
+  } else if (type.includes('Contraband')) {
+    lineColor = "#2cc1ba"; // complementary variant
+  } else if (type.includes('Smuggling')) {
+    lineColor = "#5ad4d0"; // lighter complementary blue
+  } else if (type.includes('FalsifiedDocuments')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('UnlawfulParkingVehicle')) {
+    lineColor = "#001f40"; // very dark variant
+  } else {
+    lineColor = "#32c7c1"; // default secondary light blue
   }
   return lineColor;
-}
+};
 
-export const getDetectionLineColor=(type:string)=>{
-  let lineColor = "#cf1578";
-  if(type.includes('UnusualPatternDetection')){
-    lineColor="#2389ff";
-  }
-  else if(type.includes('FaceVerificationIdentification')){
-    lineColor="#0dcccc";
 
-  }
-  else if(type.includes('PersonPattern')){
-    lineColor="#7f6bff";
-
-  }
-  else if(type.includes('PersonIdentification')){
-    lineColor="#c1952f";
-
-  }
-  else if(type.includes('PersonVerification')){
-    lineColor="#2f97b7";
-
-  }
-  else if(type.includes('BlockchainVerification')){
-    lineColor="#2389ff";
-
-  }
-  else if(type.includes('Vesselrecognition')){
-    lineColor="#68c738";
-
-  }
-  else if(type.includes('Contraband')){
-    lineColor="#f3ca20";
-
-  }
-  else if(type.includes('Smuggling')){
-    lineColor="#d72631";
-
-  }
-  else if(type.includes('Dangeroussubstance')){
-    lineColor="#a2d5c6";
-
-  }
-  else if(type.includes('HumanTrafficking')){
-    lineColor="#077b8a";
-
-  }
-  else if(type.includes('PersonPattern')){
-    lineColor="#5c3c92";
-  }
-  else{
-    lineColor="#ff87cd";
-
+export const getDetectionLineColor = (type: string) => {
+  let lineColor = "#32c7c1"; // default to secondary (light blue)
+  if (type.includes('UnusualPatternDetection')) {
+    lineColor = "#002353"; // primary dark blue
+  } else if (type.includes('FaceVerificationIdentification')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('PersonPattern')) {
+    lineColor = "#003f72"; // complementary dark blue variant
+  } else if (type.includes('PersonIdentification')) {
+    lineColor = "#2cc1ba"; // complementary variant
+  } else if (type.includes('PersonVerification')) {
+    lineColor = "#002353"; // primary dark blue
+  } else if (type.includes('BlockchainVerification')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('Vesselrecognition')) {
+    lineColor = "#001f40"; // very dark variant
+  } else if (type.includes('Contraband')) {
+    lineColor = "#2cc1ba"; // complementary variant
+  } else if (type.includes('Smuggling')) {
+    lineColor = "#5ad4d0"; // lighter complementary blue
+  } else if (type.includes('Dangeroussubstance')) {
+    lineColor = "#32c7c1"; // secondary light blue
+  } else if (type.includes('HumanTrafficking')) {
+    lineColor = "#001f40"; // very dark variant
+  } else {
+    lineColor = "#32c7c1"; // default secondary light blue
   }
   return lineColor;
-}
+};
 
 // type CountData = {
 //   [date: string]: number;

@@ -4,7 +4,15 @@ import { Modal, DatePicker, ConfigProvider, Layout, Row, Col, Card, Tag } from '
 import { countRiskTypesForPieChart } from '../../hooks/useRiskTypeCount';
 import dayjs from 'dayjs';
 
-const COLORS = ['#0dcccc', '#2389ff', '#48dbfb', '#1dd1a1', '#ff6b6b', '#ff9f43', '#feca57', '#1dd1a1', '#48dbfb', '#5f27cd', '#ff4757'];
+//const COLORS = ['#0dcccc', '#2389ff', '#48dbfb', '#1dd1a1', '#ff6b6b', '#ff9f43', '#feca57', '#1dd1a1', '#48dbfb', '#5f27cd', '#ff4757'];
+const COLORS = [
+  '#002353', // dark blue (primary)
+  '#32c7c1', // light blue (primary)
+  '#1fb7b3', // a slightly muted light blue
+  '#003f73', // a deeper blue variant
+  '#50d0cb', // a brighter tint of light blue
+  '#001f40', // a very dark blue accent
+];
 
 interface ChartData {
   name: string;
@@ -89,23 +97,23 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const total = processedData.reduce((acc: number, curr: any) => acc + curr.value, 0);
     const percentage = getPercentage(payload[0].value, total);
-
     return (
       <div
         style={{
-          backgroundColor: '#1d1d1d',
+          backgroundColor: '#fff',       // white background
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-          color: '#fff', // Ensure text color is white
-          border: 'none',
+          color: '#002353',             // dark blue text
+          border: '1px solid #002353',    // light blue border
           fontSize: '13px',
           padding: '10px',
-          textAlign: 'center', // Center the text
+          textAlign: 'center',
         }}
       >
-        <p style={{ margin: '0 0 4px 0', color:'#feca57' }}>{`${payload[0].name}`}</p>
+        <p style={{ margin: '0 0 4px 0', color: '#002353', fontWeight:'bold' }}>{`${payload[0].name}`}</p>
         <p style={{ margin: '0 0 4px 0' }}>{`Total: ${payload[0].value}`}</p>
-        <p style={{ margin: '0 0 4px 0' }}>{`Percentage: ${percentage}%`}</p>      </div>
+        <p style={{ margin: '0 0 4px 0' }}>{`Percentage: ${percentage}%`}</p>
+      </div>
     );
   }
 
@@ -114,13 +122,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
   return (
     <ConfigProvider
-      theme={{
-        token: {
-          colorBgContainer: '#1d1d1d',
-          colorText: '#fff',
-          colorBorder: '#444',
-        },
-      }}
+    theme={{
+      token: {
+        colorBgContainer: '#fff',   // white background
+        colorText: '#002353',       // dark blue text
+        colorBorder: '#32c7c1',     // light blue border
+      },
+    }}
+    
     >
       <div style={{ textAlign: 'center' }}>
         {/* Date Range Picker */}
@@ -133,10 +142,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               }}
               placeholder="Start Date"
               style={{
-                backgroundColor: '#1d1d1d',
-                color: '#fff',
-                border: '1px solid #444',
-              }}
+                backgroundColor: '#fff',
+                color: '#002353',
+                border: '1px solid #32c7c1',
+              }}            
               picker="date"
             />
           </Col>
@@ -148,10 +157,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               }}
               placeholder="End Date"
               style={{
-                backgroundColor: '#1d1d1d',
-                color: '#fff',
-                border: '1px solid #444',
-              }}
+                backgroundColor: '#fff',
+                color: '#002353',
+                border: '1px solid #32c7c1',
+              }}            
               picker="date"
             />
           </Col>
@@ -238,7 +247,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <p>Ids of related cases:</p>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
                 {selectedData?.ids.map((uniqueId, index) => (
-                  <Tag key={index} color="yellow" style={{ margin: '5px' }}>
+                  <Tag key={index} color="cyan" style={{ margin: '5px' }}>
                     {uniqueId as string}
                   </Tag>
                 ))}

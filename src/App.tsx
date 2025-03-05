@@ -8,7 +8,8 @@ import enUSIntl from 'antd/lib/locale/en_US';
 import keycloak from "./keycloak";
 import { ReactKeycloakProvider } from '@react-keycloak/web/lib/provider';
 
-const { darkAlgorithm } = theme;
+//defaultalgorithm or darkalgorithm or compactalgorithm
+const { defaultAlgorithm } = theme;
 const initOptions = {
   onLoad: 'login-required',
   checkLoginIframe: false, // Disables iframe-based session check
@@ -23,7 +24,7 @@ const App: React.FC = () => (
     <ConfigProvider
       locale={enUSIntl}
       theme={{
-        algorithm: darkAlgorithm,
+        algorithm: defaultAlgorithm,
         token: {
             // "colorPrimary": "#0e0e0e",
             "fontSize": 16,
