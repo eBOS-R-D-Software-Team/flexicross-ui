@@ -1150,26 +1150,32 @@ const handleChartReady = (plot: any) => {
         {modalContent}
       </Modal>
 
-      <Modal
+<Modal
   title="Anomalies for Selected Day"
   visible={isAnomalyModalVisible}
   onCancel={() => setIsAnomalyModalVisible(false)}
   footer={null} // Remove default footer buttons
 >
   {selectedAnpmalyDayData.length > 0 ? (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', color: '#002353' }}>
       {(() => {
         const selected = selectedAnpmalyDayData[0];
-        // Format the selected date/time.
         const formattedDate = formatDateTime(selected.time);
-        // Get the list of related anomaly items by filtering anomalyData using the IDs.
         const relatedAnomalies = anomalyData.filter(item =>
           selected.ids && selected.ids.includes(item.id)
         );
         return (
           <div>
-            <div style={{ marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-              <h3 style={{ margin: 0 }}>Selected Date &amp; Time: {formattedDate}</h3>
+            <div
+              style={{
+                marginBottom: '20px',
+                borderBottom: '1px solid #32c7c1',
+                paddingBottom: '10px'
+              }}
+            >
+              <h3 style={{ margin: 0, color: '#002353' }}>
+                Selected Date &amp; Time: {formattedDate}
+              </h3>
               <p style={{ margin: '5px 0' }}>
                 <strong>Anomaly Type:</strong> {selected.type}
               </p>
@@ -1178,7 +1184,7 @@ const handleChartReady = (plot: any) => {
               </p>
             </div>
             <div>
-              <h4 style={{ marginBottom: '10px', color: '#fff' }}>Anomalies Information:</h4>
+              <h4 style={{ marginBottom: '10px', color: '#002353' }}>Anomalies Information:</h4>
               {relatedAnomalies.length > 0 ? (
                 relatedAnomalies.map((anomaly, index) => (
                   <div
@@ -1186,9 +1192,8 @@ const handleChartReady = (plot: any) => {
                     style={{
                       marginBottom: '20px',
                       padding: '15px',
-                      border: '1px solid #fff',
-                      borderRadius: '5px',
-                      // backgroundColor: '#fafafa',
+                      border: '1px solid #32c7c1',
+                      borderRadius: '5px'
                     }}
                   >
                     <p style={{ margin: '0 0 5px' }}>
@@ -1198,7 +1203,9 @@ const handleChartReady = (plot: any) => {
                       <strong>Anomaly Type:</strong> {anomaly.anomalyType}
                     </p>
                     <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
-                      <p style={{ margin: '0 0 5px' }}><strong>Involved Objects:</strong></p>
+                      <p style={{ margin: '0 0 5px' }}>
+                        <strong>Involved Objects:</strong>
+                      </p>
                       <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
                         {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
                           <li key={idx} style={{ marginBottom: '5px' }}>
@@ -1244,9 +1251,10 @@ const handleChartReady = (plot: any) => {
       })()}
     </div>
   ) : (
-    <p style={{ padding: '20px' }}>No anomalies found for this day.</p>
+    <p style={{ padding: '20px', color: '#002353' }}>No anomalies found for this day.</p>
   )}
 </Modal>
+
 <Modal
   title="Detections for Selected Day"
   visible={isDetectionModalVisible}
@@ -1254,19 +1262,25 @@ const handleChartReady = (plot: any) => {
   footer={null} // Remove default footer buttons
 >
   {selectedDetectionDayData.length > 0 ? (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', color: '#002353' }}>
       {(() => {
         const selected = selectedDetectionDayData[0];
-        // Format the selected date/time.
         const formattedDate = formatDateTime(selected.time);
-        // Get the list of related anomaly items by filtering anomalyData using the IDs.
         const relatedAnomalies = detectionData.filter(item =>
           selected.ids && selected.ids.includes(item.id)
         );
         return (
           <div>
-            <div style={{ marginBottom: '20px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-              <h3 style={{ margin: 0 }}>Selected Date &amp; Time: {formattedDate}</h3>
+            <div
+              style={{
+                marginBottom: '20px',
+                borderBottom: '1px solid #32c7c1',
+                paddingBottom: '10px'
+              }}
+            >
+              <h3 style={{ margin: 0, color: '#002353' }}>
+                Selected Date &amp; Time: {formattedDate}
+              </h3>
               <p style={{ margin: '5px 0' }}>
                 <strong>Detection Type:</strong> {selected.type}
               </p>
@@ -1275,7 +1289,7 @@ const handleChartReady = (plot: any) => {
               </p>
             </div>
             <div>
-              <h4 style={{ marginBottom: '10px', color: '#fff' }}>Detections Information:</h4>
+              <h4 style={{ marginBottom: '10px', color: '#002353' }}>Detections Information:</h4>
               {relatedAnomalies.length > 0 ? (
                 relatedAnomalies.map((anomaly, index) => (
                   <div
@@ -1283,9 +1297,8 @@ const handleChartReady = (plot: any) => {
                     style={{
                       marginBottom: '20px',
                       padding: '15px',
-                      border: '1px solid #fff',
-                      borderRadius: '5px',
-                      // backgroundColor: '#fafafa',
+                      border: '1px solid #32c7c1',
+                      borderRadius: '5px'
                     }}
                   >
                     <p style={{ margin: '0 0 5px' }}>
@@ -1295,7 +1308,9 @@ const handleChartReady = (plot: any) => {
                       <strong>Anomaly Type:</strong> {anomaly.detectionType}
                     </p>
                     <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
-                      <p style={{ margin: '0 0 5px' }}><strong>Involved Objects:</strong></p>
+                      <p style={{ margin: '0 0 5px' }}>
+                        <strong>Involved Objects:</strong>
+                      </p>
                       <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
                         {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
                           <li key={idx} style={{ marginBottom: '5px' }}>
@@ -1341,9 +1356,10 @@ const handleChartReady = (plot: any) => {
       })()}
     </div>
   ) : (
-    <p style={{ padding: '20px' }}>No detections found for this day.</p>
+    <p style={{ padding: '20px', color: '#002353' }}>No detections found for this day.</p>
   )}
 </Modal>
+
 
     </Layout>
   );
