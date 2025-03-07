@@ -17,6 +17,55 @@ if(data){
   }));}
 };
 
+// Define the RiskItem type for raw risk events
+export interface RiskItem {
+  id: string;
+  riskType: string;
+  severity: 'PotentialOBUMisoperation' | 'NegligableSeverity' | 'NoSeverity' | 'LowSeverity' | 'MediumSeverity' | 'HighSeverity';
+  // additional properties as needed...
+}
+
+// Define the aggregated data structure for the chart
+export interface ChartDataItem {
+  riskType: string;
+  total: number;
+  HighSeverity: number;
+  MediumSeverity: number;
+  LowSeverity: number;
+  NoSeverity: number;
+  NegligableSeverity: number;
+  PotentialOBUMisoperation: number;
+}
+// New aggregation function that groups by riskType and counts severity levels
+export const countRiskTypesForBarChart = (data: RiskItem[]): ChartDataItem[] => {
+  const aggregation: { [riskType: string]: ChartDataItem } = {};
+  if (data) {
+    data.forEach((item) => {
+      const { riskType, severity } = item;
+      if (!aggregation[riskType]) {
+        aggregation[riskType] = {
+          riskType,
+          total: 0,
+          HighSeverity: 0,
+          MediumSeverity: 0,
+          LowSeverity: 0,
+          NoSeverity: 0,
+          NegligableSeverity: 0,
+          PotentialOBUMisoperation: 0,
+        };
+      }
+      aggregation[riskType].total += 1;
+      // Increase the count for the appropriate severity, if it exists
+      if (severity in aggregation[riskType]) {
+        aggregation[riskType][severity as keyof Omit<ChartDataItem, 'riskType' | 'total'>] += 1;
+      }
+    });
+    return Object.values(aggregation);
+  }
+  return [];
+};
+
+
 export const countRiskTypesForPieChart = (data: any[], flag: any): any => {
   const riskTypeCounts: { [key: string]: { count: number; ids: string[] } } = {};
 

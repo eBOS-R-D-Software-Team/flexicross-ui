@@ -7,8 +7,9 @@ import { getDashboardDataById } from '../../redux/slices/riskDataSlice';
 import { Card, Col, Layout, Row, Spin, Table, Tag } from 'antd';
 import { Bar, Heatmap } from '@ant-design/charts';
 import { Pie } from '@ant-design/plots';
-import { countOccurrences, countRiskTypes, getAnomalyLineColor } from '../../hooks/useRiskTypeCount';
+import { countOccurrences, countRiskTypes, countRiskTypesForBarChart, getAnomalyLineColor } from '../../hooks/useRiskTypeCount';
 import StatsGraph from '../shared/Graphs/StatsGraph';
+import StackedBarChart from '../charts/StackedBarChart';
 
 type RouteParams = {
   id: string;
@@ -193,12 +194,20 @@ const SingleDashboard: React.FC = () => {
         </Col>
       </Row>
       <Row gutter={24}>
-        <Col span={12}>
-          <Card title={'Risk Level by Type'}>
+      <Col span={24}>
+
+      {graphData === undefined && <Spin />}
+            {graphData && <StackedBarChart loading={false} data={countRiskTypesForBarChart(graphData)} rawData={graphData}  />}
+            </Col>
+      </Row>
+      <Row gutter={24}>
+        {/* <Col span={12}>
+          {/* <Card title={'Risk Level by Type'}>
             {graphData === undefined && <Spin />}
             {graphData && <Bar data={countRiskTypes(graphData, 'riskType')} {...config} />}
-          </Card>
-        </Col>
+          </Card> */}
+         
+        {/* </Col> */} 
         <Col span={12}>
           <Card title={'Risk Status'}>
             {graphData === undefined && <Spin />}
