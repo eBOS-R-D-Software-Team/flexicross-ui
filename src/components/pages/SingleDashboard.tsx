@@ -7,9 +7,10 @@ import { getDashboardDataById } from '../../redux/slices/riskDataSlice';
 import { Card, Col, Layout, Row, Spin, Table, Tag } from 'antd';
 import { Bar, Heatmap } from '@ant-design/charts';
 import { Pie } from '@ant-design/plots';
-import { countOccurrences, countRiskTypes, countRiskTypesForBarChart, getAnomalyLineColor } from '../../hooks/useRiskTypeCount';
+import { countOccurrences, countRiskTypes, countRiskTypesForBarChart, countRiskTypesForPieChart, countRiskTypesForRiskPieChart, getAnomalyLineColor } from '../../hooks/useRiskTypeCount';
 import StatsGraph from '../shared/Graphs/StatsGraph';
 import StackedBarChart from '../charts/StackedBarChart';
+import RiskPieChart from '../charts/RiskPieChart';
 
 type RouteParams = {
   id: string;
@@ -201,6 +202,26 @@ const SingleDashboard: React.FC = () => {
             </Col>
       </Row>
       <Row gutter={24}>
+        <Col span={12}>
+           <Card >
+            {graphData === undefined && <Spin />}
+            {graphData && <RiskPieChart data={countRiskTypesForRiskPieChart(graphData, 'severity')}  title="Severity Distribution" 
+              rawData={graphData}
+              flag="severity" />}
+          </Card>
+         
+       </Col> 
+        <Col span={12}>
+          <Card >
+            {graphData === undefined && <Spin />}
+            {graphData && <RiskPieChart data={countRiskTypesForRiskPieChart(graphData, 'riskType')} title="Risk Type Distribution" 
+              rawData={graphData}
+              flag="riskType"/>}
+          </Card>
+        </Col>
+      
+      </Row>
+      <Row gutter={24}>
         {/* <Col span={12}>
           {/* <Card title={'Risk Level by Type'}>
             {graphData === undefined && <Spin />}
@@ -208,12 +229,12 @@ const SingleDashboard: React.FC = () => {
           </Card> */}
          
         {/* </Col> */} 
-        <Col span={12}>
+        {/* <Col span={12}>
           <Card title={'Risk Status'}>
             {graphData === undefined && <Spin />}
             {graphData && <Pie data={countRiskTypes(graphData, 'severity')} {...configPie} />}
           </Card>
-        </Col>
+        </Col> */}
         <Col span={24}>
           <Card style={{ marginTop: 16 }} title={'Risk Matrix'}>
             {graphData === undefined && <Spin />}

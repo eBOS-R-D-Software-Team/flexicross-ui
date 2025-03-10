@@ -65,6 +65,29 @@ export const countRiskTypesForBarChart = (data: RiskItem[]): ChartDataItem[] => 
   return [];
 };
 
+export const countRiskTypesForRiskPieChart = (data: any[], flag: string): any[] => {
+  const counts: { [key: string]: number } = {};
+  if (data) {
+    data.forEach(item => {
+      let keyValue: string | undefined;
+      if (flag === 'riskType') {
+        keyValue = item.riskType;
+      } else if (flag === 'severity') {
+        keyValue = item.severity;
+      } else if (flag === 'probability') {
+        keyValue = item.probability;
+      } else {
+        keyValue = item.type;
+      }
+      if (keyValue) {
+        counts[keyValue] = (counts[keyValue] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }
+  return [];
+};
+
 
 export const countRiskTypesForPieChart = (data: any[], flag: any): any => {
   const riskTypeCounts: { [key: string]: { count: number; ids: string[] } } = {};

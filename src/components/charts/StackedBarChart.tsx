@@ -42,17 +42,17 @@ const severityOrder: (keyof Omit<ChartDataItem, 'riskType' | 'total'>)[] = [
   'PotentialOBUMisoperation',
 ];
 
-// Updated severity colors with distinct values:
+// Updated severity colors (distinct for each severity)
 const severityColors: { [key in keyof Omit<ChartDataItem, 'riskType' | 'total'>]: string } = {
   HighSeverity: "#c42021",
   MediumSeverity: "#6c0e23",
   LowSeverity: "#ffad69",
-  NoSeverity: "#FAE151",             // new color for NoSeverity
-  NegligableSeverity: "#79addc",      // changed as requested
+  NoSeverity: "#fff2b2",
+  NegligableSeverity: "#79addc",
   PotentialOBUMisoperation: "#52BA5E",
 };
 
-// Custom Tooltip component – white background and using severity colors
+// Custom Tooltip component – white background and using severity colors for each line
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -79,21 +79,51 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// Helper to render risk item details.
-// If a property is an array or an object, it is rendered in a collapsible panel.
+// Helper to recursively format object/array values in a nicely styled way.
+const renderFormattedContent = (value: any): React.ReactNode => {
+  if (Array.isArray(value)) {
+    return (
+      <ul style={{ margin: 0, paddingLeft: '1rem', listStyleType: 'disc' }}>
+        {value.map((item, index) => (
+          <li key={index}>{renderFormattedContent(item)}</li>
+        ))}
+      </ul>
+    );
+  } else if (typeof value === 'object' && value !== null) {
+    return (
+      <div style={{ marginLeft: '1rem' }}>
+        {Object.entries(value).map(([k, v]) => (
+          <div key={k} style={{ marginBottom: '0.25rem' }}>
+            <strong style={{ color: '#002353' }}>{k}:</strong> {renderFormattedContent(v)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return value?.toString();
+};
+
+// Updated helper to render risk item details.
+// For object/array values, a collapsible panel is shown with the nicely formatted content.
 const renderRiskItem = (item: any): React.ReactElement => {
   return (
     <div style={{ marginBottom: '1rem' }}>
       {Object.entries(item).map(([key, value]) => {
-        if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+        if (typeof value === 'object' && value !== null) {
           return (
             <div key={key} style={{ marginBottom: '0.5rem' }}>
               <strong style={{ color: '#002353' }}>{key}:</strong>
               <Collapse>
-                <Panel header={`View ${key} details`} key="1">
-                  <pre style={{ whiteSpace: 'pre-wrap' }}>
-                    {JSON.stringify(value, null, 2)}
-                  </pre>
+                <Panel header={`View ${key} details`} key={key}>
+                  <div
+                    style={{
+                      padding: '0.5rem',
+                      background: '#f9f9f9',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {renderFormattedContent(value)}
+                  </div>
                 </Panel>
               </Collapse>
             </div>
@@ -136,7 +166,7 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ data, loading, rawDat
   return (
     <>
       <Card
-        title="Risk by Category"
+        title="Risk Level by Type"
         style={{
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           borderRadius: 8,
@@ -149,11 +179,11 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ data, loading, rawDat
             <BarChart
               layout="vertical"
               data={data}
-              margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
             >
               <XAxis
                 type="number"
-                domain={[0, 'dataMax']}
+                domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.2)]}
                 tick={{ fill: '#002353', fontSize: 14 }}
               />
               <YAxis
@@ -161,9 +191,7 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ data, loading, rawDat
                 dataKey="riskType"
                 tick={{ fill: '#002353', fontSize: 14 }}
               />
-                            {/* <Tooltip cursor={{fill: 'white'}} content={<CustomTooltip />} /> */}
-
-              <Tooltip  content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ color: '#002353', fontSize: 14 }} />
               {severityOrder.map((severity) => (
                 <Bar
