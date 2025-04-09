@@ -15,7 +15,7 @@ const initOptions = {
   onLoad: 'login-required',
   checkLoginIframe: false,
   enable3PC: false,
-  redirectUri: window.location.origin, // ✅ this is important
+  //redirectUri: window.location.origin, // ✅ this is important
 };
 
 const KeycloakGroupsLogger: React.FC = () => {

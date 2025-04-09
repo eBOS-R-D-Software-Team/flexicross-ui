@@ -6,7 +6,7 @@ import { Line } from '@ant-design/plots';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor, countRiskTypesForPieChart, processAnomalyDataToTime, formatDateTime } from '../../hooks/useRiskTypeCount';
+import { countRiskTypes, mergeAndPrepareData, processAnomalyData, processDataDetection, totalDataTypesPerDay, getAnomalyLineColor, getDetectionLineColor, countRiskTypesForPieChart, processAnomalyDataToTime, formatDateTime, processDataDetectionToTime } from '../../hooks/useRiskTypeCount';
 import DataTableComponent from '../shared/Datatable/DataTableComponent';
 import { detectionDummy } from '../../redux/slices/data/dummyDetections';
 import MapComponent from '../shared/Map/MapComponent';
@@ -65,7 +65,7 @@ const isBeiaEvent = userGroup == 'uc1_beia' ||  userGroup == 'uc3_beia';
 const isWings = userGroup == 'uc2_wings';
 const isIccs = userGroup == 'uc1_iccs';
 const [selectedAnomalyTypes, setSelectedAnomalyTypes] = useState<string[]>(userGroup == 'uc3_beia' ? ['ClandestineMigrant', 'PersonMisIdentification']: userGroup == 'uc1_beia' ? ['ClandestineMigrant', 'HumanTrafficking']: userGroup == 'uc2_wings' ? ['Smuggling', 'HumanTrafficking']: userGroup == 'uc1_iccs' ? ['PersonOutOfBounds', 'PersonMisIdentification'] : ['UnusualBehaviourOutOfBounds', 'UnusualBehaviourRunning']); // Show 2 types by default
-const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>( userGroup == 'uc3_beia' ? ['PersonIdentification', 'TrainRecognition']: userGroup == 'uc2_wings' ? ['PersonIdentification', 'PersonVerification'] :  userGroup == 'uc1_iccs' ? ['PersonPattern', 'PersonIdentification'] : ['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
+const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>( userGroup == 'uc3_beia' ? ['PersonIdentification', 'TrainRecognition']: userGroup == 'uc2_wings' ? ['NormalDrivingPattern'] :  userGroup == 'uc1_iccs' ? ['PersonPattern', 'PersonIdentification'] : ['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
 
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
@@ -139,9 +139,22 @@ setanomaliesMapData(
 
     }
 
-    if (detectionData) {
+    if (detectionData && detectionData.length) {
       detectionData= detectionData.filter(detection => detection != null);
       console.log('detection data', detectionData);
+      
+      const firstDetectionDate = detectionData[0].datetime.substring(0,10);
+      console.log("first date: ",firstDetectionDate);
+      setFirstDetectionDate(detectionData[0].datetime.substring(0,10))
+      let isOneDetectionDate = true;
+      detectionData.forEach(anomaly =>{
+        if (anomaly.datetime.substring(0,10) != firstDetectionDate){
+          setIsOneDetectionDateOnly(false);
+          isOneDetectionDate = false;
+          return;
+        }
+      })
+
       // detectionMapData = detectionData.filter(item => {
       //   if(item)
       //   return item.location;
@@ -166,8 +179,8 @@ setanomaliesMapData(
       //     return;
       //   }
       // })
-      // const processedDetectionData = isOneDate? processAnomalyDataToTime(detectionData) : processDataDetection(detectionData);
-      const processedDetectionData = processDataDetection(detectionData);
+       const processedDetectionData = isOneDetectionDate? processDataDetectionToTime(detectionData) : processDataDetection(detectionData);
+     // const processedDetectionData = processDataDetection(detectionData);
       setTinyDataDetection(processedDetectionData);
       console.log("tiny data detection", tinyDataDetection);
       const anomalyTotals = totalDataTypesPerDay(anomalyData);
