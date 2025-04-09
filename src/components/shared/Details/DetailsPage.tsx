@@ -21,8 +21,9 @@
             const selectedDetection = useSelector((state: RootState) => state.detectionData.selectedDetection);
           
             const [objectData, setObjectData] = React.useState<any>(null);
-          
-            useEffect(() => {
+            const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+            const isIcssGroup = usergroup == 'uc1_iccs';
+                        useEffect(() => {
               if (type === 'anomaly') {
                 dispatch(getAnomalyDataById(id));
               }
@@ -103,7 +104,7 @@
                         <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
                       <p>Tracking Location: </p>
                      
-                       <MapComponent locations={[selectedRisk?.location]}  center={selectedRisk?.location.geometry.coordinates}/>
+                       {!isIcssGroup && <MapComponent locations={[selectedRisk?.location]}  center={selectedRisk?.location.geometry.coordinates}/>}
           
                         </div>
           )}
@@ -132,7 +133,7 @@
                         <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
                       <p>Tracking Location: </p>
                      
-            <MapComponent locations={[selectedAnomaly?.trackingDetection.geometries[0]]}  center={selectedAnomaly?.trackingDetection.geometries[0].geometry.coordinates[0]}/>
+                      {!isIcssGroup && <MapComponent locations={[selectedAnomaly?.trackingDetection.geometries[0]]}  center={selectedAnomaly?.trackingDetection.geometries[0].geometry.coordinates[0]}/>}
                         </div>
           )}
 
@@ -160,7 +161,7 @@
                         <div style={{ display: 'flex',  alignItems: 'center', flexWrap: 'wrap' }}>
                       <p>Tracking Location: </p>
                      
-            <MapComponent locations={[selectedDetection?.trackingDetection.geometries[0]]}  center={selectedDetection?.trackingDetection.geometries[0].geometry.coordinates[0]}/>
+                      {!isIcssGroup &&  <MapComponent locations={[selectedDetection?.trackingDetection.geometries[0]]}  center={selectedDetection?.trackingDetection.geometries[0].geometry.coordinates[0]}/>}
                         </div>
           )}
 
@@ -240,7 +241,7 @@
                       )}
                     </Descriptions>
 
-                    {item?.location?.geometry?.coordinates && (
+                    {item?.location?.geometry?.coordinates && !isIcssGroup && (
             <MapComponent locations={[item?.location]}  center={item.location.geometry.coordinates}/>
           )}
 

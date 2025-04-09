@@ -27,8 +27,6 @@ const AnalyticsDashboard: React.FC = () => {
   const anomalyData = useSelector((state: RootState) => state.anomalyData.anomalyData);
   let detectionData = useSelector((state: RootState) => state.detectionData.detectionData);
 
-  const [selectedAnomalyTypes, setSelectedAnomalyTypes] = useState<string[]>(['UnusualBehaviourOutOfBounds', 'UnusualBehaviourRunning']); // Show 2 types by default
-  const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>(['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
 
   const [statsData, setStatsData] = useState<any>();
   const [tinyAnomalyData, setTinyAnomalyData] = useState<any>();
@@ -62,8 +60,12 @@ const AnalyticsDashboard: React.FC = () => {
 const [selectedAnpmalyDayData, setSelectedAnpmalyDayData] = useState<any[]>([]);
 const [isDetectionModalVisible, setIsDetectionModalVisible] = useState(false);
 const [selectedDetectionDayData, setSelectedDetectionDayData] = useState<any[]>([]);
-
-
+const userGroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+const isBeiaEvent = userGroup == 'uc1_beia' ||  userGroup == 'uc3_beia';
+const isWings = userGroup == 'uc2_wings';
+const isIccs = userGroup == 'uc1_iccs';
+const [selectedAnomalyTypes, setSelectedAnomalyTypes] = useState<string[]>(userGroup == 'uc3_beia' ? ['ClandestineMigrant', 'PersonMisIdentification']: userGroup == 'uc1_beia' ? ['ClandestineMigrant', 'HumanTrafficking']: userGroup == 'uc2_wings' ? ['Smuggling', 'HumanTrafficking']: userGroup == 'uc1_iccs' ? ['PersonOutOfBounds', 'PersonMisIdentification'] : ['UnusualBehaviourOutOfBounds', 'UnusualBehaviourRunning']); // Show 2 types by default
+const [selectedDetectionsTypes, setSelectedDetectionsTypes] = useState<string[]>( userGroup == 'uc3_beia' ? ['PersonIdentification', 'TrainRecognition']: userGroup == 'uc2_wings' ? ['PersonIdentification', 'PersonVerification'] :  userGroup == 'uc1_iccs' ? ['PersonPattern', 'PersonIdentification'] : ['UnusualPatternDetection', 'FaceVerificationIdentification']); // Show 2 types by default
 
   const handleAnomalyTypeChange = (value: string[]) => {
     setSelectedAnomalyTypes(value);
@@ -97,11 +99,43 @@ useEffect(() => {
       setStatsData(processedAnomalyData);
       setTinyAnomalyData(processedAnomalyData);
       console.log("tiny anomaly data1: ", tinyAnomalyData);
-      setanomaliesMapData(anomalyData.map(item => 
-         item.trackingDetection.geometries[0]));
-      // if(anomaliesMapData)
-      // setanomaliesMapData(anomaliesMapData.map(item => item.trackingDetection.geometries[0]));
-      console.log("anomaliesMapData: ",anomaliesMapData);
+      // Separate the ones we want to remove
+const removedItems = anomalyData.filter(item => !item.trackingDetection && userGroup !== 'uc2_wings');
+
+// Keep only the ones we want to keep
+const filteredDatahere = anomalyData.filter(item => item.trackingDetection || userGroup === 'uc2_wings');
+
+// Now do the mapping
+setanomaliesMapData(
+  filteredDatahere.map(item => {
+    if (item.trackingDetection) {
+      return item.trackingDetection.geometries[0];
+    } else {
+      return item.location; // userGroup is 'uc2_wings' at this point
+    }
+  })
+);
+
+      // setanomaliesMapData(
+      //   anomalyData
+      //     .map(item => {
+      //       if (item.trackingDetection) {
+      //         console.log("el cas loul");
+
+      //         return item.trackingDetection.geometries[0];
+      //       } else if (userGroup === 'uc2_wings') {
+      //         return item.location;
+      //       } else {
+      //         console.log("el cas theleth");
+
+      //         return null; // Remove from array if no trackingDetection and not uc2_wings
+      //       }
+      //     })
+      //     .filter(Boolean) // Removes null (or undefined) values
+      // );
+      //       // if(anomaliesMapData)
+      // // setanomaliesMapData(anomaliesMapData.map(item => item.trackingDetection.geometries[0]));
+      // console.log("anomaliesMapData: ",anomaliesMapData);
 
     }
 
@@ -114,7 +148,11 @@ useEffect(() => {
       // })
       setdetectionMapData(detectionData.map(item => {
         if(item.trackingDetection){
-        return item.trackingDetection.geometries[0];}}));
+        return item.trackingDetection.geometries[0];}
+        else if (userGroup == 'uc2_wings') return item.location
+
+        
+      }));
 
       console.log("detection map data", detectionMapData);
 
@@ -156,10 +194,33 @@ useEffect(() => {
       setStatsData(processedAnomalyData);
       setTinyAnomalyData(processedAnomalyData);
       console.log("tiny anomaly data1: ", tinyAnomalyData);
-      setanomaliesMapData(filteredAnomalyDataState.map(item => 
-         item.trackingDetection.geometries[0]));
+      // Separate the ones we want to remove
+      const removedItems = anomalyData.filter(item => !item.trackingDetection && userGroup !== 'uc2_wings');
+
+      // Keep only the ones we want to keep
+      const filteredDatahere = anomalyData.filter(item => item.trackingDetection || userGroup === 'uc2_wings');
+      
+      // Now do the mapping
+      setanomaliesMapData(
+        filteredDatahere.map(item => {
+          if (item.trackingDetection) {
+            return item.trackingDetection.geometries[0];
+          } else {
+            return item.location; // userGroup is 'uc2_wings' at this point
+          }
+        })
+      );
+      
+      
+         
     }
   }, [filteredAnomalyDataState]);
+
+  useEffect(() => {
+
+   console.log("anomalies map data tbadlet w walet: ", anomaliesMapData);  
+  }, [anomaliesMapData]);
+
 
   useEffect(() => {
     if (filteredDetectionDataState) {
@@ -167,7 +228,10 @@ useEffect(() => {
       console.log('filtered detection data', filteredDetectionDataState);
       setdetectionMapData(filteredDetectionDataState.map(item => {
         if(item.trackingDetection){
-        return item.trackingDetection.geometries[0];}}));
+          return item.trackingDetection.geometries[0];}
+          else if (userGroup == 'uc2_wings') return item.location
+
+    }));
 
       console.log("detection map data", detectionMapData);
 
@@ -356,6 +420,10 @@ useEffect(() => {
     sizeField: 'value',
     shapeField: 'trail',
     legend: { size: true },
+    axis:{
+      x:{title:'date'},
+      y:{title: 'anomaly/detection value', min: 0}
+    },
     colorField: 'type',
     // style: {
     //    textAlign: 'center', 
@@ -1114,10 +1182,10 @@ const handleChartReady = (plot: any) => {
         <Col span={24}>
         <Card
             title="Anomalies Locations"
-            extra={anomaliesMapData && anomaliesMapData.length>0 && <FullscreenOutlined onClick={() => openModal('Anomalies Map', <MapComponent locations={anomaliesMapData.map(item => item)} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]}  />)} />}
+            extra={userGroup!='uc2_wings' && !isBeiaEvent && anomaliesMapData && anomaliesMapData.length>0 && <FullscreenOutlined onClick={() => openModal('Anomalies Map', <MapComponent locations={anomaliesMapData.map(item => item)} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]}  />)} />}
           >
             {anomaliesMapData === undefined && <Spin />}
-            {anomaliesMapData && anomaliesMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={anomaliesMapData.map(item => item)} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]} />}
+            {userGroup!='uc2_wings' && !isBeiaEvent  && anomaliesMapData && anomaliesMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={anomaliesMapData} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]} />}
           </Card>
         </Col>
       </Row>
@@ -1125,10 +1193,10 @@ const handleChartReady = (plot: any) => {
         <Col span={24}>
         <Card
             title="Detections Locations"
-            extra={detectionMapData && detectionMapData.length>0 &&<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]}  />)} />}
+            extra={userGroup!='uc2_wings' && !isBeiaEvent  && detectionMapData && detectionMapData.length>0 &&<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]}  />)} />}
           >
             {detectionData === undefined && <Spin />}
-            {detectionMapData && detectionMapData != undefined && detectionMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]} />}
+            {userGroup!='uc2_wings' && !isBeiaEvent  && detectionMapData && detectionMapData != undefined && detectionMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]} />}
           </Card>
         </Col>
       </Row>
@@ -1207,21 +1275,21 @@ const handleChartReady = (plot: any) => {
                         <strong>Involved Objects:</strong>
                       </p>
                       <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                        {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
+                        {anomaly.involvedObjects[0].location && anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
                           <li key={idx} style={{ marginBottom: '5px' }}>
                             <p style={{ margin: 0 }}>
                               <strong>Detection Confidence:</strong>{' '}
-                              {obj.location.properties.detectionConfidence}
+                              {(obj.location && obj.location.properties.detectionConfidence)? obj.location.properties.detectionConfidence : 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
                               <strong>Tracking Confidence:</strong>{' '}
-                              {obj.location.properties.trackingConfidence}
+                              {(obj.location && obj.location.properties.trackingConfidence)? obj.location.properties.trackingConfidence: 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
-                              <strong>Type:</strong> {obj.type}
+                              <strong>Type:</strong> {obj.type? obj.type : 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
-                              <strong>Visual ID:</strong> {obj.visualId}
+                              <strong>Visual ID:</strong> {obj.visualId? obj.visualId : 'No data available from ' + userGroup}
                             </p>
                           </li>
                         ))}
@@ -1233,11 +1301,11 @@ const handleChartReady = (plot: any) => {
                       </p>
                       <p style={{ margin: 0 }}>
                         <strong>Detection Confidence:</strong>{' '}
-                        {anomaly.trackingDetection.detectionConfidence.join(', ')}
+                        {anomaly.trackingDetection? anomaly.trackingDetection.detectionConfidence.join(', '): 'No data available from ' + userGroup}
                       </p>
                       <p style={{ margin: 0 }}>
                         <strong>Tracking Confidence:</strong>{' '}
-                        {anomaly.trackingDetection.trackingConfidence[0]}
+                        {anomaly.trackingDetection? anomaly.trackingDetection.trackingConfidence[0] : 'No data available from ' + userGroup}
                       </p>
                     </div>
                   </div>
@@ -1305,28 +1373,28 @@ const handleChartReady = (plot: any) => {
                       <strong>ID:</strong> {anomaly.id}
                     </p>
                     <p style={{ margin: '0 0 10px' }}>
-                      <strong>Anomaly Type:</strong> {anomaly.detectionType}
+                      <strong>Detection Type:</strong> {anomaly.detectionType}
                     </p>
                     <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
                       <p style={{ margin: '0 0 5px' }}>
                         <strong>Involved Objects:</strong>
                       </p>
                       <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                        {anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
+                        {anomaly.involvedObjects[0].location &&  anomaly.involvedObjects.map((obj: { location: { properties: { detectionConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; trackingConfidence: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }; type: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; visualId: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
                           <li key={idx} style={{ marginBottom: '5px' }}>
                             <p style={{ margin: 0 }}>
                               <strong>Detection Confidence:</strong>{' '}
-                              {obj.location.properties.detectionConfidence}
+                              {obj.location.properties.detectionConfidence? obj.location.properties.detectionConfidence : 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
                               <strong>Tracking Confidence:</strong>{' '}
-                              {obj.location.properties.trackingConfidence}
+                              {obj.location.properties.trackingConfidence? obj.location.properties.trackingConfidence : 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
-                              <strong>Type:</strong> {obj.type}
+                              <strong>Type:</strong> {obj.type? obj.type : 'No data available from ' + userGroup}
                             </p>
                             <p style={{ margin: 0 }}>
-                              <strong>Visual ID:</strong> {obj.visualId}
+                              <strong>Visual ID:</strong> {obj.visualId ? obj.visualId : 'No data available from ' + userGroup}
                             </p>
                           </li>
                         ))}
@@ -1338,11 +1406,11 @@ const handleChartReady = (plot: any) => {
                       </p>
                       <p style={{ margin: 0 }}>
                         <strong>Detection Confidence:</strong>{' '}
-                        {anomaly.trackingDetection.detectionConfidence.join(', ')}
+                        {anomaly.trackingDetection? anomaly.trackingDetection.detectionConfidence.join(', ') : 'No data available from ' + userGroup}
                       </p>
                       <p style={{ margin: 0 }}>
                         <strong>Tracking Confidence:</strong>{' '}
-                        {anomaly.trackingDetection.trackingConfidence[0]}
+                        {anomaly.trackingDetection? anomaly.trackingDetection.trackingConfidence[0] : 'No data available from ' + userGroup}
                       </p>
                     </div>
                   </div>

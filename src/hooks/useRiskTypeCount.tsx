@@ -182,6 +182,54 @@ result.statistics['total'] = dataArray.length;
   return result;} else { return {}}
 };
 
+
+// Function to process the data
+export const processRiskData = (data: any[]) => {
+  // Update the type declaration for result
+  const result: Record<string, Record<string, { count: number; ids: string[] }>> = {};
+  
+  data.forEach((risk) => {
+    // Check if datetime, anomalyType, and _id are present
+    if (!risk.datetime || !risk.riskType || !risk.id) return;
+
+    const date = new Date(risk.datetime);
+    // Format the date in European structure (dd-mm-yyyy)
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    // // Format the time in hh:mm
+    // const hours = String(date.getHours()).padStart(2, '0');
+    // const minutes = String(date.getMinutes()).padStart(2, '0');
+    //const formattedTime = `${hours}:${minutes}`;
+    const formattedDate = `${day}-${month}-${year}`;
+
+
+    const type = risk.riskType;
+    const id = risk.id;
+
+    if (!result[formattedDate]) {
+      result[formattedDate] = {};
+    }
+
+    if (!result[formattedDate][type]) {
+      result[formattedDate][type] = { count: 0, ids: [] }; // Initialize with count and ids
+    }
+
+    result[formattedDate][type].count += 1;
+    result[formattedDate][type].ids.push(id);
+  });
+
+  const formattedResult = [];
+
+  for (const [time, types] of Object.entries(result)) {
+    for (const [type, { count, ids }] of Object.entries(types)) {
+      formattedResult.push({ time, type, total: count, ids });
+    }
+  }
+  return formattedResult;
+};
+
 // Function to process the data
 export const processAnomalyData = (data: any[]) => {
   // Update the type declaration for result
@@ -382,7 +430,7 @@ export const getAnomalyLineColor = (type: string) => {
   } else if (type.includes('PersonMisVerified')) {
     lineColor = "#2cc1ba"; // complementary variant
   } else if (type.includes('PersonOutOfBounds')) {
-    lineColor = "#002353"; // primary dark blue
+    lineColor = "#7CB9E8"; // primary dark blue
   } else if (type.includes('PersonRunning')) {
     lineColor = "#32c7c1"; // secondary light blue
   } else if (type.includes('HumanTrafficking')) {
@@ -392,10 +440,19 @@ export const getAnomalyLineColor = (type: string) => {
   } else if (type.includes('Smuggling')) {
     lineColor = "#5ad4d0"; // lighter complementary blue
   } else if (type.includes('FalsifiedDocuments')) {
-    lineColor = "#32c7c1"; // secondary light blue
+    lineColor = "#e9c46a"; // secondary light blue
   } else if (type.includes('UnlawfulParkingVehicle')) {
-    lineColor = "#001f40"; // very dark variant
-  } else {
+    lineColor = "#0a9396"; // very dark variant
+  }  else if (type.includes('falsified_documents')) {
+    lineColor = "#003f73"; // very dark variant
+  }
+  else if (type.includes('PersonMisIdentification')) {
+    lineColor = "#5072A7"; 
+  } 
+  else if (type.includes('unlawful_crossing_border')) {
+    lineColor = "#e9c46a"; // very dark variant
+  } 
+  else {
     lineColor = "#32c7c1"; // default secondary light blue
   }
   return lineColor;
@@ -426,11 +483,39 @@ export const getDetectionLineColor = (type: string) => {
     lineColor = "#32c7c1"; // secondary light blue
   } else if (type.includes('HumanTrafficking')) {
     lineColor = "#001f40"; // very dark variant
-  } else {
+  }else if (type.includes('TrainRecognition')) {
+    lineColor = "#002353"; 
+  }
+  else if (type.includes('BlockchainVerification')) {
+    lineColor = "red"; 
+  }
+   else {
     lineColor = "#32c7c1"; // default secondary light blue
   }
   return lineColor;
 };
+export const getRiskLineColor = (type: string) => {
+  if (type.includes('humanTrafficking')) {
+    return '#002353'; // dark blue (primary)
+  } else if (type.includes('Contraband')) {
+    return '#32c7c1'; // light blue (primary)
+  } else if (type.includes('UTurnVehicle')) {
+    return 'red'; // bright teal
+  } else if (type.includes('SuspiciousDrivingPattern')) {
+    return '#f4a261'; // warm orange
+  } else if (type.includes('MigrationRisk')) {
+    return '#e9c46a'; // soft yellow
+  } else if (type.includes('HumanTrafficking')) {
+    return '#003f73'; // deeper blue variant
+  }
+  // else if (type.includes('NewRiskType')) {
+  //   return '#ff0000'; // Uncomment and set color for a new risk type
+  // }
+  else {
+    return '#32c7c1'; // default to light blue (primary)
+  }
+};
+
 
 // type CountData = {
 //   [date: string]: number;
@@ -498,3 +583,17 @@ export function formatDateTime(dateStr: string) {
   };
   return date.toLocaleString(undefined, options);
 }
+
+
+// Helper to compute percentage
+export const getPercentage = (value: number, total: number): string => {
+  if (total === 0) return '0';
+  return ((value / total) * 100).toFixed(2);
+};
+
+ // Helper: parse a date string in DD-MM-YYYY format.
+ export function parseDate(dateStr: string) {
+  const [day, month, year] = dateStr.split('-');
+  return new Date(`${year}-${month}-${day}`);
+}
+    

@@ -8,9 +8,9 @@ import dayjs from 'dayjs';
 const COLORS = [
   '#002353', // dark blue (primary)
   '#32c7c1', // light blue (primary)
-  '#1fb7b3', // a slightly muted light blue
+  '#418cc0', 
   '#003f73', // a deeper blue variant
-  '#50d0cb', // a brighter tint of light blue
+  '#5F9EA0', // a brighter tint of light blue
   '#001f40', // a very dark blue accent
 ];
 

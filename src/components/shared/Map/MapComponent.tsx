@@ -20,7 +20,7 @@ interface MapComponentProps {
   center: any;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ locations,center}) => {
 //   locations=[{
 //     geometry: {
 //         coordinates: [
@@ -33,10 +33,20 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
 //     },
 //     type: "Feature"
 // }];
+const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+const isIcssGroup = usergroup == 'uc1_iccs';
   console.log("received locations in map component: ", locations);
-  let isFromDashboard = locations[0].geometry.coordinates[0][0] ? true : false;
+  let isFromDashboard = true;
+  if(isIcssGroup && locations[0].geometry.coordinates[0][0][0] ){
+    isFromDashboard = locations[0].geometry.coordinates[0][0][0] ? true : false;
+
+  }
+  else{
+   isFromDashboard = locations[0].geometry.coordinates[0][0] ? true : false;}
+ 
+  console.log("is from dashboar:", isFromDashboard );
   return (
-    <MapContainer center={[center[1], center[0]]} zoom={12} style={{ height: '100vh', width: '100%' }}>
+    <MapContainer center={isIcssGroup? [center[0][1], center[0][0]]: [center[1], center[0]]} zoom={12} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
         noWrap={true}
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
@@ -49,10 +59,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center }) => {
         subdomains={['mt1', 'mt2', 'mt3']}
         zIndex={10}
       />
-      {locations.map((location, index) => (
+      {locations && locations.map((location, index) => (
         <>{location &&
           <Marker
-            position={isFromDashboard? [location.geometry.coordinates[0][1], location.geometry.coordinates[0][0]] : [location.geometry.coordinates[1], location.geometry.coordinates[0]]}
+            position={(isIcssGroup && isFromDashboard)? [location.geometry.coordinates[0][0][1], location.geometry.coordinates[0][0][0]] :(!isIcssGroup && isFromDashboard) ? [location.geometry.coordinates[0][1], location.geometry.coordinates[0][0]] : [location.geometry.coordinates[1], location.geometry.coordinates[0]]}
             icon={L.icon({
               iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
               iconSize: [25, 41],
