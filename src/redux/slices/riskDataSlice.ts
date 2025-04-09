@@ -119,7 +119,7 @@ export const fetchRisksFromAPI = () => async (dispatch: any) => {
   try {
     const postData = new URLSearchParams();
     postData.append('type', 'risk');  // Ensure 'type' has a value
-    //postData.append('usecase','uc1_iccs');
+    postData.append('usecase','uc2_wings');
     const response = await fetch('http://localhost:8080/api/UseCaseData', {
       method: 'POST',
       headers: {

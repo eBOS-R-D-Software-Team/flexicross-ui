@@ -346,6 +346,7 @@ legend:false,
       points = points.sort((a: number[], b: number[]) => a[0] - b[0]);
   
       // Extract x and y values for regression
+      
       const xValues = points.map((p: any[]) => p[0]);
       const yValues = points.map((p: any[]) => p[1]);
       const n = points.length;
@@ -418,7 +419,7 @@ legend:false,
   return (
     <Layout>
       <Row gutter={24} style={{ marginBottom: 32 }}>
-        {statsData && Object.keys(statsData.riskType).map((key) => (
+        {statsData && Object.keys(statsData.riskType) && Object.keys(statsData.riskType).map((key) => (
           <Col span={6} key={key}>
             <StatsGraph
               data={statsData.riskType[key]}
@@ -531,7 +532,7 @@ legend:false,
             </div>
             <div>
   <h4 style={{ marginBottom: '10px', color: '#002353' }}>Risk Information:</h4>
-  {relatedRisks.length > 0 ? (
+  {relatedRisks && relatedRisks.length > 0 ? (
     relatedRisks.map((risk: { id: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; riskType: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; probability: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; datetime: string | number | Date; involvedObjects: any[]; trackingDetection: { detectionConfidence: any[]; trackingConfidence: (string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined)[]; }; }, index: React.Key | null | undefined) => (
       <div
         key={index}

@@ -14,7 +14,8 @@ const { defaultAlgorithm } = theme;
 const initOptions = {
   onLoad: 'login-required',
   checkLoginIframe: false,
-  enable3PC: false
+  enable3PC: false,
+  redirectUri: window.location.origin, // ✅ this is important
 };
 
 const KeycloakGroupsLogger: React.FC = () => {
