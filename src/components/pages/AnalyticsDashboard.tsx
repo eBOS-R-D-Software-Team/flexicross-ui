@@ -239,6 +239,17 @@ setanomaliesMapData(
     if (filteredDetectionDataState) {
       filteredDetectionDataState= filteredDetectionDataState.filter(detection => detection != null);
       console.log('filtered detection data', filteredDetectionDataState);
+      const firstDetectionDate = filteredDetectionDataState[0].datetime.substring(0,10);
+      setFirstDetectionDate(filteredDetectionDataState[0].datetime.substring(0,10))
+      let isOneDetectionDate = true;
+      filteredDetectionDataState.forEach(anomaly =>{
+        if (anomaly.datetime.substring(0,10) != firstDetectionDate){
+          setIsOneDateOnly(false);
+          isOneDetectionDate = false;
+          return;
+        }
+      })
+
       setdetectionMapData(filteredDetectionDataState.map(item => {
         if(item.trackingDetection){
           return item.trackingDetection.geometries[0];}
@@ -247,8 +258,9 @@ setanomaliesMapData(
     }));
 
       console.log("detection map data", detectionMapData);
+      const processedDetectionData = isOneDetectionDate? processDataDetectionToTime(detectionData) : processDataDetection(detectionData);
 
-      const processedDetectionData = processDataDetection(filteredDetectionDataState);
+   //   const processedDetectionData = processDataDetection(filteredDetectionDataState);
       setTinyDataDetection(processedDetectionData);
       console.log("tiny data detection", tinyDataDetection);
       const anomalyTotals = totalDataTypesPerDay(filteredAnomalyDataState);

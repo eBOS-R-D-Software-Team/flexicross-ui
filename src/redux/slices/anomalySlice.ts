@@ -112,7 +112,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
     console.log("retrieved user group in anomaly slice: ", usergroup);
     postData.append('usecase',usergroup);
-    const response = await fetch('http://172.16.11.12:8080/api/UseCaseData', {
+    const response = await fetch('https://fcbe-172-16-11-12.nip.io:30451/api/UseCaseData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
