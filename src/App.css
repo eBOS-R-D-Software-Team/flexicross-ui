@@ -1,0 +1,19 @@
+.leaflet-bottom {
+  transform: translateY(100%)!important;
+  bottom: 0;
+}
+
+.gauge-wrapper {
+  position: relative;
+}
+
+.recharts-bar-rectangle:hover {
+  fill-opacity: 1 !important;
+  filter: none !important;
+}
+svg .recharts-rectangle:hover {
+  fill-opacity: 1 !important;
+  filter: none !important;
+  fill: inherit !important;
+  outline: none !important;
+}
