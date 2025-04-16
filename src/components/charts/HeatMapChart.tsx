@@ -27,11 +27,11 @@ type RiskData = {
 
 const probabilityMapping: { [key: string]: string } = {
   Rare: "Rare",
-  AlmostImprobable: "Unlikely",
-  Occasional: "Moderate",
-  Frequent: "Likely",
-  HighlyProbable: "Highly Likely",
-  VeryProbable: "Very Likely",
+  AlmostImprobable: "Almost Improbable",
+  Occasional: "Occasional",
+  Frequent: "Frequent",
+  HighlyProbable: "Highly Probable",
+  VeryProbable: "Very Probable",
 }
 
 const severityMapping: { [key: string]: string } = {
@@ -43,7 +43,7 @@ const severityMapping: { [key: string]: string } = {
   NoSeverity: "No Severity",
 }
 
-const columns = ["Rare", "Unlikely", "Moderate", "Likely", "Highly Likely", "Very Likely"]
+const columns = ["Rare", "Almost Improbable", "Occasional", "Frequent", "Highly Probable", "Very Probable"]
 const rows = ["Potential OBU", "High", "Medium", "Low", "Negligible", "No Severity"]
 
 export default function HeatMapChart({ data }: any) {
@@ -145,15 +145,7 @@ export default function HeatMapChart({ data }: any) {
                     <div key={metric.key}>
                       <strong>{metric.description}:</strong> {metric.value} {metric.unit}
                     </div>
-                  ))}
-                  {/* {risk.metadata?.map((meta, index) => (
-                    <div key={index}>
-                      <strong>{meta.description}:</strong>{" "}
-                      <a href={meta.fileURI} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                        View Image
-                      </a>
-                    </div>
-                  ))} */}
+                  ))}   
                 </div>
               </details>
             ))
