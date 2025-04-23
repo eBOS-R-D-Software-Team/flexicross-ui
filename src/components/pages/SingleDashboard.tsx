@@ -14,6 +14,7 @@ import RiskPieChart from '../charts/RiskPieChart';
 import RiskTrendChart from '../charts/RiskTrendChart';
 import { Line } from '@ant-design/plots';
 import HeatMapChart from '../charts/HeatMapChart';
+import RiskDetectedObjectsChart from '../charts/RiskDetectedObjectsChart';
 
 type RouteParams = {
   id: string;
@@ -486,6 +487,18 @@ legend:false,
             {/* {graphData && <RiskTrendChart graphData={graphData} />} */}
             
             {!tinyRiskData ? <Spin /> : <HeatMapChart data={selectedDashboard}   />}
+            </Card>
+        </Col>
+      </Row>
+<Row gutter={24}>
+        <Col span={24}>
+        <Card
+      title="Risk Heat Map"
+>
+          {graphData === undefined && <Spin />}
+            {/* {graphData && <RiskTrendChart graphData={graphData} />} */}
+            
+            {!tinyRiskData ? <Spin /> : <RiskDetectedObjectsChart risksData={selectedDashboard.data}   />}
             </Card>
         </Col>
       </Row>

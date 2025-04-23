@@ -25,7 +25,6 @@ const COLORS = [
 
 const processAnomaliesData = (anomaliesData: Anomaly[]): ChartData[] => {
   const typeCounts: Record<string, { count: number; visualIds: string[] }> = {};
-
   anomaliesData.forEach((anomaly) => {
     if (anomaly.involvedObjects) {
       const involvedObject = anomaly.involvedObjects[0]; // Get the first element of involvedObjects
@@ -48,6 +47,7 @@ const processAnomaliesData = (anomaliesData: Anomaly[]): ChartData[] => {
 };
 
 const BarChartWithPopup = (props: { anomaliesData: Anomaly[] }) => {
+console.log(props.anomaliesData)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedData, setSelectedData] = useState<ChartData | null>(null);
 
