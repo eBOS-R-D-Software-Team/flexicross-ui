@@ -106,7 +106,7 @@ export default function HeatMapChart({ data }: any) {
 
   const buildTooltipContent = (cellData: { [riskType: string]: number }) => {
     return Object.entries(cellData).map(([riskType, count]) => (
-      <div key={riskType} className="py-1 text-xs whitespace-nowrap text-start">
+      <div key={riskType}  style={{ padding: "0.25rem 0", fontSize: "0.75rem", whiteSpace: "nowrap", textAlign: "left" }}>
         {count} {riskType}
       </div>
     ))
@@ -118,26 +118,26 @@ export default function HeatMapChart({ data }: any) {
     console.log(risksInCell)
 
     return (
-      <div className="fixed inset-0 z-40 bg-black bg-opacity-30 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto w-full max-w-4xl relative">
+      <div style={{ position: "fixed", inset: 0, zIndex: 40, backgroundColor: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ backgroundColor: "#fff", padding: 24, borderRadius: 8, boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)", maxHeight: "90vh", overflowY: "auto", width: "100%", maxWidth: "64rem", position: "relative" }}>
           <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            style={{ position: "absolute", top: 8, right: 8, color: "#6b7280", background: "none", border: "none", cursor: "pointer" }}
             onClick={() => setSelectedCell(null)}
           >
             ✕
           </button>
-          <h2 className="text-lg font-semibold mb-4 text-[#002353]">
+          <h2 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: 16, color: "#002353" }}>
             Detailed Risks for {row} - {col}
           </h2>
           {risksInCell.length === 0 ? (
-            <p className="text-sm text-gray-500">No detailed risks in this cell.</p>
+            <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>No detailed risks in this cell.</p>
           ) : (
             risksInCell.map((risk) => (
-              <details key={risk.id} className="mb-4 border-2 border-[#32c7c1] text-[#002353] p-4 rounded-lg">
-                <summary className="cursor-pointer font-medium">
+              <details key={risk.id} style={{ marginBottom: 16, border: "2px solid #32c7c1", color: "#002353", padding: 16, borderRadius: 8 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 500 }}>
                   {risk.riskType} — {new Date(risk.datetime).toLocaleString()}
                 </summary>
-                <div className="mt-2 space-y-2 text-sm text-[#002353] ">
+                <div style={{ marginTop: 8, fontSize: "0.875rem" }}>
                   <div><strong>ID:</strong> {risk.id}</div>
                   <div><strong>Severity:</strong> {severityMapping[risk.severity]}</div>
                   <div><strong>Probability:</strong> {probabilityMapping[risk.probability]}</div>
@@ -156,59 +156,64 @@ export default function HeatMapChart({ data }: any) {
   }
 
   return (
-    <div className="w-full relative overflow-auto">
-      <div className="flex justify-end mb-1">
-        <div className="text-sm text-gray-500">Total of Risk Rating</div>
-      </div>
-
-      <table className="w-full border-collapse">
-        <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={row}>
-              <th className="p-2 text-left font-normal">{row}</th>
-              {columns.map((col, colIndex) => {
-                const count = heatmapData[row]?.[colIndex] || 0
-                const cellTooltipData = tooltipData[row]?.[col] || {}
-                const isHovered = hoveredCell?.row === row && hoveredCell?.col === col
-                const hasTooltip = Object.keys(cellTooltipData).length > 0
-
-                return (
-                  <td
-                    key={col}
-                    className="relative border p-2 text-center font-medium  cursor-pointer"
-                    style={{
-                      backgroundColor: getCellColor(rowIndex, colIndex),
-                      color: "#ffffff",
-                    }}
-                    onMouseEnter={() => hasTooltip && setHoveredCell({ row, col })}
-                    onMouseLeave={() => setHoveredCell(null)}
-                    onClick={() => setSelectedCell({ row, col })}
-                  >
-                    {count}
-                    {hasTooltip && isHovered && (
-                      <div className="absolute z-20 bg-white text-black text-xs rounded-lg shadow-lg p-2 mt-2 left-1/2 transform -translate-x-1/2">
-                        {buildTooltipContent(cellTooltipData)}
-                      </div>
-                    )}
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th className="p-2"></th>
-            {columns.map((col) => (
-              <th key={col} className="p-2 text-center font-normal">
-                {col}
-              </th>
-            ))}
-          </tr>
-        </tfoot>
-      </table>
-
-      {selectedCell && buildModal(selectedCell.row, selectedCell.col)}
+    <div style={{ width: "100%", position: "relative", overflow: "auto" }}>
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
+      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Total of Risk Rating</div>
     </div>
+
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <tbody>
+        {rows.map((row, rowIndex) => (
+          <tr key={row}>
+            <th style={{ padding: 8, textAlign: "left", fontWeight: "normal" }}>{row}</th>
+            {columns.map((col, colIndex) => {
+              const count = heatmapData[row]?.[colIndex] || 0
+              const cellTooltipData = tooltipData[row]?.[col] || {}
+              const isHovered = hoveredCell?.row === row && hoveredCell?.col === col
+              const hasTooltip = Object.keys(cellTooltipData).length > 0
+
+              return (
+                <td
+                  key={col}
+                  style={{
+                    position: "relative",
+                    border: "1px solid #ccc",
+                    padding: 8,
+                    textAlign: "center",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    backgroundColor: getCellColor(rowIndex, colIndex),
+                    color: "#ffffff"
+                  }}
+                  onMouseEnter={() => hasTooltip && setHoveredCell({ row, col })}
+                  onMouseLeave={() => setHoveredCell(null)}
+                  onClick={() => setSelectedCell({ row, col })}
+                >
+                  {count}
+                  {hasTooltip && isHovered && (
+                    <div style={{ position: "absolute", zIndex: 20, backgroundColor: "#fff", color: "#000", fontSize: "0.75rem", borderRadius: 8, boxShadow: "0 4px 6px rgba(0,0,0,0.1)", padding: 8, marginTop: 8, left: "50%", transform: "translateX(-50%)" }}>
+                      {buildTooltipContent(cellTooltipData)}
+                    </div>
+                  )}
+                </td>
+              )
+            })}
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th style={{ padding: 8 }}></th>
+          {columns.map((col) => (
+            <th key={col} style={{ padding: 8, textAlign: "center", fontWeight: "normal" }}>
+              {col}
+            </th>
+          ))}
+        </tr>
+      </tfoot>
+    </table>
+
+    {selectedCell && buildModal(selectedCell.row, selectedCell.col)}
+  </div>
   )
 }

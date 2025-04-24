@@ -44,10 +44,14 @@ interface ChartData {
   risks: {
     id: string
     riskType: string
+    severity: string
+    probability: string
+    metrics?: any[]
     visualId: string | number
     datetime?: string
     metadata?: any[]
   }[]
+  
 }
 
 const COLORS = [
@@ -59,7 +63,7 @@ const COLORS = [
 const processRisksData = (risksData: Risk[]): ChartData[] => {
   const typeCounts: Record<string, { count: number, risks: ChartData["risks"] }> = {}
   let totalObjects = 0
-
+console.log(risksData)
   risksData.forEach((risk) => {
     if (risk.involvedObjects) {
       risk.involvedObjects.forEach((obj) => {
@@ -76,6 +80,10 @@ const processRisksData = (risksData: Risk[]): ChartData[] => {
           visualId: obj.visualId,
           datetime: risk.datetime,
           metadata: obj.metadata,
+          severity: risk.severity,
+          probability: risk.probability,
+          metrics:risk.metrics
+          
         })
       })
     }
@@ -96,10 +104,17 @@ const CustomBarTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
-      <div className="bg-white p-3 border rounded-lg shadow-md">
-        <p className="font-medium text-sm">{data.type}</p>
-        <p className="text-sm text-gray-700">{data.percentage.toFixed(1)}% ({data.count} objects)</p>
-        <p className="text-xs text-gray-500 mt-1">Click for details</p>
+      <div style={{
+        backgroundColor: "white",
+        padding: "12px",
+        border: "1px solid #d1d5db",
+        borderRadius: "0.5rem",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        fontSize: "0.875rem"
+      }}>
+        <p style={{ fontWeight: "500" }}>{data.type}</p>
+        <p style={{ color: "#374151" }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
+        <p style={{ marginTop: "0.25rem", color: "#6b7280", fontSize: "0.75rem" }}>Click for details</p>
       </div>
     )
   }
@@ -125,18 +140,25 @@ console.log(selectedData)
   }
 
   return (
-    <div className="w-full">
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <h3 className="text-lg font-medium mb-4 text-center">Risk Distribution by Object Type</h3>
+     <div style={{ width: "100%" }}>
+      <div style={{
+        backgroundColor: "white",
+        padding: "16px",
+        borderRadius: "0.5rem",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
+      }}>
+        <h3 style={{ fontSize: "1.125rem", fontWeight: "500", marginBottom: "1rem", textAlign: "center" }}>
+          Risk Distribution by Object Type
+        </h3>
 
-        <div className="w-full h-[450px]">
+        <div style={{ width: "100%", height: "450px" }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} barCategoryGap="20%">
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="type" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
               <YAxis tickFormatter={(v) => `${v}%`} domain={[0, Math.ceil(Math.max(...data.map(d => d.percentage)) / 10) * 10]} />
               <RechartsTooltip content={<CustomBarTooltip />} cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
-              <Legend verticalAlign="top" height={36} formatter={(v) => <span className="text-sm">{v}</span>} />
+              <Legend verticalAlign="top" height={36} formatter={(v) => <span style={{ fontSize: "0.875rem" }}>{v}</span>} />
               <Bar
                 dataKey="percentage"
                 name="Percentage of Total"
@@ -155,25 +177,39 @@ console.log(selectedData)
 
       <Modal title={`${selectedData?.type} Objects`} open={isModalOpen} onCancel={handleCancel} footer={null} width={600}>
         {selectedData && (
-          <div className="space-y-4">
-            <div className="text-base mb-2">
-              {selectedData.percentage.toFixed(1)}% of all objects are {selectedData.type.toLowerCase()}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <div style={{ fontSize: "1rem" }}>
+              <span style={{ fontWeight: "500" }}>{selectedData.percentage.toFixed(1)}%</span> of all objects are{" "}
+              <span style={{ fontWeight: "500" }}>{selectedData.type.toLowerCase()}</span>
             </div>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem 1rem", fontSize: "0.875rem" }}>
+              <div style={{ color: "#4b5563", fontWeight: "600" }}>Object Type:</div>
+              <div style={{ fontWeight: "600" }}>{selectedData.type}</div>
+              <div style={{ color: "#4b5563", fontWeight: "600" }}>Count:</div>
+              <div style={{ fontWeight: "600" }}>{selectedData.count}</div>
+              <div style={{ color: "#4b5563", fontWeight: "600" }}>Percentage:</div>
+              <div style={{ fontWeight: "600" }}>{selectedData.percentage.toFixed(1)}%</div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: "300px", overflowY: "auto", paddingRight: "0.5rem" }}>
+              <div style={{ fontWeight: "600", color: "#1f2937" }}>Associated Risks:</div>
               {selectedData.risks.map((risk, index) => (
-                <details
-                  key={index}
-                  className="border border-teal-300 rounded-lg p-3"
-                  open={index === 0}
-                >
-                  <summary className="cursor-pointer font-semibold text-blue-900">
+                <details key={index} style={{ border: "1px solid #14b8a6", borderRadius: "0.5rem", padding: "0.75rem" }} open={index === 0}>
+                  <summary style={{ cursor: "pointer", fontWeight: "600", color: "#1e3a8a" }}>
                     ▾ UTurnVehicle — {risk.datetime ? new Date(risk.datetime).toLocaleString() : "Unknown Time"}
                   </summary>
-                  <div className="mt-2 text-sm space-y-1 pl-2">
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", paddingLeft: "0.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                     <p><strong>ID:</strong> {risk.id}</p>
                     <p><strong>Risk Type:</strong> {risk.riskType}</p>
                     <p><strong>Visual ID:</strong> {risk.visualId}</p>
-                   
+                    <p><strong>Risk Severity:</strong> {risk.severity}</p>
+                    <p><strong>Risk Probability:</strong> {risk.probability}</p>
+                    {risk.metrics?.map((metric) => (
+                      <div key={metric.key}>
+                        <strong>{metric.description}:</strong> {metric.value} {metric.unit}
+                      </div>
+                    ))}
                   </div>
                 </details>
               ))}
