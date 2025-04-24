@@ -199,12 +199,12 @@ console.log(selectedData)
                   <summary style={{ cursor: "pointer", fontWeight: "600", color: "#1e3a8a" }}>
                     ▾ UTurnVehicle — {risk.datetime ? new Date(risk.datetime).toLocaleString() : "Unknown Time"}
                   </summary>
-                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", paddingLeft: "0.5rem", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
-                    <p><strong>ID:</strong> {risk.id}</p>
-                    <p><strong>Risk Type:</strong> {risk.riskType}</p>
-                    <p><strong>Visual ID:</strong> {risk.visualId}</p>
-                    <p><strong>Risk Severity:</strong> {risk.severity}</p>
-                    <p><strong>Risk Probability:</strong> {risk.probability}</p>
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", paddingLeft: "0.5rem", display: "flex", flexDirection: "column" }}>
+                    <p style={{margin:"unset"}}><strong>ID:</strong> {risk.id}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Type:</strong> {risk.riskType}</p>
+                    <p style={{margin:"unset"}}><strong>Visual ID:</strong> {risk.visualId}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Severity:</strong> {risk.severity}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Probability:</strong> {risk.probability}</p>
                     {risk.metrics?.map((metric) => (
                       <div key={metric.key}>
                         <strong>{metric.description}:</strong> {metric.value} {metric.unit}
