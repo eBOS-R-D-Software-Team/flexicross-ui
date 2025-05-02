@@ -1,6 +1,10 @@
 "use client"
 
+import { Modal, Tooltip, Typography, Collapse } from "antd"
 import { useMemo, useState } from "react"
+
+const { Text } = Typography
+const { Panel } = Collapse
 
 type HeatmapData = {
   [key: string]: number[]
@@ -50,6 +54,12 @@ export default function HeatMapChart({ data }: any) {
   const risks: RiskData[] = data.data
   const [hoveredCell, setHoveredCell] = useState<{ row: string, col: string } | null>(null)
   const [selectedCell, setSelectedCell] = useState<{ row: string, col: string } | null>(null)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
+  const handleCancel = () => {
+    setSelectedCell(null)
+    setIsModalVisible(false)
+  }
 
   const { heatmapData, tooltipData, cellRisks } = useMemo(() => {
     const initialData: HeatmapData = {}
@@ -105,115 +115,134 @@ export default function HeatMapChart({ data }: any) {
   }
 
   const buildTooltipContent = (cellData: { [riskType: string]: number }) => {
-    return Object.entries(cellData).map(([riskType, count]) => (
-      <div key={riskType}  style={{ padding: "0.25rem 0", fontSize: "0.75rem", whiteSpace: "nowrap", textAlign: "left" }}>
-        {count} {riskType}
-      </div>
-    ))
-  }
-
-  const buildModal = (row: string, col: string) => {
-    const cellKey = `${row}-${col}`
-    const risksInCell = cellRisks[cellKey] || []
-    console.log(risksInCell)
-
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 40, backgroundColor: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ backgroundColor: "#fff", padding: 24, borderRadius: 8, boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)", maxHeight: "90vh", overflowY: "auto", width: "100%", maxWidth: "64rem", position: "relative" }}>
-          <button
-            style={{ position: "absolute", top: 8, right: 8, color: "#6b7280", background: "none", border: "none", cursor: "pointer" }}
-            onClick={() => setSelectedCell(null)}
-          >
-            ✕
-          </button>
-          <h2 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: 16, color: "#002353" }}>
-            Detailed Risks for {row} - {col}
-          </h2>
-          {risksInCell.length === 0 ? (
-            <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>No detailed risks in this cell.</p>
-          ) : (
-            risksInCell.map((risk) => (
-              <details key={risk.id} style={{ marginBottom: 16, border: "2px solid #32c7c1", color: "#002353", padding: 16, borderRadius: 8 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 500 }}>
-                  {risk.riskType} — {new Date(risk.datetime).toLocaleString()}
-                </summary>
-                <div style={{ marginTop: 8, fontSize: "0.875rem" }}>
-                  <div><strong>ID:</strong> {risk.id}</div>
-                  <div><strong>Severity:</strong> {severityMapping[risk.severity]}</div>
-                  <div><strong>Probability:</strong> {probabilityMapping[risk.probability]}</div>
-                  {risk.metrics?.map((metric) => (
-                    <div key={metric.key}>
-                      <strong>{metric.description}:</strong> {metric.value} {metric.unit}
-                    </div>
-                  ))}   
-                </div>
-              </details>
-            ))
-          )}
-        </div>
+      <div style={{ minWidth: 120 }}>
+        {Object.entries(cellData).map(([riskType, count]) => (
+          <div key={riskType} style={{ padding: "4px 0" }}>
+            <Text strong>{count}</Text> {riskType}
+          </div>
+        ))}
+        <Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 4 }}>Click for details</Text>
       </div>
     )
   }
 
+  const handleCellClick = (row: string, col: string) => {
+    setSelectedCell({ row, col })
+    setIsModalVisible(true)
+  }
+
   return (
     <div style={{ width: "100%", position: "relative", overflow: "auto" }}>
-    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
-      <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Total of Risk Rating</div>
-    </div>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
+        <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Total of Risk Rating</div>
+      </div>
 
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <tbody>
-        {rows.map((row, rowIndex) => (
-          <tr key={row}>
-            <th style={{ padding: 8, textAlign: "left", fontWeight: "normal" }}>{row}</th>
-            {columns.map((col, colIndex) => {
-              const count = heatmapData[row]?.[colIndex] || 0
-              const cellTooltipData = tooltipData[row]?.[col] || {}
-              const isHovered = hoveredCell?.row === row && hoveredCell?.col === col
-              const hasTooltip = Object.keys(cellTooltipData).length > 0
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr key={row}>
+              <th style={{ padding: 8, textAlign: "left", fontWeight: "normal" }}>{row}</th>
+              {columns.map((col, colIndex) => {
+                const count = heatmapData[row]?.[colIndex] || 0
+                const cellTooltipData = tooltipData[row]?.[col] || {}
+                const isHovered = hoveredCell?.row === row && hoveredCell?.col === col
+                const hasTooltip = Object.keys(cellTooltipData).length > 0
 
-              return (
-                <td
-                  key={col}
-                  style={{
-                    position: "relative",
-                    border: "1px solid #ccc",
-                    padding: 8,
-                    textAlign: "center",
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    backgroundColor: getCellColor(rowIndex, colIndex),
-                    color: "#ffffff"
-                  }}
-                  onMouseEnter={() => hasTooltip && setHoveredCell({ row, col })}
-                  onMouseLeave={() => setHoveredCell(null)}
-                  onClick={() => setSelectedCell({ row, col })}
-                >
-                  {count}
-                  {hasTooltip && isHovered && (
-                    <div style={{ position: "absolute", zIndex: 20, backgroundColor: "#fff", color: "#000", fontSize: "0.75rem", borderRadius: 8, boxShadow: "0 4px 6px rgba(0,0,0,0.1)", padding: 8, marginTop: 8, left: "50%", transform: "translateX(-50%)" }}>
-                      {buildTooltipContent(cellTooltipData)}
-                    </div>
-                  )}
-                </td>
-              )
-            })}
-          </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th style={{ padding: 8 }}></th>
-          {columns.map((col) => (
-            <th key={col} style={{ padding: 8, textAlign: "center", fontWeight: "normal" }}>
-              {col}
-            </th>
+                return (
+                  <td
+                    key={col}
+                    style={{
+                      position: "relative",
+                      border: "1px solid #ccc",
+                      padding: 8,
+                      textAlign: "center",
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      backgroundColor: getCellColor(rowIndex, colIndex),
+                      color: "#ffffff"
+                    }}
+                    onMouseEnter={() => hasTooltip && setHoveredCell({ row, col })}
+                    onMouseLeave={() => setHoveredCell(null)}
+                    onClick={() => handleCellClick(row, col)}
+                  >
+                    {count}
+                    {hasTooltip && isHovered && (
+                      <Tooltip
+                        title={buildTooltipContent(cellTooltipData)}
+                        open={true}
+                        placement={
+                          rowIndex === 0 ? 'bottom' : 
+                          rowIndex === rows.length - 1 ? 'top' : 
+                          colIndex === columns.length - 1 ? 'left' : 
+                          colIndex === 0 ? 'right' : 'top'
+                        }
+                        color="white"
+                        overlayInnerStyle={{ color: 'black', padding: 12, border: '1px solid #002353', }}
+                        arrow={false}
+                      />
+                    )}
+                  </td>
+                )
+              })}
+            </tr>
           ))}
-        </tr>
-      </tfoot>
-    </table>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th style={{ padding: 8 }}></th>
+            {columns.map((col) => (
+              <th key={col} style={{ padding: 8, textAlign: "center", fontWeight: "normal" }}>
+                {col}
+              </th>
+            ))}
+          </tr>
+        </tfoot>
+      </table>
 
-    {selectedCell && buildModal(selectedCell.row, selectedCell.col)}
-  </div>
+      <Modal
+        title={`Detailed Risks for ${selectedCell?.row || ''} - ${selectedCell?.col || ''}`}
+        open={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+        width="80%"
+        style={{ maxWidth: '1024px' }}
+      >
+        {selectedCell && (
+          <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            {(cellRisks[`${selectedCell.row}-${selectedCell.col}`] || []).length === 0 ? (
+              <Text type="secondary">No detailed risks in this cell.</Text>
+            ) : (
+              <Collapse bordered={false}>
+                {cellRisks[`${selectedCell.row}-${selectedCell.col}`].map((risk) => (
+                  <Panel 
+                    key={risk.id} 
+                    header={`${risk.riskType} — ${new Date(risk.datetime).toLocaleString()}`}
+                    style={{ 
+                      marginBottom: 16, 
+                      border: '2px solid #32c7c1',
+                      color: '#002353',
+                      borderRadius: 8,
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div style={{ padding: 16 }}>
+                      <div><Text strong>ID:</Text> {risk.id}</div>
+                      <div><Text strong>Severity:</Text> {severityMapping[risk.severity]}</div>
+                      <div><Text strong>Probability:</Text> {probabilityMapping[risk.probability]}</div>
+                      {risk.metrics?.map((metric) => (
+                        <div key={metric.key}>
+                          <Text strong>{metric.description}:</Text> {metric.value} {metric.unit}
+                        </div>
+                      ))}
+                    </div>
+                  </Panel>
+                ))}
+              </Collapse>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
   )
 }

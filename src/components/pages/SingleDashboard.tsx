@@ -493,7 +493,7 @@ legend:false,
 <Row gutter={24}>
         <Col span={24}>
         <Card
-      title="Risk Heat Map"
+      title="Risk by Object Type"
 >
           {graphData === undefined && <Spin />}
             {/* {graphData && <RiskTrendChart graphData={graphData} />} */}

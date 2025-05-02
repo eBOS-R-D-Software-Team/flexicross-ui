@@ -34,7 +34,6 @@ interface Risk {
   faceDetection?: any
   metrics?: any[]
   metadata?: any[]
-  
 }
 
 interface ChartData {
@@ -51,7 +50,6 @@ interface ChartData {
     datetime?: string
     metadata?: any[]
   }[]
-  
 }
 
 const COLORS = [
@@ -63,7 +61,7 @@ const COLORS = [
 const processRisksData = (risksData: Risk[]): ChartData[] => {
   const typeCounts: Record<string, { count: number, risks: ChartData["risks"] }> = {}
   let totalObjects = 0
-console.log(risksData)
+
   risksData.forEach((risk) => {
     if (risk.involvedObjects) {
       risk.involvedObjects.forEach((obj) => {
@@ -82,8 +80,7 @@ console.log(risksData)
           metadata: obj.metadata,
           severity: risk.severity,
           probability: risk.probability,
-          metrics:risk.metrics
-          
+          metrics: risk.metrics
         })
       })
     }
@@ -104,18 +101,36 @@ const CustomBarTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
-      <div style={{
-        backgroundColor: "white",
-        padding: "12px",
-        border: "1px solid #d1d5db",
-        borderRadius: "0.5rem",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        fontSize: "0.875rem"
-      }}>
-        <p style={{ fontWeight: "500" }}>{data.type}</p>
-        <p style={{ color: "#374151" }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
-        <p style={{ marginTop: "0.25rem", color: "#6b7280", fontSize: "0.75rem" }}>Click for details</p>
-      </div>
+      // <div style={{
+      //   backgroundColor: "white",
+      //   padding: "12px",
+      //   border: "1px solid #d1d5db",
+      //   borderRadius: "0.5rem",
+      //   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+      //   fontSize: "0.875rem"
+      // }}
+      
+      // >
+      //   <p style={{ fontWeight: "500" }}>{data.type}</p>
+      //   <p style={{ color: "#374151" }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
+      //   <p style={{ marginTop: "0.25rem", color: "#6b7280", fontSize: "0.75rem" }}>Click for details</p>
+      // </div>
+      <div
+      style={{
+        backgroundColor: '#fff',       // white background
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+        color: '#002353',             // dark blue text
+        border: '1px solid #002353',    // light blue border
+        fontSize: '13px',
+        padding: '10px',
+        textAlign: 'center',
+      }}
+    >
+      <p style={{ margin: '0 0 4px 0', color: '#002353', fontWeight:'bold' }}>{data.type}</p>
+      <p style={{ margin: '0 0 4px 0' }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
+      <p style={{ margin: '0 0 4px 0' }}>Click for details</p>
+    </div>
     )
   }
   return null
@@ -124,7 +139,7 @@ const CustomBarTooltip = ({ active, payload }: any) => {
 export default function ObjectTypePercentageBarChart({ risksData }: { risksData: Risk[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedData, setSelectedData] = useState<ChartData | null>(null)
-console.log(selectedData)
+
   const data = processRisksData(risksData)
 
   const handleBarClick = (entry: any) => {
@@ -138,33 +153,93 @@ console.log(selectedData)
   const handleCancel = () => {
     setIsModalOpen(false)
   }
+ 
+const objectsList=data.map((el, i) => el.count )
+const total=objectsList.reduce((sum, num) => sum + num, 0);
 
+  
   return (
-     <div style={{ width: "100%" }}>
+    <div style={{ width: "100%" }}>
       <div style={{
         backgroundColor: "white",
         padding: "16px",
         borderRadius: "0.5rem",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
       }}>
-        <h3 style={{ fontSize: "1.125rem", fontWeight: "500", marginBottom: "1rem", textAlign: "center" }}>
+        {/* <h3 style={{ fontSize: "1.125rem", fontWeight: "500", marginBottom: "1rem", textAlign: "center" }}>
           Risk Distribution by Object Type
-        </h3>
+        </h3> */}
 
         <div style={{ width: "100%", height: "450px" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} barCategoryGap="20%">
+            <BarChart 
+              data={data} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }} 
+              barCategoryGap="20%"
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="type" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={(v) => `${v}%`} domain={[0, Math.ceil(Math.max(...data.map(d => d.percentage)) / 10) * 10]} />
-              <RechartsTooltip content={<CustomBarTooltip />} cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} />
-              <Legend verticalAlign="top" height={36} formatter={(v) => <span style={{ fontSize: "0.875rem" }}>{v}</span>} />
+             <XAxis 
+                dataKey="type" 
+                angle={-45} 
+                textAnchor="end" 
+                height={60} 
+                tick={{ fontSize: 12 }} 
+                label={{ 
+                  value: 'Object Type', 
+                  // angle: -90, 
+                  position: 'center',
+                  style: { textAnchor: 'middle' },
+                  dy:30
+                }} 
+                
+              />
+             
+              <YAxis 
+                domain={[0,total]}
+
+                label={{ 
+                  value: 'Count', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  style: { textAnchor: 'middle' }
+                }} 
+              />
+              <RechartsTooltip 
+              
+                content={<CustomBarTooltip  />} 
+                cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} 
+              />
+             <Legend
+  verticalAlign="top"
+  height={36}
+  payload={data.map((entry, index) => ({
+    value: entry.type,
+    type: 'rect',
+    id: entry.type,
+    color: COLORS[index % COLORS.length],
+  }))}
+  formatter={(value) => (
+    <span style={{
+      color: '#4b5563',
+      fontSize: '0.875rem',
+      fontWeight: 500
+    }}>
+      {value}
+    </span>
+  )}
+/>
+
+             
               <Bar
-                dataKey="percentage"
-                name="Percentage of Total"
+                dataKey="count"
+                name="Object Count"
                 onClick={handleBarClick}
                 cursor="pointer"
-                label={{ position: "top", formatter: (v: number) => `${v.toFixed(1)}%`, fontSize: 12 }}
+                label={{ 
+                  position: "top", 
+                  formatter: (v: number) => `${v}`, 
+                  fontSize: 12 
+                }}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -197,7 +272,7 @@ console.log(selectedData)
               {selectedData.risks.map((risk, index) => (
                 <details key={index} style={{ border: "1px solid #14b8a6", borderRadius: "0.5rem", padding: "0.75rem" }} open={index === 0}>
                   <summary style={{ cursor: "pointer", fontWeight: "600", color: "#1e3a8a" }}>
-                    ▾ UTurnVehicle — {risk.datetime ? new Date(risk.datetime).toLocaleString() : "Unknown Time"}
+                    ▾ {risk.riskType} — {risk.datetime ? new Date(risk.datetime).toLocaleString() : "Unknown Time"}
                   </summary>
                   <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", paddingLeft: "0.5rem", display: "flex", flexDirection: "column" }}>
                     <p style={{margin:"unset"}}><strong>ID:</strong> {risk.id}</p>
