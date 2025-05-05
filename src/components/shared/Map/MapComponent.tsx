@@ -33,7 +33,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations,center}) => {
 //     },
 //     type: "Feature"
 // }];
-const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+const usergroup = localStorage.getItem("usergroup") || 'khra';
 const isIcssGroup = usergroup == 'uc1_iccs';
   console.log("received locations in map component: ", locations);
   let isFromDashboard = true;

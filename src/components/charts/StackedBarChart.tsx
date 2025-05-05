@@ -175,7 +175,7 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ data, loading, rawDat
       >
         {loading && <Spin />}
         {data && (
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" aspect={1.6}>
             <BarChart
               layout="vertical"
               data={data}
@@ -192,7 +192,13 @@ const StackedBarChart: React.FC<StackedBarChartProps> = ({ data, loading, rawDat
                 tick={{ fill: '#002353', fontSize: 14 }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ color: '#002353', fontSize: 14 }} />
+              <Legend
+               layout="horizontal"
+               verticalAlign="top"
+                align="center"
+                iconSize={10}
+               wrapperStyle={{ color: '#002353', fontSize: 12 }}
+             />
               {severityOrder.map((severity) => (
                 <Bar
                   key={severity}

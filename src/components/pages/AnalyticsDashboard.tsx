@@ -60,7 +60,7 @@ const AnalyticsDashboard: React.FC = () => {
 const [selectedAnpmalyDayData, setSelectedAnpmalyDayData] = useState<any[]>([]);
 const [isDetectionModalVisible, setIsDetectionModalVisible] = useState(false);
 const [selectedDetectionDayData, setSelectedDetectionDayData] = useState<any[]>([]);
-const userGroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+const userGroup = localStorage.getItem("usergroup") || 'khra';
 const isBeiaEvent = userGroup == 'uc1_beia' ||  userGroup == 'uc3_beia';
 const isWings = userGroup == 'uc2_wings';
 const isIccs = userGroup == 'uc1_iccs';
@@ -239,8 +239,9 @@ setanomaliesMapData(
     if (filteredDetectionDataState) {
       filteredDetectionDataState= filteredDetectionDataState.filter(detection => detection != null);
       console.log('filtered detection data', filteredDetectionDataState);
+      if (filteredDetectionDataState[0]){
       const firstDetectionDate = filteredDetectionDataState[0].datetime.substring(0,10);
-      setFirstDetectionDate(filteredDetectionDataState[0].datetime.substring(0,10))
+      setFirstDetectionDate(filteredDetectionDataState[0].datetime.substring(0,10))}
       let isOneDetectionDate = true;
       filteredDetectionDataState.forEach(anomaly =>{
         if (anomaly.datetime.substring(0,10) != firstDetectionDate){
@@ -899,8 +900,8 @@ const handleChartReady = (plot: any) => {
 };
   return (
     <Layout>
-      <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={12}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24} lg={12}>
           <Card
             title="Filter Anomalies"
             extra={
@@ -926,7 +927,7 @@ const handleChartReady = (plot: any) => {
             />
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xs={24} lg={12}>
           <Card
             title="Filter Detections"
             extra={
@@ -954,21 +955,21 @@ const handleChartReady = (plot: any) => {
         </Col>
       </Row>
 
-      <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={24}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24}>
         <Card
       title={isOneDateOnly? "Anomalies Trend for " + firstAnomalyDate : "Anomalies Trend"}
       extra={
         <>
           <Select
-            mode="multiple"
-            allowClear
-            style={{ width: '600px', marginRight: '16px' }}
-            placeholder="Select anomaly types"
-            value={selectedAnomalyTypes}
-            onChange={handleAnomalyTypeChange}
-            options={options} // Use the options array here
-          />
+  mode="multiple"
+  allowClear
+  style={{ width: '100%', maxWidth: 600, marginRight: 16 }}
+  placeholder="Select anomaly types"
+  value={selectedAnomalyTypes}
+  onChange={handleAnomalyTypeChange}
+  options={options}
+/>
 
           <FullscreenOutlined
             onClick={() =>
@@ -977,15 +978,17 @@ const handleChartReady = (plot: any) => {
                    <Select
             mode="multiple"
             allowClear
-            style={{ width: '600px', marginRight: '16px' }}
+            style={{ width: '100%', maxWidth: 600, marginRight: 16 }}
             placeholder="Select anomaly types"
             value={selectedAnomalyTypes}
             onChange={handleAnomalyTypeChange}
             options={options} // Use the options array here
           />
-                <Line width={1300} data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData}
-                 {...anomaliesTrendConfig}
-                                  />
+                <Line
+  data={combinedAnomalyData ? combinedAnomalyData.sort() : combinedAnomalyData}
+  autoFit            /* turns on responsive width & height */
+  {...anomaliesTrendConfig}
+/>
                 </div>
               ))
             }
@@ -993,7 +996,7 @@ const handleChartReady = (plot: any) => {
         </>
       }
     >
-      {!tinyAnomalyData ? <Spin /> : <Line width={1300}  data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData} 
+      {!tinyAnomalyData ? <Spin /> : <Line   data={combinedAnomalyData?combinedAnomalyData.sort():combinedAnomalyData} autoFit
       {...anomaliesTrendConfig} 
       // onEvent={(chart, event) => {
       //   if (event.type === 'element:click') {
@@ -1033,7 +1036,7 @@ const handleChartReady = (plot: any) => {
           <Select
             mode="multiple"
             allowClear
-            style={{ width: '600px', marginRight: '16px' }}
+            style={{ width: '100%', maxWidth: 600, marginRight: 16 }}
             placeholder="Select detection types"
             value={selectedDetectionsTypes}
             onChange={handleDetectionTypeChange}
@@ -1053,7 +1056,7 @@ const handleChartReady = (plot: any) => {
             onChange={handleDetectionTypeChange}
             options={detectionOptions} // Use the options array here
           />
-                <Line width={1300} data={combinedDetectionData} {...detectionsTrendConfig} />
+                <Line  data={combinedDetectionData} autofit {...detectionsTrendConfig}  />
                 </div>
               ))
             }
@@ -1061,7 +1064,7 @@ const handleChartReady = (plot: any) => {
         </>
       }
     >
-      {!tinyDataDetection ? <Spin /> : <Line width={1300}  data={combinedDetectionData} {...detectionsTrendConfig} />}
+      {!tinyDataDetection ? <Spin /> : <Line  data={combinedDetectionData} autoFit {...detectionsTrendConfig} />}
     </Card>
           <Card
             title="Anomalies and detections count graph"
@@ -1069,20 +1072,20 @@ const handleChartReady = (plot: any) => {
               <FullscreenOutlined
                 onClick={() =>
                   openModal('Anomalies and detections graph', (
-                    <Line width={1300}  data={combinedData} {...config} />
+                    <Line   data={combinedData} autoFit {...config} />
                   ))
                 }
               />
             }
           >
-            {!combinedData ? <Spin /> : <Line width={1300} data={combinedData} {...config} />}
+            {!combinedData ? <Spin /> : <Line  data={combinedData} autoFit {...config} />}
           </Card>
         </Col>
       </Row>
 
-        <Row gutter={24} style={{ marginBottom: 32 }}>
+        <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
 
-<Col span={12}>
+<Col xs={24} lg={12}>
     <Card
       title="Anomalies Distribution"
       extra={
@@ -1100,7 +1103,7 @@ const handleChartReady = (plot: any) => {
     </Card>
   </Col>
 
-  <Col span={12}>
+  <Col xs={24} lg={12}>
     <Card
       title="Detections Distribution"
       extra={
@@ -1118,7 +1121,7 @@ const handleChartReady = (plot: any) => {
     </Card>
   </Col>
 
-        {/* <Col span={12}>
+        {/* <Col xs={24} lg={12}>
           <Card
             title="Anomalies Distribution"
             extra={
@@ -1135,7 +1138,7 @@ const handleChartReady = (plot: any) => {
           </Card>
         </Col>
 
-        <Col span={12}>
+        <Col xs={24} lg={12}>
           <Card
             title="Detections Distribution"
             extra={
@@ -1154,9 +1157,9 @@ const handleChartReady = (plot: any) => {
       </Row>
 
 
-      <Row gutter={24} style={{ marginBottom: 32 }}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
 
-      <Col span={12}>
+      <Col xs={24} lg={12}>
           <Card
             title="Anomalies Involved Objects"
             extra={
@@ -1174,7 +1177,7 @@ const handleChartReady = (plot: any) => {
           </Card>
         </Col>
 
-        <Col span={12}>
+        <Col xs={24} lg={12}>
           <Card
             title="Detections Involved Objects"
             extra={
@@ -1194,8 +1197,8 @@ const handleChartReady = (plot: any) => {
         </Row>
 
 
-        {/* <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={24}>
+        {/* <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24}>
         <Card
             title="Line chart"
           >
@@ -1203,8 +1206,8 @@ const handleChartReady = (plot: any) => {
           </Card>
         </Col>
       </Row> */}
-      <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={24}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24}>
         <Card
             title="Anomalies Locations"
             extra={userGroup!='uc2_wings' && !isBeiaEvent && anomaliesMapData && anomaliesMapData.length>0 && <FullscreenOutlined onClick={() => openModal('Anomalies Map', <MapComponent locations={anomaliesMapData.map(item => item)} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]}  />)} />}
@@ -1214,8 +1217,8 @@ const handleChartReady = (plot: any) => {
           </Card>
         </Col>
       </Row>
-      <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={24}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24}>
         <Card
             title="Detections Locations"
             extra={userGroup!='uc2_wings' && !isBeiaEvent  && detectionMapData && detectionMapData.length>0 &&<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]}  />)} />}
@@ -1232,8 +1235,8 @@ const handleChartReady = (plot: any) => {
         open={modalVisible}
         footer={null}
         onCancel={() => setModalVisible(false)}
-        width="100%"
-        style={{ top: 0 }}
+        width="100vw"
+        style={{ top: 0, padding: 0 }}
         modalRender={(modalContent) => (
           <div style={{ height: '100vh', padding: 0 }}>
             {modalContent}

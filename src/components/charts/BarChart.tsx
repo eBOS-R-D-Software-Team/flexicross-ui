@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,  ResponsiveContainer, } from 'recharts';
 import { Modal, ConfigProvider } from 'antd';
 
 interface Anomaly {
@@ -79,11 +79,9 @@ const BarChartWithPopup = (props: { anomaliesData: Anomaly[] }) => {
     >
       <div style={{ textAlign: 'center', color: '#002353' }}>
         <h3></h3>
+        <ResponsiveContainer width="100%" height={400}>
         <BarChart
-          width={500}
-          height={400}
           data={data}
-          style={{ margin: '0 auto' }}
           barCategoryGap="20%"
         >
           {/* Use a light grey grid for subtle separation */}
@@ -128,6 +126,7 @@ const BarChartWithPopup = (props: { anomaliesData: Anomaly[] }) => {
             ))}
           </Bar>
         </BarChart>
+        </ResponsiveContainer>
         <Modal
           title="Details"
           open={isModalVisible}

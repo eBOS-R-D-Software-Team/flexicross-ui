@@ -21,7 +21,7 @@
             const selectedDetection = useSelector((state: RootState) => state.detectionData.selectedDetection);
           
             const [objectData, setObjectData] = React.useState<any>(null);
-            const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
+            const usergroup = localStorage.getItem("usergroup") || 'khra';
             const isIcssGroup = usergroup == 'uc1_iccs';
                         useEffect(() => {
               if (type === 'anomaly') {

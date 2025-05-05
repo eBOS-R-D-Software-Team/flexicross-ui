@@ -418,9 +418,9 @@ legend:false,
 
   return (
     <Layout>
-      <Row gutter={24} style={{ marginBottom: 32 }}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         {statsData && Object.keys(statsData.riskType) && Object.keys(statsData.riskType).map((key) => (
-          <Col span={6} key={key}>
+          <Col xs={24} sm={12} md={8} lg={6} key={key}>
             <StatsGraph
               data={statsData.riskType[key]}
               total={statsData.statistics['total']}
@@ -429,22 +429,22 @@ legend:false,
           </Col>
         ))}
       </Row>
-      <Row gutter={24} style={{ marginBottom: 32 }}>
-        <Col span={24}>
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24}>
           <Card>
-            {graphData && <Table columns={columns} dataSource={graphData} />}
+            {graphData && <Table columns={columns} dataSource={graphData} scroll={{ x: 'max-content' }} />}
           </Card>
         </Col>
       </Row>
-      <Row gutter={24}>
-      <Col span={24}>
+      <Row gutter={[16, 16]}>
+      <Col xs={24}>
 
       {graphData === undefined && <Spin />}
             {graphData && <StackedBarChart loading={false} data={countRiskTypesForBarChart(graphData)} rawData={graphData}  />}
             </Col>
       </Row>
-      <Row gutter={24}>
-        <Col span={12}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
            <Card >
             {graphData === undefined && <Spin />}
             {graphData && <RiskPieChart data={countRiskTypesForRiskPieChart(graphData, 'severity')}  title="Severity Distribution" 
@@ -453,7 +453,7 @@ legend:false,
           </Card>
          
        </Col> 
-        <Col span={12}>
+        <Col xs={24} lg={12}>
           <Card >
             {graphData === undefined && <Spin />}
             {graphData && <RiskPieChart data={countRiskTypesForRiskPieChart(graphData, 'riskType')} title="Risk Type Distribution" 
@@ -463,34 +463,34 @@ legend:false,
         </Col>
       
       </Row>
-      <Row gutter={24}>
-        <Col span={24}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24}>
         <Card
       title="Risks Trend"
 >
           {graphData === undefined && <Spin />}
             {/* {graphData && <RiskTrendChart graphData={graphData} />} */}
             
-            {!tinyRiskData ? <Spin /> : <Line width={1300}  data={combinedRiskData?combinedRiskData.sort():combinedRiskData} {...risksTrendConfig} />}
+            {!tinyRiskData ? <Spin /> : <Line   data={combinedRiskData?combinedRiskData.sort():combinedRiskData} autoFit {...risksTrendConfig} />}
             </Card>
         </Col>
       </Row>
 
-      <Row gutter={24}>
-        {/* <Col span={12}>
+      <Row gutter={[16, 16]}>
+        {/* <Col xs={24} lg={12}>
           {/* <Card title={'Risk Level by Type'}>
             {graphData === undefined && <Spin />}
             {graphData && <Bar data={countRiskTypes(graphData, 'riskType')} {...config} />}
           </Card> */}
          
         {/* </Col> */} 
-        {/* <Col span={12}>
+        {/* <Col xs={24} lg={12}>
           <Card title={'Risk Status'}>
             {graphData === undefined && <Spin />}
             {graphData && <Pie data={countRiskTypes(graphData, 'severity')} {...configPie} />}
           </Card>
         </Col> */}
-        <Col span={24}>
+        <Col xs={24}>
           <Card style={{ marginTop: 16 }} title={'Risk Matrix'}>
             {graphData === undefined && <Spin />}
             {graphData && <Heatmap {...configHeat} />}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Modal, DatePicker, ConfigProvider, Layout, Row, Col, Card, Tag } from 'antd';
 import { countRiskTypesForPieChart } from '../../hooks/useRiskTypeCount';
 import dayjs from 'dayjs';
@@ -134,7 +134,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div style={{ textAlign: 'center' }}>
         {/* Date Range Picker */}
         <Row gutter={16} style={{ marginBottom: 20 }}>
-          <Col span={12}>
+        <Col xs={24} sm={12}>
             <DatePicker
               onChange={(date) => {
                 setStartDate(date);
@@ -149,7 +149,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               picker="date"
             />
           </Col>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <DatePicker
               onChange={(date) => {
                 setEndDate(date);
@@ -168,7 +168,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
         {/* Conditional rendering for the PieChart */}
         {processedData && processedData.length > 0 ? (
-          <PieChart width={650} height={500}>
+          <ResponsiveContainer width="100%" aspect={1.3}>
+          <PieChart>
             <Legend
               layout="horizontal"
               verticalAlign="top"
@@ -187,7 +188,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={150}
+              outerRadius="75%"
               fill="#8884d8"
               onClick={handleClick}
               stroke="none"
@@ -205,6 +206,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               content={<CustomTooltip />}
             />
           </PieChart>
+          </ResponsiveContainer>
         ) : (
           <p>No data available to display.</p>
         )}

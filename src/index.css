@@ -11,3 +11,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* ===== Recharts legend responsiveness ===== */
+.recharts-default-legend {
+  display: flex;
+  flex-wrap: wrap;          /* let items break into new rows        */
+  justify-content: center;
+}
+
+.recharts-default-legend .recharts-legend-item {
+  margin-right: 8px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  font-size: 12px;          /* default size                         */
+}
+
+@media (max-width: 575px) {
+  .recharts-default-legend .recharts-legend-item {
+    font-size: 10px;        /* shrink text on very small screens    */
+  }
+}

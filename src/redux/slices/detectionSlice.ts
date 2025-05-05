@@ -93,9 +93,9 @@ export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
     postData.append('type', 'detection');  // Ensure 'type' has a value
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
 
-    postData.append('usecase',usergroup);
+    //postData.append('usecase',usergroup);
 
-    const response = await fetch('http://172.16.11.12:8080/api/UseCaseData', {
+    const response = await fetch('https://slimrelief.pythonanywhere.com/api/UseCaseData', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

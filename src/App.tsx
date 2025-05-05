@@ -18,7 +18,7 @@ const initOptions = {
   //redirectUri: window.location.origin, // ✅ this is important
 };
 
-const KeycloakGroupsLogger: React.FC = () => {
+/*const KeycloakGroupsLogger: React.FC = () => {
   const { keycloak } = useKeycloak();
   const navigate = useNavigate();
 
@@ -45,13 +45,13 @@ const KeycloakGroupsLogger: React.FC = () => {
   }, [keycloak, navigate]);
 
   return null;
-};
+};*/
 
 
 
 
 const App: React.FC = () => (
-  <ReactKeycloakProvider authClient={keycloak} initOptions={initOptions}>
+  // <ReactKeycloakProvider authClient={keycloak} initOptions={initOptions}>
     <ConfigProvider
       locale={enUSIntl}
       theme={{
@@ -64,12 +64,12 @@ const App: React.FC = () => (
     >
       <Router>
         <Provider store={store}>
-          <KeycloakGroupsLogger />
+          {/* <KeycloakGroupsLogger /> */}
           <Routes />
         </Provider>
       </Router>
     </ConfigProvider>
-  </ReactKeycloakProvider>
+  // </ReactKeycloakProvider>
 );
 
 export default App;

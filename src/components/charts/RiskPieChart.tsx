@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PieChart, Pie, Tooltip, Legend, Cell } from 'recharts';
+import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { Modal, Collapse } from 'antd';
 
 const { Panel } = Collapse;
@@ -141,13 +141,13 @@ const RiskPieChart: React.FC<RiskPieChartProps> = ({ data, title, rawData, flag 
     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h3 style={{ color: '#002353' }}>{title}</h3>
       <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-
-      <PieChart width={500} height={500}>
+      <ResponsiveContainer width="100%" aspect={1.6}>
+      <PieChart>
         <Pie
           data={pieData}
           cx="50%"
           cy="50%"
-          outerRadius={150}
+          outerRadius="75%"
           dataKey="value"
           // label
         >
@@ -161,8 +161,15 @@ const RiskPieChart: React.FC<RiskPieChartProps> = ({ data, title, rawData, flag 
           ))}
         </Pie>
         <Tooltip content={<CustomTooltipPie total={total} />} />
-        <Legend wrapperStyle={{ color: '#002353', fontSize: '13px' }} />
+        <Legend
+         layout="horizontal"
+         verticalAlign="bottom"
+         align="center"
+        iconSize={10}
+         wrapperStyle={{ color: '#002353', fontSize: 12 }}  /*  only colour/font; flex-wrap handled globally */
+       />
       </PieChart>
+      </ResponsiveContainer>
       </div>
       {selectedSliceDetails && (
         <Modal
