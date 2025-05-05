@@ -32,7 +32,7 @@ const SingleDashboard: React.FC = () => {
   const [combinedRiskData, setCombinedRiskData] = React.useState<any[]>();
   const [isRiskModalVisible, setIsRiskModalVisible] = React.useState(false);
   const [selectedRiskDayData, setSelectedRiskDayData] = React.useState<any[]>([]);
-  
+  console.log(selectedRiskDayData)
 
   useEffect(() => {
     dispatch(getDashboardDataById(id));
@@ -80,6 +80,7 @@ const SingleDashboard: React.FC = () => {
   },
 
   interaction: {
+    
     tooltip: {
       render: (e:any, { title, items }: { title:any, items:any }) => {
         const list = items.filter((item: { value: any; }) => item.value);
@@ -114,6 +115,7 @@ const SingleDashboard: React.FC = () => {
       },
     },
   },
+  
   // Use onReady to attach a click listener at the plot level.
   onReady: ({ chart }: { chart: any }) => {
     console.log("Chart is ready", chart);
@@ -128,12 +130,16 @@ const SingleDashboard: React.FC = () => {
       
       // Attempt coordinate inversion.
       let coordinate;
+      console.log("chart :",chart)
       if (chart.chart && chart.chart.getCoordinate) {
         coordinate = chart.chart.getCoordinate();
+        console.log("coordinate 1 :",coordinate)
+
       } else if (chart.getChart && chart.getChart().getCoordinate) {
         coordinate = chart.getChart().getCoordinate();
+        console.log("coordinate 2:",coordinate)
+
       }
-      
       let clickedTime: any = null;
       if (coordinate && coordinate.invert) {
         const inverted = coordinate.invert({ x, y });
@@ -167,6 +173,7 @@ const SingleDashboard: React.FC = () => {
       const clickedTimestamp = new Date(clickedTime).getTime();
       console.log("Clicked timestamp:", clickedTimestamp);
       // Find the record in combinedAnomalyData whose time is closest.
+      console.log(chart.children)
       if(chart.children[0].length){
 
       const closestRecord = chart.children[0].value.data.reduce((prev: any, curr: any) => {
