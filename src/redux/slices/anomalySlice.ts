@@ -6,15 +6,15 @@ console.log("production: ", process.env.REACT_APP_PRODUCTION);
 const isProd = process.env.REACT_APP_PRODUCTION == 'true';  // make sure your env var is literally "true"
 const isNetlify = process.env.REACT_APP_NETLIFY == 'true';  // make sure your env var is literally "true"
 
-// choose the base for all your calls
-const API_BASE = isNetlify
-  // in prod your Netlify redirects will proxy /api → http://172.16.11.12:8080/api
-  ? 'api'
-  // in local/dev go directly to your backend
-  : 'http://172.16.11.12:8080/api';
+// // choose the base for all your calls
+// const API_BASE = isNetlify
+//   // in prod your Netlify redirects will proxy /api → http://172.16.11.12:8080/api
+//   ? 'api'
+//   // in local/dev go directly to your backend
+//   : 'http://172.16.11.12:8080/api';
 
 
-  console.log("api base: ", API_BASE);
+//   console.log("api base: ", API_BASE);
 
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
@@ -129,7 +129,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
     console.log("retrieved user group in anomaly slice: ", usergroup);
     postData.append('usecase',usergroup);
-    const response = await fetch(`${API_BASE}/UseCaseData`, {
+    const response = await fetch(`https://fcbe-172-16-11-12.nip.io:30451/api/UseCaseData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
