@@ -27,35 +27,39 @@ function getItem(
 
 const Sidebar: React.FC<any> = (menu) => {
     const [collapsed, setCollapsed] = useState(false);
-    const { keycloak } = useKeycloak();
+   const { keycloak } = useKeycloak();
     const navigate = useNavigate(); // Needed for programmatic nav
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<string | undefined>(undefined);
-    
-    const items: MenuItem[] = [
-        getItem('Home', '1', <DesktopOutlined />, '/'),
+    const storedGroups = JSON.parse(localStorage.getItem("usergroups") || "[]");
+const hasRiskAccess = storedGroups.includes("uc2_wings") || storedGroups.includes("uc3_beia");
 
-        getItem('Risk Analysis', '', <DesktopOutlined />, '', undefined, [
-            getItem('Create Dashboard', '2', <PieChartOutlined />, '/risk/create-dashboard'),
-            getItem('Dashboards', '4', <DesktopOutlined />, '/risk/view-dashboards'),
-        ]),
-
-        getItem('Visual Analytics', '6', <DesktopOutlined />, undefined, () => {
-            const storedGroups = JSON.parse(localStorage.getItem("usergroups") || "[]");
-            if (storedGroups.length > 1) {
-              setIsModalVisible(true); // show modal
-            } else {
-              navigate('/visual-analytics/report');
-            }
-          }),
-          
-        // ✅ Logout option
-        getItem('Logout', 'logout', <LogoutOutlined />, undefined, () => {
-            keycloak.logout({
-                redirectUri: window.location.origin, // back to app's root
-            });
-        }),
-    ];
+const items: MenuItem[] = [
+    getItem('Home', '1', <DesktopOutlined />, '/'),
+  
+    // ✅ Only add "Risk Analysis" if user has access
+    ...(hasRiskAccess
+      ? [getItem('Risk Analysis', '', <DesktopOutlined />, '', undefined, [
+          getItem('Create Dashboard', '2', <PieChartOutlined />, '/risk/create-dashboard'),
+          getItem('Dashboards', '4', <DesktopOutlined />, '/risk/view-dashboards'),
+        ])]
+      : []),
+  
+    getItem('Visual Analytics', '6', <DesktopOutlined />, undefined, () => {
+      if (storedGroups.length > 1) {
+        setIsModalVisible(true);
+      } else {
+        navigate('/visual-analytics/report');
+      }
+    }),
+  
+    getItem('Logout', 'logout', <LogoutOutlined />, undefined, () => {
+      keycloak.logout({
+        redirectUri: window.location.origin,
+      });
+    }),
+  ];
+  
 
     return (
         <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>

@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
 import { DashboardData } from '../../interfaces/dashboardData';
 
+
+console.log("production: ", process.env.REACT_APP_PRODUCTION);
+const isProd = process.env.REACT_APP_PRODUCTION === 'true';  // make sure your env var is literally "true"
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
@@ -22,6 +25,7 @@ const loadStateFromLocalStorage = (): any[] => {
 
 // Utility function to save state to local storage
 const saveStateToLocalStorage = (state: any[]) => {
+  console.log("received state to be mapped: ", state);
   try {
     const serializableState = state.map(item => ({
       ...item,
@@ -80,6 +84,7 @@ const anomalySlice = createSlice({
     },
     fetchAnomalies: (state, action: PayloadAction<any[]>) => {
       // Exclude the first element from the fetched anomalies
+      console.log("state.anomalydata f fetch anomalies: ", action.payload);
       state.anomalyData = action.payload;
       saveStateToLocalStorage(state.anomalyData); // Save fetched data to local storage
 
@@ -122,9 +127,13 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     if (!response.ok) {
       throw new Error('Failed to fetch anomalies');
     }
-    const data = await response.json();
-    console.log("recieved anomalies response: ", data);
-    dispatch(fetchAnomalies(data));
+
+    const raw = await response.json();
+    console.log('received anomalies response:', raw);
+
+    // unwrap for prod, else use the body directly
+    const payload = isProd ? raw.documents : raw;
+    dispatch(fetchAnomalies(payload));
     await new Promise(resolve => setTimeout(resolve, 1000));
    // saveStateToLocalStorage(data); // Save fetched data to local storage
   } catch (err) {

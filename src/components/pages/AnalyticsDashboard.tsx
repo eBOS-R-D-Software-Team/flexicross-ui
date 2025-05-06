@@ -236,7 +236,7 @@ setanomaliesMapData(
 
 
   useEffect(() => {
-    if (filteredDetectionDataState) {
+    if (filteredDetectionDataState && filteredDetectionDataState.length) {
       filteredDetectionDataState= filteredDetectionDataState.filter(detection => detection != null);
       console.log('filtered detection data', filteredDetectionDataState);
       const firstDetectionDate = filteredDetectionDataState[0].datetime.substring(0,10);
@@ -1210,7 +1210,7 @@ const handleChartReady = (plot: any) => {
             extra={userGroup!='uc2_wings' && !isBeiaEvent && anomaliesMapData && anomaliesMapData.length>0 && <FullscreenOutlined onClick={() => openModal('Anomalies Map', <MapComponent locations={anomaliesMapData.map(item => item)} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]}  />)} />}
           >
             {anomaliesMapData === undefined && <Spin />}
-            {userGroup!='uc2_wings' && !isBeiaEvent  && anomaliesMapData && anomaliesMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={anomaliesMapData} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]} />}
+            {userGroup!='uc2_wings' && !isBeiaEvent && !isIccs  && anomaliesMapData && anomaliesMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={anomaliesMapData} center={[anomaliesMapData[0].geometry.coordinates[0][0],anomaliesMapData[0].geometry.coordinates[0][1]]} />}
           </Card>
         </Col>
       </Row>
@@ -1221,7 +1221,7 @@ const handleChartReady = (plot: any) => {
             extra={userGroup!='uc2_wings' && !isBeiaEvent  && detectionMapData && detectionMapData.length>0 &&<FullscreenOutlined onClick={() => openModal('Detection Map', <MapComponent locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]}  />)} />}
           >
             {detectionData === undefined && <Spin />}
-            {userGroup!='uc2_wings' && !isBeiaEvent  && detectionMapData && detectionMapData != undefined && detectionMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]} />}
+            {userGroup!='uc2_wings' && userGroup!='uc1_iccs'  && !isBeiaEvent  && detectionMapData && detectionMapData != undefined && detectionMapData.length>0 && <MapComponent key={Math.floor(Math.random() * 9) +Math.floor(100000000)} locations={detectionMapData} center={[detectionMapData[0].geometry.coordinates[0][0],detectionMapData[0].geometry.coordinates[0][1]]} />}
           </Card>
         </Col>
       </Row>

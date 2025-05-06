@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
 
+
+console.log("production: ", process.env.REACT_APP_PRODUCTION);
+const isProd = process.env.REACT_APP_PRODUCTION === 'true';  // make sure your env var is literally "true"
+
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
@@ -89,6 +93,9 @@ export const {
 // Thunk to fetch data from API
 export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
   try {
+
+    //https://slimrelief.pythonanywhere.com/api/UseCaseData
+    //http://172.16.11.12:8080/api/UseCaseData
     const postData = new URLSearchParams();
     postData.append('type', 'detection');  // Ensure 'type' has a value
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
@@ -105,9 +112,14 @@ export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
     if (!response.ok) {
       throw new Error('Failed to fetch detections');
     }
-    const data = await response.json();
-    dispatch(fetchDetections(data));
-    saveStateToLocalStorage(data); // Save fetched data to local storage
+    const raw = await response.json();
+    console.log('received detection response:', raw);
+
+    // unwrap for prod, else use the body directly
+    const payload = isProd ? raw.documents : raw;
+
+    dispatch(fetchDetections(payload));
+    saveStateToLocalStorage(payload); // Save fetched data to local storage
   } catch (err) {
     console.error('Failed to fetch detections:', err);
   }

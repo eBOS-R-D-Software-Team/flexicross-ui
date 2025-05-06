@@ -69,7 +69,7 @@ const App: React.FC = () => (
         </Provider>
       </Router>
     </ConfigProvider>
-  </ReactKeycloakProvider>
+   </ReactKeycloakProvider>
 );
 
 export default App;
