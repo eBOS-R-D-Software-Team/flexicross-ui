@@ -111,7 +111,7 @@ export const fetchDetectionsFromAPI = () => async (dispatch: any) => {
 
     postData.append('usecase',usergroup);
 
-    const response = await fetch(`${API_BASE}/UseCaseData`, {
+    const response = await fetch(`api/UseCaseData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

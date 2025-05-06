@@ -129,7 +129,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
     console.log("retrieved user group in anomaly slice: ", usergroup);
     postData.append('usecase',usergroup);
-    const response = await fetch(`${API_BASE}/UseCaseData`, {
+    const response = await fetch(`api/UseCaseData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
