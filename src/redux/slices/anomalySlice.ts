@@ -129,7 +129,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
     console.log("retrieved user group in anomaly slice: ", usergroup);
     postData.append('usecase',usergroup);
-    const response = await fetch(`api/UseCaseData`, {
+    const response = await fetch(`${API_BASE}/UseCaseData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -137,7 +137,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
       body: postData.toString(),
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch anomalies');
+      throw new Error(`Anomalies fetch failed: ${response.status}`);
     }
 
     const raw = await response.json();
