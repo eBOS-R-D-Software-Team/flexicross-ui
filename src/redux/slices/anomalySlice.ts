@@ -3,7 +3,17 @@ import { DashboardData } from '../../interfaces/dashboardData';
 
 
 console.log("production: ", process.env.REACT_APP_PRODUCTION);
-const isProd = process.env.REACT_APP_PRODUCTION === 'true';  // make sure your env var is literally "true"
+const isProd = process.env.REACT_APP_PRODUCTION == 'true';  // make sure your env var is literally "true"
+const isNetlify = process.env.REACT_APP_NETLIFY == 'true';  // make sure your env var is literally "true"
+
+// choose the base for all your calls
+const API_BASE = isNetlify
+  // in prod your Netlify redirects will proxy /api → http://172.16.11.12:8080/api
+  ? '/api'
+  // in local/dev go directly to your backend
+  : 'http://172.16.11.12:8080/api';
+
+
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
@@ -117,7 +127,7 @@ export const fetchAnomaliesFromAPI = () => async (dispatch: any) => {
     const usergroup = localStorage.getItem("usergroup") || 'uc1_iccs';
     console.log("retrieved user group in anomaly slice: ", usergroup);
     postData.append('usecase',usergroup);
-    const response = await fetch('http://172.16.11.12:8080/api/UseCaseData', {
+    const response = await fetch(`${API_BASE}/UseCaseData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

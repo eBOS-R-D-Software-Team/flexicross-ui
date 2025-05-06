@@ -2,8 +2,8 @@ import { createSlice, PayloadAction, Middleware } from '@reduxjs/toolkit';
 
 
 console.log("production: ", process.env.REACT_APP_PRODUCTION);
-const isProd = process.env.REACT_APP_PRODUCTION === 'true';  // make sure your env var is literally "true"
-const isNetlify = process.env.REACT_APP_NETLIFY === 'true';  // make sure your env var is literally "true"
+const isProd = process.env.REACT_APP_PRODUCTION == 'true';  // make sure your env var is literally "true"
+const isNetlify = process.env.REACT_APP_NETLIFY == 'true';  // make sure your env var is literally "true"
 
 // choose the base for all your calls
 const API_BASE = isNetlify
