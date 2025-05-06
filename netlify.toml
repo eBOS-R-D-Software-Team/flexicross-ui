@@ -1,0 +1,12 @@
+# 1) Proxy all API calls from /api/* → your HTTP backend
+[[redirects]]
+  from   = "/api/*"
+  to     = "http://172.16.11.12:8080/api/:splat"
+  status = 200
+  force  = true
+
+# 2) SPA fallback: serve index.html for everything else (so refreshes don’t 404)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
