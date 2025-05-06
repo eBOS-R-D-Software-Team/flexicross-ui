@@ -1,7 +1,7 @@
 [build]
   publish = "build"
   command = "npm run build"
-
+  
 [[redirects]]
   from   = "/api/*"
   to     = "http://172.16.11.12:8080/api/:splat"
@@ -12,10 +12,3 @@
   from   = "/*"
   to     = "/index.html"
   status = 200
-
-# 2) Proxy all Keycloak endpoints
-[[redirects]]
-  from   = "/keycloak/*"
-  to     = "http://172.16.11.11:9696/keycloak/:splat"
-  status = 200
-  force  = true
