@@ -8,7 +8,7 @@ const isNetlify = process.env.REACT_APP_NETLIFY == 'true';  // make sure your en
 // choose the base for all your calls
 const API_BASE = isNetlify
   // in prod your Netlify redirects will proxy /api → http://172.16.11.12:8080/api
-  ? '/api'
+  ? 'api'
   // in local/dev go directly to your backend
   : 'http://172.16.11.12:8080/api';
 
