@@ -14,6 +14,8 @@ const API_BASE = isNetlify
   : 'http://172.16.11.12:8080/api';
 
 
+  console.log("api base: ", API_BASE);
+
 // Utility function to load state from local storage
 const loadStateFromLocalStorage = (): any[] => {
   try {
