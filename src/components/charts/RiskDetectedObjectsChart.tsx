@@ -155,6 +155,9 @@ export default function ObjectTypePercentageBarChart({ risksData }: { risksData:
   }
  
 const objectsList=data.map((el, i) => el.count )
+const max=Math.max(...objectsList)
+const transformedValue = max % 10 === 0 ? max + 10 : Math.ceil(max / 10) * 10;
+
 const total=objectsList.reduce((sum, num) => sum + num, 0);
 
   
@@ -195,7 +198,7 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
               />
              
               <YAxis 
-                domain={[0,total]}
+                domain={[0,transformedValue]}
 
                 label={{ 
                   value: 'Count', 

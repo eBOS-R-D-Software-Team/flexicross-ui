@@ -475,12 +475,13 @@ legend:false,
       <Row gutter={24}>
         <Col span={24}>
         <Card
-      title="Risks Trend"
->
+      title="Risks Trend">
+
           {graphData === undefined && <Spin />}
             {/* {graphData && <RiskTrendChart graphData={graphData} />} */}
             
-            {!tinyRiskData ? <Spin /> : <Line width={1300}  data={combinedRiskData?combinedRiskData.sort():combinedRiskData} {...risksTrendConfig} />}
+            {!tinyRiskData ? <Spin /> : <Line width={1300}   data={combinedRiskData ? [...combinedRiskData].sort() : []} 
+  {...risksTrendConfig}  />}
             </Card>
         </Col>
       </Row>

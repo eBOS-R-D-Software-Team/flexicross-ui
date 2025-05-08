@@ -133,16 +133,22 @@ export default function HeatMapChart({ data }: any) {
   }
 
   return (
-    <div style={{ width: "100%", position: "relative", overflow: "auto" }}>
+<div>
+
+<div style={{display:'flex', alignItems:'center'}}>
+            <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', marginRight: 8, fontSize: '1.2rem'}}>Risk Severity</div>
+            <div style={{ width: "100%", position: "relative", overflow: "auto" }}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 4 }}>
         <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>Total of Risk Rating</div>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <tbody>
+          
           {rows.map((row, rowIndex) => (
+            
             <tr key={row}>
-              <th style={{ padding: 8, textAlign: "left", fontWeight: "normal" }}>{row}</th>
+              <th style={{ padding: 8, textAlign: "left", fontWeight: "400",fontSize:"14px" }}>{row}</th>
               {columns.map((col, colIndex) => {
                 const count = heatmapData[row]?.[colIndex] || 0
                 const cellTooltipData = tooltipData[row]?.[col] || {}
@@ -192,7 +198,7 @@ export default function HeatMapChart({ data }: any) {
           <tr>
             <th style={{ padding: 8 }}></th>
             {columns.map((col) => (
-              <th key={col} style={{ padding: 8, textAlign: "center", fontWeight: "normal" }}>
+              <th key={col} style={{ padding: 8, textAlign: "left", fontWeight: "400",fontSize:"14px" }}>
                 {col}
               </th>
             ))}
@@ -244,5 +250,10 @@ export default function HeatMapChart({ data }: any) {
         )}
       </Modal>
     </div>
+    </div>
+
+            <div  style={{ textAlign: 'center', padding: 8,  }}>Risk Probability</div>
+</div>
+   
   )
 }
