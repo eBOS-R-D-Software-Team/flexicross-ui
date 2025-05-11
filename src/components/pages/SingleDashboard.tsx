@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { RootState } from '../../redux/store';
 import { getDashboardDataById } from '../../redux/slices/riskDataSlice';
-import { Card, Col, Layout, Modal, Row, Spin, Table, Tag } from 'antd';
+import { Button, Card, Col, Collapse, Descriptions, Layout, Modal, Row, Select, Spin, Table, Tag } from 'antd';
 import { Bar, Heatmap } from '@ant-design/charts';
 import { Pie } from '@ant-design/plots';
 import { countOccurrences, countRiskTypes, countRiskTypesForBarChart, countRiskTypesForPieChart, countRiskTypesForRiskPieChart, formatDateTime, getAnomalyLineColor, getRiskLineColor, parseDate, processRiskData } from '../../hooks/useRiskTypeCount';
@@ -25,6 +25,7 @@ const SingleDashboard: React.FC = () => {
   const { id } = useParams<RouteParams>();
   const dispatch = useDispatch();
   const selectedDashboard = useSelector((state: RootState) => state.dashboardData.selectedDashboard);
+  console.log(selectedDashboard)
   const [graphData, setGraphData] = React.useState<any>();
   const [statsData, setStatsData] = React.useState<any>();
   const [tinyRiskData, setTinyRiskData] = React.useState<any[]>();
@@ -32,8 +33,13 @@ const SingleDashboard: React.FC = () => {
   const [combinedRiskData, setCombinedRiskData] = React.useState<any[]>();
   const [isRiskModalVisible, setIsRiskModalVisible] = React.useState(false);
   const [selectedRiskDayData, setSelectedRiskDayData] = React.useState<any[]>([]);
-  console.log(selectedRiskDayData)
+  const [modalData, setmodalData] =React.useState<any>(null)
+  const [selectedRiskTypes, setSelectedRiskTypes] = React.useState<string[]>([]);
+  const [selectedTrendLines, setSelectedTrendLines] = React.useState<string[]>([]);
 
+  console.log(selectedRiskDayData)
+console.log("modal data :",modalData)
+console.log("trendlineData :",trendlineData)
   useEffect(() => {
     dispatch(getDashboardDataById(id));
   }, [id, dispatch]);
@@ -56,34 +62,94 @@ const SingleDashboard: React.FC = () => {
       setCombinedRiskData(combined);
     }
   }, [tinyRiskData, trendlineData]);
+  const hoverDataRef = React.useRef<{
+    tooltipDate?: string;
+    tooltipItems?: any[];
+  }>({});
+  const combinedRiskDataRef = React.useRef(combinedRiskData);
+
+// Update ref when data changes
+useEffect(() => {
+  combinedRiskDataRef.current = combinedRiskData;
+}, [combinedRiskData]);
+
+const selectedDashboardRef = React.useRef(selectedDashboard);
+
+// Update ref when data changes
+useEffect(() => {
+  selectedDashboardRef.current = selectedDashboard;
+}, [selectedDashboard]);
+
+useEffect(() => {
+  if (combinedRiskData) {
+    // Get all unique risk types (excluding trends)
+    const allTypes = new Set<string>();
+    combinedRiskData.forEach(item => {
+      if (!item.type.includes('(Trend)')) {
+        allTypes.add(item.type);
+      }
+    });
+    // Initialize with all types selected
+    setSelectedRiskTypes(Array.from(allTypes));
+  }
+}, [combinedRiskData]);
+const handleRiskTypeChange = (selectedTypes: string[]) => {
+  setSelectedRiskTypes(selectedTypes);
+};
+const filteredTrendlineData = React.useMemo(() => {
+  if (selectedTrendLines.length === 0) return combinedRiskData;
   
+  return combinedRiskData?.filter(item => {
+    const baseType = item.type.replace(' (Trend)', '');
+    return selectedTrendLines.includes(baseType);
+  });
+}, [combinedRiskData, selectedTrendLines]);
+
+const filteredTrendlineDataRef = React.useRef(filteredTrendlineData);
+
+// Update ref when filtered data changes
+useEffect(() => {
+  filteredTrendlineDataRef.current = filteredTrendlineData;
+}, [filteredTrendlineData]);
+
   const risksTrendConfig = React.useMemo(() => ({
     //theme: 'classicDark',
+    autoFit:true,
     xField: 'time',
     yField: 'total',
+
     axis:{
       x:{title:'date'},
       y:{title: 'risk total'}
     },
-    
-  style: {
-    lineWidth: 2,
-    textAlign: 'center', display: 'flex',
-    lineDash: (items: { type: string; }[]) => {
-      const { type } = items[0];
-      return type.includes('(Trend)') ? [2, 4] : [0, 0];
+   
+
+    style: {
+      lineWidth: (items: any) => items[0]?.type?.includes('(Trend)') ? 2 : 3,
+      textAlign: 'center', 
+      display: 'flex',
+      lineDash: (items: any) => {
+        return items[0]?.type?.includes('(Trend)') ? [4, 4] : [0, 0];
+      },
+      stroke: (items: any) => {
+        const type = items[0]?.type?.replace(' (Trend)', '');
+        return getRiskLineColor(type);
+      },
+      opacity: (items: any) => {
+        return items[0]?.type?.includes('(Trend)') ? 0.7 : 1;
+      }
     },
-    stroke:(items: { type: string; }[]) => {
-      const { type } = items[0];
-     return getRiskLineColor(type);
-    },
-  },
 
   interaction: {
     
     tooltip: {
       render: (e:any, { title, items }: { title:any, items:any }) => {
         const list = items.filter((item: { value: any; }) => item.value);
+        // Store only the hovered date and items in state
+        hoverDataRef.current = { tooltipDate: title, tooltipItems: list };
+console.log(hoverDataRef.current)
+        // console.log(modalData)
+        // Update modalData state
         return (
           <div key={title}>
             <h4 style={{color: "#808080"}}>{title}</h4>
@@ -118,83 +184,54 @@ const SingleDashboard: React.FC = () => {
   
   // Use onReady to attach a click listener at the plot level.
   onReady: ({ chart }: { chart: any }) => {
-    console.log("Chart is ready", chart);
-    
     chart.on('plot:click', (event: any) => {
-      console.log("Plot click event:", event);
+      const tooltipDate = hoverDataRef.current.tooltipDate;
+      if (!tooltipDate) return;
       
-      // Get the canvas click coordinates.
-      const { x, y } = event.canvas;
-      console.log("Canvas coordinates:", x, y);
-
+      // Use the filtered data ref instead of combinedRiskDataRef
+      const currentFilteredData = filteredTrendlineDataRef.current;
+      const currentSelectedDashboardData = selectedDashboardRef.current;
       
-      // Attempt coordinate inversion.
-      let coordinate;
-      console.log("chart :",chart)
-      if (chart.chart && chart.chart.getCoordinate) {
-        coordinate = chart.chart.getCoordinate();
-        console.log("coordinate 1 :",coordinate)
-
-      } else if (chart.getChart && chart.getChart().getCoordinate) {
-        coordinate = chart.getChart().getCoordinate();
-        console.log("coordinate 2:",coordinate)
-
-      }
-      let clickedTime: any = null;
-      if (coordinate && coordinate.invert) {
-        const inverted = coordinate.invert({ x, y });
-        console.log("Inverted coordinate:", inverted);
-        if (inverted && inverted.x) {
-          clickedTime = inverted.x;
+      if (!currentFilteredData || !currentSelectedDashboardData) return;
+      
+      try {
+        const [day, month, year] = tooltipDate.split("-");
+        const tooltipDateObj = new Date(`${year}-${month}-${day}`);
+        
+        if (!isNaN(tooltipDateObj.getTime())) {
+          const formattedTooltipDate = `${String(tooltipDateObj.getDate()).padStart(2, '0')}-${String(tooltipDateObj.getMonth() + 1).padStart(2, '0')}-${tooltipDateObj.getFullYear()}`;
+          
+          // Filter using the filtered data
+          const risksForDate = currentFilteredData.filter(item => 
+            item.time === formattedTooltipDate && !item.type?.includes('(Trend)')
+          );
+          
+          const trendsForDate = currentFilteredData.filter(item => 
+            item.time === formattedTooltipDate && item.type?.includes('(Trend)')
+          );
+          
+          // Get risk details if available
+          const riskDetails: any[] = [];
+          if (currentSelectedDashboardData?.data) {
+            risksForDate.forEach(riskEntry => {
+              riskEntry.ids?.forEach((id: string) => {
+                const foundRisk = currentSelectedDashboardData.data.find((r: any) => r.id === id);
+                if (foundRisk) riskDetails.push(foundRisk);
+              });
+            });
+          }
+          
+          setmodalData({
+            date: formattedTooltipDate,
+            trends: trendsForDate,
+            risks: risksForDate,
+            riskDetails
+          });
         }
+        setIsRiskModalVisible(true);
+      } catch (e) {
+        console.error('Error handling click:', e);
       }
-      
-      // Fallback: if inversion didn’t work, compute based on canvas x.
-      if (!clickedTime) {
-        console.warn("Coordinate inversion failed. Using fallback.");
-        // Try getting chart width (using chart.getWidth if available)
-        let chartWidth = chart.getWidth ? chart.getWidth() : 1300;
-        // Compute the time domain from your data (parsing date strings properly)
-        if(chart.children[0].length){
-        const timeValues = chart.children[0].value.data.map((record: any) => parseDate(record.time).getTime());
-        const minTime = Math.min(...timeValues);
-        const maxTime = Math.max(...timeValues);
-        // Determine the proportion along the chart width.
-        const proportion = x / chartWidth;
-        const computedTime = new Date(minTime + proportion * (maxTime - minTime));
-        clickedTime = computedTime.toISOString();
-        console.log("Computed clicked time (fallback):", computedTime);
-      }
-      } else {
-        console.log("Clicked time from inversion:", clickedTime);
-      }
-      
-      // Convert clickedTime to a timestamp.
-      const clickedTimestamp = new Date(clickedTime).getTime();
-      console.log("Clicked timestamp:", clickedTimestamp);
-      // Find the record in combinedAnomalyData whose time is closest.
-      console.log(chart.children)
-      if(chart.children[0].length){
-
-      const closestRecord = chart.children[0].value.data.reduce((prev: any, curr: any) => {
-        const prevTime = parseDate(prev.time).getTime();
-        const currTime = parseDate(curr.time).getTime();
-        return Math.abs(currTime - clickedTimestamp) < Math.abs(prevTime - clickedTimestamp)
-          ? curr
-          : prev;
-      }, chart.children[0].value.data[0]);
-      
-      console.log("Closest record:", closestRecord);
-      setSelectedRiskDayData([closestRecord]);
-
-    }
-    else{
-        setSelectedRiskDayData([]);
-
-    }
-      
-      // Update state with the closest record.
-      setIsRiskModalVisible(true);
     });
   },
 
@@ -480,8 +517,45 @@ legend:false,
           {graphData === undefined && <Spin />}
             {/* {graphData && <RiskTrendChart graphData={graphData} />} */}
             
-            {!tinyRiskData ? <Spin /> : <Line width={1300}   data={combinedRiskData ? [...combinedRiskData].sort() : []} 
-  {...risksTrendConfig}  />}
+            {!tinyRiskData ? <Spin /> : <>
+            {/* <Select
+  mode="multiple"
+  placeholder="Select Trend Lines"
+  value={selectedTrendLines}
+  onChange={setSelectedTrendLines}
+  style={{ width: '100%', marginBottom: 20 }}
+>
+  {Array.from(new Set(combinedRiskData?.map(item => item.type))).map(type => (
+    <Select.Option key={type} value={type}>
+      {type}
+    </Select.Option>
+  ))}
+</Select> */}
+<Select
+  mode="multiple"
+  placeholder="Select Trend Lines"
+  value={selectedTrendLines}
+  onChange={setSelectedTrendLines}
+  style={{ width: '100%', marginBottom: 20 }}
+  optionFilterProp="children"
+  filterOption={(input: string, option?: { children?: string }) => {
+    return (option?.children ?? '').toLowerCase().includes(input.toLowerCase())
+  }}
+>
+  {Array.from(
+    new Set(
+      combinedRiskData
+        ?.map(item => item.type.replace(' (Trend)', ''))
+        .filter(type => type) // Remove any empty strings
+    )
+  ).map(type => (
+    <Select.Option key={type} value={type}>
+      {type}
+    </Select.Option>
+  ))}
+</Select>
+<Line    data={filteredTrendlineData ? [...filteredTrendlineData].sort() : []} 
+  {...risksTrendConfig}  /></> }
             </Card>
         </Col>
       </Row>
@@ -534,113 +608,97 @@ legend:false,
         </Col>
       </Row>
       <Modal
-  title="Risks for Selected Day"
+  title={`Risk Details for ${modalData?.date}`}
   visible={isRiskModalVisible}
   onCancel={() => setIsRiskModalVisible(false)}
-  footer={null} // Remove default footer buttons
+  footer={null}
+  width={1000}
 >
-  {selectedRiskDayData.length > 0 ? (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', color: '#002353' }}>
-      {(() => {
-        const selected = selectedRiskDayData[0];
-        const formattedDate = formatDateTime(selected.time);
-        const relatedRisks = graphData.filter((item: { id: any; }) =>
-          selected.ids && selected.ids.includes(item.id)
-        );
-        return (
-          <div>
-            <div
-              style={{
-                marginBottom: '20px',
-                borderBottom: '1px solid #32c7c1',
-                paddingBottom: '10px'
-              }}
-            >
-              <h3 style={{ margin: 0, color: '#002353' }}>
-                Selected Date &amp; Time: {formattedDate}
-              </h3>
-              <p style={{ margin: '5px 0' }}>
-                <strong>Anomaly Type:</strong> {selected.type}
-              </p>
-              <p style={{ margin: '5px 0' }}>
-                <strong>Total Anomalies:</strong> {selected.total}
-              </p>
-            </div>
-            <div>
-  <h4 style={{ marginBottom: '10px', color: '#002353' }}>Risk Information:</h4>
-  {relatedRisks && relatedRisks.length > 0 ? (
-    relatedRisks.map((risk: { id: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; riskType: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; severity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; probability: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; datetime: string | number | Date; involvedObjects: any[]; trackingDetection: { detectionConfidence: any[]; trackingConfidence: (string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined)[]; }; }, index: React.Key | null | undefined) => (
-      <div
-        key={index}
-        style={{
-          marginBottom: '20px',
-          padding: '15px',
-          border: '1px solid #32c7c1',
-          borderRadius: '5px'
-        }}
-      >
-        <p style={{ margin: '0 0 5px' }}>
-          <strong>ID:</strong> {risk.id}
-        </p>
-        <p style={{ margin: '0 0 10px' }}>
-          <strong>Risk Type:</strong> {risk.riskType}
-        </p>
-        <p style={{ margin: '0 0 10px' }}>
-          <strong>Severity:</strong> {risk.severity}
-        </p>
-        <p style={{ margin: '0 0 10px' }}>
-          <strong>Probability:</strong> {risk.probability}
-        </p>
-        <p style={{ margin: '0 0 10px' }}>
-          <strong>Date/Time:</strong> {formatDate(new Date(risk.datetime))}
-        </p>
-        <div style={{ marginLeft: '15px', marginBottom: '10px' }}>
-          <p style={{ margin: '0 0 5px' }}>
-            <strong>Involved Objects:</strong>
-          </p>
-          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-            {risk.involvedObjects && risk.involvedObjects.map((obj, idx) => (
-              <li key={idx} style={{ marginBottom: '5px' }}>
-                <p style={{ margin: 0 }}>
-                  <strong>Detection Confidence:</strong> {obj.location.properties.detectionConfidence}
-                </p>
-                <p style={{ margin: 0 }}>
-                  <strong>Tracking Confidence:</strong> {obj.location.properties.trackingConfidence}
-                </p>
-                <p style={{ margin: 0 }}>
-                  <strong>Type:</strong> {obj.type}
-                </p>
-                <p style={{ margin: 0 }}>
-                  <strong>Visual ID:</strong> {obj.visualId}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <p style={{ margin: '0 0 5px' }}>
-            <strong>Tracking Detection:</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Detection Confidence:</strong> {risk.trackingDetection.detectionConfidence.join(', ')}
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Tracking Confidence:</strong> {risk.trackingDetection.trackingConfidence[0]}
-          </p>
-        </div>
-      </div>
-    ))
-  ) : (
-    <p>No detailed risk information available.</p>
-  )}
-</div>
+  {modalData ? (
+    <div>
+      {/* <Row gutter={16}>
+       
+        <Col span={24}>
+          <h3>Risk Counts</h3>
+          <Table
+          style={{background:'white'}}
+            columns={[
+              { title: 'Risk Type', dataIndex: 'type', key: 'type' },
+              { title: 'Count', dataIndex: 'total', key: 'total' }
+            ]}
+            dataSource={modalData.risks || []}
+            pagination={false}
+            size="small"
+          />
+        </Col>
+      </Row> */}
 
-          </div>
-        );
-      })()}
+      {/* <h3 style={{ marginTop: 20 }}>Detailed Risk Information</h3> */}
+      {modalData.riskDetails?.length > 0 ? (
+        <Collapse accordion>
+          {modalData.riskDetails.map((risk: any, index: number) => (
+            <Collapse.Panel 
+            style={{ 
+              marginBottom: 16, 
+              border: '2px solid #32c7c1',
+              color: '#002353',
+              borderRadius: 8,
+              overflow: 'hidden'
+            }}
+              header={`${risk.riskType} — ${formatDateTime(risk.datetime)}`} 
+              key={risk.id}
+              // extra={<Tag color={getRiskLineColor(risk.riskType)}>{risk.severity}</Tag>}
+            >
+               <div style={{ marginTop: "0.5rem", fontSize: "0.875rem", paddingLeft: "0.5rem", display: "flex", flexDirection: "column" }}>
+                    <p style={{margin:"unset"}}><strong>ID:</strong> {risk.id}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Type:</strong> {risk.riskType}</p>
+                    <p style={{margin:"unset"}}><strong>Visual ID:</strong> {risk.visualId}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Severity:</strong> {risk.severity}</p>
+                    <p style={{margin:"unset"}}><strong>Risk Probability:</strong> {risk.probability}</p>
+                    {risk.metrics?.map((metric: { key: React.Key | null | undefined; description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; value: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; unit: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }) => (
+                      <div key={metric.key}>
+                        <strong>{metric.description}:</strong> {metric.value} {metric.unit}
+                      </div>
+                    ))}
+                  </div>
+              {/* <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label="ID">{risk.id}</Descriptions.Item>
+                <Descriptions.Item label="Type">{risk.riskType}</Descriptions.Item>
+                <Descriptions.Item label="Severity">
+                  <Tag color={getRiskLineColor(risk.riskType)}>{risk.severity}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Probability">{risk.probability}</Descriptions.Item>
+                <Descriptions.Item label="Date/Time">
+                  {formatDateTime(risk.datetime)}
+                </Descriptions.Item>
+                
+                {risk.metrics?.length > 0 && (
+                  <Descriptions.Item label="Metrics">
+                    <Table
+                      columns={[
+                        { title: 'Description', dataIndex: 'description', key: 'description' },
+                        { title: 'Value', dataIndex: 'value', key: 'value' },
+                        { title: 'Unit', dataIndex: 'unit', key: 'unit' }
+                      ]}
+                      dataSource={risk.metrics}
+                      pagination={false}
+                      size="small"
+                      bordered
+                    />
+                  </Descriptions.Item>
+                )}
+                
+             
+              </Descriptions> */}
+            </Collapse.Panel>
+          ))}
+        </Collapse>
+      ) : (
+        <p>No detailed risk information available for this date.</p>
+      )}
     </div>
   ) : (
-    <p style={{ padding: '20px', color: '#002353' }}>No risks found for this day.</p>
+    <Spin tip="Loading risk data..." />
   )}
 </Modal>
     </Layout>

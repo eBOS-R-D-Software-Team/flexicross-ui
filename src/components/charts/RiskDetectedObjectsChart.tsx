@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
   BarChart,
   Bar,
@@ -10,7 +10,8 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts"
-import { Modal } from "antd"
+import { Modal, DatePicker, Space, Empty } from "antd"
+import dayjs from "dayjs"
 
 // Interfaces
 interface InvolvedObject {
@@ -101,36 +102,22 @@ const CustomBarTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
-      // <div style={{
-      //   backgroundColor: "white",
-      //   padding: "12px",
-      //   border: "1px solid #d1d5db",
-      //   borderRadius: "0.5rem",
-      //   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-      //   fontSize: "0.875rem"
-      // }}
-      
-      // >
-      //   <p style={{ fontWeight: "500" }}>{data.type}</p>
-      //   <p style={{ color: "#374151" }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
-      //   <p style={{ marginTop: "0.25rem", color: "#6b7280", fontSize: "0.75rem" }}>Click for details</p>
-      // </div>
       <div
-      style={{
-        backgroundColor: '#fff',       // white background
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-        color: '#002353',             // dark blue text
-        border: '1px solid #002353',    // light blue border
-        fontSize: '13px',
-        padding: '10px',
-        textAlign: 'center',
-      }}
-    >
-      <p style={{ margin: '0 0 4px 0', color: '#002353', fontWeight:'bold' }}>{data.type}</p>
-      <p style={{ margin: '0 0 4px 0' }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
-      <p style={{ margin: '0 0 4px 0' }}>Click for details</p>
-    </div>
+        style={{
+          backgroundColor: '#fff',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          color: '#002353',
+          border: '1px solid #002353',
+          fontSize: '13px',
+          padding: '10px',
+          textAlign: 'center',
+        }}
+      >
+        <p style={{ margin: '0 0 4px 0', color: '#002353', fontWeight:'bold' }}>{data.type}</p>
+        <p style={{ margin: '0 0 4px 0' }}>{data.percentage.toFixed(1)}% ({data.count} objects)</p>
+        <p style={{ margin: '0 0 4px 0' }}>Click for details</p>
+      </div>
     )
   }
   return null
@@ -139,8 +126,20 @@ const CustomBarTooltip = ({ active, payload }: any) => {
 export default function ObjectTypePercentageBarChart({ risksData }: { risksData: Risk[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedData, setSelectedData] = useState<ChartData | null>(null)
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null)
 
-  const data = processRisksData(risksData)
+  // Filter risks based on date range
+  const filteredRisks = useMemo(() => {
+    if (!dateRange) return risksData
+    
+    const [start, end] = dateRange
+    return risksData.filter(risk => {
+      const riskDate = dayjs(risk.datetime)
+      return riskDate.isAfter(start) && riskDate.isBefore(end)
+    })
+  }, [risksData, dateRange])
+
+  const data = processRisksData(filteredRisks)
 
   const handleBarClick = (entry: any) => {
     const clickedData = data.find((item) => item.type === entry.type)
@@ -154,13 +153,11 @@ export default function ObjectTypePercentageBarChart({ risksData }: { risksData:
     setIsModalOpen(false)
   }
  
-const objectsList=data.map((el, i) => el.count )
-const max=Math.max(...objectsList)
-const transformedValue = max % 10 === 0 ? max + 10 : Math.ceil(max / 10) * 10;
-
-const total=objectsList.reduce((sum, num) => sum + num, 0);
-
-  
+  const objectsList = data.map((el) => el.count)
+  const max = Math.max(...objectsList)
+  const transformedValue = max % 10 === 0 ? max + 10 : Math.ceil(max / 10) * 10
+  const total = objectsList.reduce((sum, num) => sum + num, 0)
+console.log(data)
   return (
     <div style={{ width: "100%" }}>
       <div style={{
@@ -169,11 +166,15 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
         borderRadius: "0.5rem",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)"
       }}>
-        {/* <h3 style={{ fontSize: "1.125rem", fontWeight: "500", marginBottom: "1rem", textAlign: "center" }}>
-          Risk Distribution by Object Type
-        </h3> */}
+        <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
+          <DatePicker.RangePicker 
+            style={{ width: '100%', maxWidth: 400 }}
+            onChange={(dates) => setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs])}
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
+          />
+        </Space>
 
-        <div style={{ width: "100%", height: "450px" }}>
+        {data.length>0 ?<div style={{ width: "100%", height: "450px" }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
               data={data} 
@@ -181,7 +182,7 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
               barCategoryGap="20%"
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-             <XAxis 
+              <XAxis 
                 dataKey="type" 
                 angle={-45} 
                 textAnchor="end" 
@@ -189,17 +190,13 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
                 tick={{ fontSize: 12 }} 
                 label={{ 
                   value: 'Object Type', 
-                  // angle: -90, 
                   position: 'center',
                   style: { textAnchor: 'middle' },
-                  dy:30
+                  dy: 30
                 }} 
-                
               />
-             
               <YAxis 
-                domain={[0,transformedValue]}
-
+                domain={[0, transformedValue]}
                 label={{ 
                   value: 'Count', 
                   angle: -90, 
@@ -208,31 +205,28 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
                 }} 
               />
               <RechartsTooltip 
-              
-                content={<CustomBarTooltip  />} 
+                content={<CustomBarTooltip />} 
                 cursor={{ fill: "rgba(0, 0, 0, 0.05)" }} 
               />
-             <Legend
-  verticalAlign="top"
-  height={36}
-  payload={data.map((entry, index) => ({
-    value: entry.type,
-    type: 'rect',
-    id: entry.type,
-    color: COLORS[index % COLORS.length],
-  }))}
-  formatter={(value) => (
-    <span style={{
-      color: '#4b5563',
-      fontSize: '0.875rem',
-      fontWeight: 500
-    }}>
-      {value}
-    </span>
-  )}
-/>
-
-             
+              <Legend
+                verticalAlign="top"
+                height={36}
+                payload={data.map((entry, index) => ({
+                  value: entry.type,
+                  type: 'rect',
+                  id: entry.type,
+                  color: COLORS[index % COLORS.length],
+                }))}
+                formatter={(value) => (
+                  <span style={{
+                    color: '#4b5563',
+                    fontSize: '0.875rem',
+                    fontWeight: 500
+                  }}>
+                    {value}
+                  </span>
+                )}
+              />
               <Bar
                 dataKey="count"
                 name="Object Count"
@@ -250,7 +244,7 @@ const total=objectsList.reduce((sum, num) => sum + num, 0);
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </div>: <div style={{height: "200px", width: "100%",display: "flex",alignItems: "center",    justifyContent: "center"}} > <Empty/></div> }
       </div>
 
       <Modal title={`${selectedData?.type} Objects`} open={isModalOpen} onCancel={handleCancel} footer={null} width={600}>
